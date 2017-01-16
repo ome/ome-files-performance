@@ -36,9 +36,12 @@
 
 include(GNUInstallDirs)
 
-add_executable(read-performance read-performance.cpp)
-target_link_libraries(read-performance OME::Files Boost::boost)
+add_executable(metadata-performance metadata-performance.cpp result.cpp result.h)
+target_link_libraries(metadata-performance OME::Files Boost::boost Boost::chrono)
 
-install(TARGETS read-performance
+add_executable(pixels-performance pixels-performance.cpp result.cpp result.h)
+target_link_libraries(pixels-performance OME::Files Boost::boost Boost::chrono)
+
+install(TARGETS metadata-performance
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         COMPONENT "runtime")

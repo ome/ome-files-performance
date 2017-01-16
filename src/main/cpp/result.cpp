@@ -36,7 +36,35 @@
  * #L%
  */
 
-int main(int argc, char *argv[])
+#include "result.h"
+
+void
+result_header(std::ostream& os)
 {
-  return 0;
+  os << "test.lang\ttest.name\ttest.file\tsystem.time\tthread.time\tproc.real\tproc.user\tproc.system\n";
+}
+
+void
+result(std::ostream& os,
+       const std::string& testname,
+       const boost::filesystem::path& testfile,
+       const timepoint& start,
+       const timepoint& end)
+{
+  os << "C++"
+     << '\t'
+     << testname
+     << '\t'
+     << testfile.string()
+     << '\t'
+     << boost::chrono::duration_cast<boost::chrono::milliseconds>(end.system - start.system).count() // system time
+     << '\t'
+     << boost::chrono::duration_cast<boost::chrono::milliseconds>(end.thread - start.thread).count() // thread time
+     << '\t'
+     << boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().real // process real time
+     << '\t'
+     << boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().user // process user time
+     << '\t'
+     << boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().system // process system time
+     << '\t' << '\n';
 }
