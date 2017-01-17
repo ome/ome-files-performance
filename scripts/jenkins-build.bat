@@ -22,7 +22,7 @@ echo installdir=%installdir%
 echo artefactdir=%artefactdir%
 echo cachedir=%cachedir%
 
-set build_type=Debug
+set build_type=Release
 set build_arch=x64
 set build_version=14
 set build_system=MSBuild
