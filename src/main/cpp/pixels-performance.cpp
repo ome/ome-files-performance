@@ -78,6 +78,7 @@ int main(int argc, char *argv[])
           ome::compat::shared_ptr< ::ome::xml::meta::MetadataStore> store = ome::compat::dynamic_pointer_cast< ::ome::xml::meta::MetadataStore>(omexmlmeta);
           ome::compat::shared_ptr< ::ome::xml::meta::MetadataRetrieve> retrieve;
           boost::container::vector<boost::container::vector<ome::files::VariantPixelBuffer> > pixels;
+          boost::container::vector<bool> interleaved;
 
           timepoint read_start;
 
@@ -85,9 +86,9 @@ int main(int argc, char *argv[])
             ome::files::in::OMETIFFReader reader;
             reader.setMetadataStore(store);
             reader.setId(infile);
-            //            store = reader.getMetadataStore();
-
             pixels.resize(reader.getSeriesCount());
+            interleaved.resize(reader.getSeriesCount());
+
             for (ome::files::dimension_size_type series = 0;
                  series < reader.getSeriesCount();
                  ++series)
@@ -96,6 +97,7 @@ int main(int argc, char *argv[])
 
                 boost::container::vector<ome::files::VariantPixelBuffer>& planes = pixels.at(series);
                 planes.resize(reader.getImageCount(), ome::files::VariantPixelBuffer());
+                interleaved.at(series) = reader.isInterleaved();
                 for (ome::files::dimension_size_type plane = 0;
                      plane < reader.getImageCount();
                      ++plane)
@@ -123,13 +125,14 @@ int main(int argc, char *argv[])
           {
             ome::compat::shared_ptr<ome::files::FormatWriter> writer = ome::compat::make_shared<ome::files::out::OMETIFFWriter>();
             writer->setMetadataRetrieve(retrieve);
-            writer->setInterleaved(true);
+            writer->setInterleaved(interleaved.at(0));
             writer->setId(outfile);
 
             for (ome::files::dimension_size_type series = 0;
                  series < pixels.size();
                  ++series)
               {
+                writer->setInterleaved(interleaved.at(series));
                 writer->setSeries(series);
 
                 boost::container::vector<ome::files::VariantPixelBuffer>& planes = pixels.at(series);
