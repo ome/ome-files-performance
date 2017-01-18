@@ -28,6 +28,8 @@ set build_version=14
 set build_system=MSBuild
 set verbose=OFF
 
+set "OME_HOME=%OME_FILES_BUNDLE%"
+
 cd "%WORKSPACE%"
 if exist "build" (
     rmdir /s /q "build"
