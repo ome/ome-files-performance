@@ -66,4 +66,10 @@ cmake --build . || exit /b
 cmake --build . --target install || exit /b
 
 cd "%WORKSPACE%"
-install\bin\read-performance
+
+install\bin\metadata-performance 1 D:\data_performance\BBBC\NIRHTa-001.ome.tiff bbbc.ome.xml
+install\bin\metadata-performance 1 D:\data_performance\mitocheck\00001_01.ome.tiff mitocheck.ome.xml
+
+install\bin\pixels-performance 1 D:\data_performance\BBBC\NIRHTa-001.ome.tiff bbbc.ome.tiff
+install\bin\pixels-performance 1 D:\data_performance\mitocheck\00001_01.ome.tiff mitocheck.ome.tiff
+
