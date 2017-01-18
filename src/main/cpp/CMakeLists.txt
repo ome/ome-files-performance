@@ -54,6 +54,6 @@ target_link_libraries(pixels-performance
   Boost::disable_autolinking
   Boost::dynamic_linking)
 
-install(TARGETS metadata-performance
+install(TARGETS metadata-performance pixels-performance
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         COMPONENT "runtime")
