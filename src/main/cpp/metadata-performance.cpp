@@ -42,6 +42,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <ome/common/log.h>
+
 #include <ome/files/FormatException.h>
 #include <ome/files/MetadataTools.h>
 #include <ome/files/tiff/TIFF.h>
@@ -59,6 +61,8 @@ int main(int argc, char *argv[])
 
   try
     {
+      ome::common::setLogLevel(ome::logging::trivial::warning);
+
       int iterations = std::atoi(argv[1]);
       boost::filesystem::path infile(argv[2]);
       boost::filesystem::path outfile(argv[3]);
