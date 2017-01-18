@@ -53,9 +53,9 @@
 
 int main(int argc, char *argv[])
 {
-  if (argc != 4)
+  if (argc != 5)
     {
-      std::cerr << "Usage: " << argv[0] << " iterations inputfile outputfile\n";
+      std::cerr << "Usage: " << argv[0] << " iterations inputfile outputfile resultfile\n";
       std::exit(1);
     }
 
@@ -66,8 +66,11 @@ int main(int argc, char *argv[])
       int iterations = std::atoi(argv[1]);
       boost::filesystem::path infile(argv[2]);
       boost::filesystem::path outfile(argv[3]);
+      boost::filesystem::path resultfile(argv[4]);
 
-      result_header(std::cout);
+      std::ofstream results(resultfile.string().c_str());
+
+      result_header(results);
 
       for(int i = 0; i < iterations; ++i)
         {
@@ -75,6 +78,7 @@ int main(int argc, char *argv[])
 
           timepoint read_start;
 
+          std::cout << "pass " << i << ": read init...";
           if(infile.extension() == ".tiff")
             {
               // OME-TIFF file
@@ -101,24 +105,27 @@ int main(int argc, char *argv[])
               // XML file
               meta = ome::files::createOMEXMLMetadata(infile);
             }
+          std::cout << "done\n";
 
           timepoint read_end;
 
-          result(std::cout, "metadata.read", infile, read_start, read_end);
+          result(results, "metadata.read", infile, read_start, read_end);
 
           timepoint write_start;
 
           {
+            std::cout << "pass " << i << ": write init...";
             std::string xml = ome::files::getOMEXML(*meta, true);
             std::ofstream out(outfile.string().c_str());
             out << xml;
             out << std::flush;
             out.close();
+            std::cout << "done\n";
           }
 
           timepoint write_end;
 
-          result(std::cout, "metadata.write", infile, write_start, write_end);
+          result(results, "metadata.write", infile, write_start, write_end);
         }
       return 0;
     }

@@ -55,7 +55,7 @@ result(std::ostream& os,
      << '\t'
      << testname
      << '\t'
-     << testfile.string()
+     << testfile.filename().string()
      << '\t'
      << boost::chrono::duration_cast<boost::chrono::milliseconds>(end.system - start.system).count() // system time
      << '\t'
