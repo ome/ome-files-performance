@@ -41,7 +41,7 @@
 void
 result_header(std::ostream& os)
 {
-  os << "test.lang\ttest.name\ttest.file\tsystem.time\tthread.time\tproc.real\tproc.user\tproc.system\n";
+  os << "test.lang\ttest.name\ttest.file\tproc.real\tproc.user\tproc.system\n";
 }
 
 void
@@ -56,10 +56,6 @@ result(std::ostream& os,
      << testname
      << '\t'
      << testfile.filename().string()
-     << '\t'
-     << boost::chrono::duration_cast<boost::chrono::milliseconds>(end.system - start.system).count() // system time
-     << '\t'
-     << boost::chrono::duration_cast<boost::chrono::milliseconds>(end.thread - start.thread).count() // thread time
      << '\t'
      << boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().real // process real time
      << '\t'
