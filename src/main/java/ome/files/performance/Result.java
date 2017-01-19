@@ -44,7 +44,7 @@ class Result {
   Result(Path filename) throws java.io.IOException {
     writer = new FileWriter(filename.toString());
     output = new PrintWriter(writer);
-    output.println("test.lang\ttest.name\ttest.file\tproc.real\tproc.user\tproc.system");
+    output.println("test.lang\ttest.name\ttest.file\treal\tproc.cpu\tproc.user\tproc.system");
   }
 
   void add(String testname,
@@ -54,6 +54,7 @@ class Result {
     output.println("Java\t" + testname + "\t" +
                    testfile.getFileName().toString() + "\t" +
                    (end.real-start.real)/1000000 + "\t" +
+                   (end.cpu-start.cpu)/1000000 + "\t" +
                    (end.user-start.user)/1000000 + "\t" +
                    (end.system-start.system)/1000000);
 
