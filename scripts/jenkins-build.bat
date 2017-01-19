@@ -22,11 +22,13 @@ echo installdir=%installdir%
 echo artefactdir=%artefactdir%
 echo cachedir=%cachedir%
 
-set build_type=Debug
+set build_type=Release
 set build_arch=x64
 set build_version=14
 set build_system=MSBuild
 set verbose=OFF
+
+set "OME_HOME=%OME_FILES_BUNDLE%"
 
 cd "%WORKSPACE%"
 if exist "build" (
@@ -37,6 +39,7 @@ if exist "install" (
 )
 mkdir build
 mkdir install
+mkdir results
 cd build
 
 set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%PATH%"
@@ -66,4 +69,10 @@ cmake --build . || exit /b
 cmake --build . --target install || exit /b
 
 cd "%WORKSPACE%"
-install\bin\read-performance
+
+install\bin\metadata-performance 1 D:\data_performance\BBBC\NIRHTa-001.ome.tiff bbbc.ome.xml results/bbbc-metadata-win.tsv
+install\bin\metadata-performance 1 D:\data_performance\mitocheck\00001_01.ome.tiff mitocheck.ome.xml results/mitocheck-metadata-win.tsv
+
+install\bin\pixels-performance 1 D:\data_performance\BBBC\NIRHTa-001.ome.tiff bbbc.ome.tiff results/bbbc-pixeldata-win.tsv
+install\bin\pixels-performance 1 D:\data_performance\mitocheck\00001_01.ome.tiff mitocheck.ome.tiff results/mitocheck-pixeldata-win.tsv
+
