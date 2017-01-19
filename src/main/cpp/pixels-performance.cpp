@@ -182,7 +182,6 @@ int main(int argc, char *argv[])
                 std::cout << " done\n" << std::flush;
               }
 
-          timepoint write_end;
             writer->close();
           }
 
