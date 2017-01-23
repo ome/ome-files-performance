@@ -73,8 +73,7 @@ cd "%WORKSPACE%"
 cd source
 call mvn clean install
 
-
-set "DATA_DIR=D:\performance"
+set "DATA_DIR=D:\data_performance"
 
 REM Run Java metadata performance tests
 
