@@ -126,7 +126,7 @@ public final class PixelsPerformance {
         result.add("pixeldata.read.init", infile, read_start, read_init);
         result.add("pixeldata.read.pixels", infile, read_init, read_end);
 
-        Files.delete(outfile);
+        Files.deleteIfExists(outfile);
 
         Timepoint write_start = new Timepoint();
         Timepoint write_init = null;
