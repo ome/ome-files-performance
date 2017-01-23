@@ -77,7 +77,13 @@ call mvn clean install
 REM Execute Java performance tests
 call mvn -P metadata -Dtest.iterations=1 -Dtest.input=D:\data_performance\BBBC\NIRHTa-001.ome.tiff -Dtest.output=bbbc.ome.xml -Dtest.results=%WORKSPACE%\results\bbbc-metadata-win-java.tsv exec:java
 
+call mvn -P metadata -Dtest.iterations=1 -Dtest.input=D:\data_performance\mitocheck\00001_01.ome.tiff -Dtest.output=mitocheck.ome.xml -Dtest.results=%WORKSPACE%\results\bbbc-mitocheck-win-java.tsv exec:java
 
+call mvn -P pixels -Dtest.iterations=1 -Dtest.input=D:\data_performance\BBBC\NIRHTa-001.ome.tiff -Dtest.output=bbbc.ome.tiff -Dtest.results=%WORKSPACE%\results\bbbc-pixeldata-win.tsv exec:java
+
+call mvn -P pixels -Dtest.iterations=1 -Dtest.input=D:\data_performance\mitocheck\00001_01.ome.tiff -Dtest.output=mitocheck.ome.tiff -Dtest.results=%WORKSPACE%\results\mitocheck-pixeldata-win.tsv exec:java
+
+REM Execute C++ performance tests
 cd "%WORKSPACE%"
 
 install\bin\metadata-performance 1 D:\data_performance\BBBC\NIRHTa-001.ome.tiff bbbc.ome.xml results/bbbc-metadata-win.tsv
