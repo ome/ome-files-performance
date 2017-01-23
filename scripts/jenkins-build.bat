@@ -42,7 +42,7 @@ mkdir install
 mkdir results
 cd build
 
-set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%PATH%"
+set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%MAVEN_PATH%\bin;%PATH%"
 
 if [%build_version%] == [11] (
     call "%VS110COMNTOOLS%..\..\VC\vcvarsall.bat" %build_arch%
@@ -67,6 +67,15 @@ cmake -G "Ninja" ^
 
 cmake --build . || exit /b
 cmake --build . --target install || exit /b
+
+
+REM Build Java
+cd source
+mvn install
+
+REM Execute Java performance tests
+mvn -P metadata -Dtest.iterations=1 -Dtest.input=D:\data_performance\BBBC\NIRHTa-001.ome.tiff -Dtest.output=bbbc.ome.xml -Dtest.results=%WORKSPACE%\results\bbbc-metadata-win-java.tsv exec:java
+
 
 cd "%WORKSPACE%"
 
