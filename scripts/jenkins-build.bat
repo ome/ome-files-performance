@@ -70,6 +70,7 @@ cmake --build . --target install || exit /b
 
 
 REM Build Java
+cd "%WORKSPACE%"
 cd source
 mvn install
 
