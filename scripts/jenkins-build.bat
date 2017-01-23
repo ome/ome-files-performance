@@ -72,7 +72,7 @@ cmake --build . --target install || exit /b
 REM Build Java
 cd "%WORKSPACE%"
 cd source
-mvn install
+mvn clean install || exit /b
 
 REM Execute Java performance tests
 mvn -P metadata -Dtest.iterations=1 -Dtest.input=D:\data_performance\BBBC\NIRHTa-001.ome.tiff -Dtest.output=bbbc.ome.xml -Dtest.results=%WORKSPACE%\results\bbbc-metadata-win-java.tsv exec:java
