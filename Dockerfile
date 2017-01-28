@@ -40,6 +40,12 @@ RUN cmake -DCMAKE_INSTALL_PREFIX:PATH=/install \
 RUN cmake --build .
 RUN cmake --build . --target install
 
-WORKDIR /
+WORKDIR /git/ome-files-performance
+RUN apt-get update && apt-get -y install \
+  default-jdk \
+  maven
+RUN mvn clean install
 
+WORKDIR /
 CMD ["/bin/bash"]
+
