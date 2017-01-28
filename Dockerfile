@@ -46,6 +46,4 @@ RUN apt-get update && apt-get -y install \
   maven
 RUN mvn clean install
 
-WORKDIR /
 CMD ["/bin/bash"]
-
