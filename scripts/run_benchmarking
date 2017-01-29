@@ -1,3 +1,5 @@
+#! /bin/sh
+
 # Clean results folder
 mkdir -p /data/results
 rm /data/results/*
