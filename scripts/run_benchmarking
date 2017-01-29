@@ -5,10 +5,10 @@ mkdir -p /data/results
 rm /data/results/*
 
 # Java tests
-mvn -P metadata -Dtest.iterations=1 -Dtest.input=/data/BBC/NIRHTa-001.ome.tiff -Dtest.output=bbbc.ome.xml -Dtest.results=/data/results/bbbc-metadata-java.tsv exec:java
+mvn -P metadata -Dtest.iterations=1 -Dtest.input=/data/BBBC/NIRHTa-001.ome.tiff -Dtest.output=bbbc.ome.xml -Dtest.results=/data/results/bbbc-metadata-java.tsv exec:java
 mvn -P metadata -Dtest.iterations=1 -Dtest.input=/data/mitocheck/00001_01.ome.tiff -Dtest.output=mitocheck.ome.xml -Dtest.results=/data/results/mitocheck-metadata-java.tsv exec:java
 
-mvn -P pixels -Dtest.iterations=1 -Dtest.input=/data/BBC/NIRHTa-001.ome.tiff -Dtest.output=bbbc.ome.tiff -Dtest.results=/data/results/bbbc-pixels-java.tsv exec:java
+mvn -P pixels -Dtest.iterations=1 -Dtest.input=/data/BBBC/NIRHTa-001.ome.tiff -Dtest.output=bbbc.ome.tiff -Dtest.results=/data/results/bbbc-pixels-java.tsv exec:java
 mvn -P pixels -Dtest.iterations=1 -Dtest.input=/data/mitocheck/00001_01.ome.tiff -Dtest.output=mitocheck.ome.tiff -Dtest.results=/data/results/mitocheck-pixels-java.tsv exec:java
 
 # C++ tests
