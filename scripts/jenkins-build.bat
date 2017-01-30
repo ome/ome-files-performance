@@ -29,6 +29,7 @@ set build_system=MSBuild
 set verbose=OFF
 
 set "OME_HOME=%OME_FILES_BUNDLE%"
+set "DATA_DIR=D:\data_performance"
 
 cd "%WORKSPACE%"
 if exist "build" (
@@ -72,8 +73,6 @@ REM Build Java
 cd "%WORKSPACE%"
 cd source
 call mvn clean install || exit /b
-
-set "DATA_DIR=D:\data_performance"
 
 REM Run Java metadata performance tests
 
