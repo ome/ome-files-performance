@@ -29,6 +29,7 @@ set build_system=MSBuild
 set verbose=OFF
 
 set "OME_HOME=%OME_FILES_BUNDLE%"
+set "DATA_DIR=D:\data_performance"
 
 cd "%WORKSPACE%"
 if exist "build" (
@@ -42,7 +43,7 @@ mkdir install
 mkdir results
 cd build
 
-set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%PATH%"
+set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%MAVEN_PATH%\bin;%PATH%"
 
 if [%build_version%] == [11] (
     call "%VS110COMNTOOLS%..\..\VC\vcvarsall.bat" %build_arch%
@@ -68,11 +69,30 @@ cmake -G "Ninja" ^
 cmake --build . || exit /b
 cmake --build . --target install || exit /b
 
+REM Build Java
+cd "%WORKSPACE%"
+cd source
+call mvn clean install || exit /b
+
+REM Run Java metadata performance tests
+
+call mvn -P metadata -Dtest.iterations=10 -Dtest.input=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff -Dtest.output=bbbc.ome.xml -Dtest.results=%WORKSPACE%\results\bbbc-metadata-win-java.tsv exec:java
+call mvn -P metadata -Dtest.iterations=10 -Dtest.input=%DATA_DIR%\mitocheck\00001_01.ome.tiff -Dtest.output=mitocheck.ome.xml -Dtest.results=%WORKSPACE%\results\bbbc-mitocheck-win-java.tsv exec:java
+
+REM Run Java pixels performance tests
+
+call mvn -P pixels -Dtest.iterations=5 -Dtest.input=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff -Dtest.output=bbbc.ome.tiff -Dtest.results=%WORKSPACE%\results\bbbc-pixeldata-win-java.tsv exec:java
+call mvn -P pixels -Dtest.iterations=5 -Dtest.input=%DATA_DIR%\mitocheck\00001_01.ome.tiff -Dtest.output=mitocheck.ome.tiff -Dtest.results=%WORKSPACE%\results\mitocheck-pixeldata-win-java.tsv exec:java
+
+REM Execute C++ performance tests
 cd "%WORKSPACE%"
 
-install\bin\metadata-performance 1 D:\data_performance\BBBC\NIRHTa-001.ome.tiff bbbc.ome.xml results/bbbc-metadata-win.tsv
-install\bin\metadata-performance 1 D:\data_performance\mitocheck\00001_01.ome.tiff mitocheck.ome.xml results/mitocheck-metadata-win.tsv
+REM Run C++ metadata tests
 
-install\bin\pixels-performance 1 D:\data_performance\BBBC\NIRHTa-001.ome.tiff bbbc.ome.tiff results/bbbc-pixeldata-win.tsv
-install\bin\pixels-performance 1 D:\data_performance\mitocheck\00001_01.ome.tiff mitocheck.ome.tiff results/mitocheck-pixeldata-win.tsv
+install\bin\metadata-performance 10 %DATA_DIR%\BBBC\NIRHTa-001.ome.tiff bbbc.ome.xml results/bbbc-metadata-win-cpp.tsv
+install\bin\metadata-performance 10 %DATA_DIR%\mitocheck\00001_01.ome.tiff mitocheck.ome.xml results/mitocheck-metadata-win-cpp.tsv
+
+REM Run C++ pixels performance tests
+install\bin\pixels-performance 5 %DATA_DIR%\BBBC\NIRHTa-001.ome.tiff bbbc.ome.tiff results/bbbc-pixeldata-win-cpp.tsv
+install\bin\pixels-performance 5 %DATA_DIR%\mitocheck\00001_01.ome.tiff mitocheck.ome.tiff results/mitocheck-pixeldata-win-cpp.tsv
 
