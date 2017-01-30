@@ -71,7 +71,7 @@ cmake --build . --target install || exit /b
 REM Build Java
 cd "%WORKSPACE%"
 cd source
-call mvn clean install
+call mvn clean install || exit /b
 
 set "DATA_DIR=D:\data_performance"
 
