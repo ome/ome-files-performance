@@ -36,6 +36,8 @@
  * #L%
  */
 
+#pragma once
+
 #include <boost/chrono/process_cpu_clocks.hpp>
 #include <boost/chrono/system_clocks.hpp>
 #include <boost/chrono/thread_clock.hpp>
@@ -88,3 +90,9 @@ result(std::ostream& os,
        const boost::filesystem::path& testfile,
        const timepoint& start,
        const timepoint& end);
+
+/*
+ * Local Variables:
+ * mode:C++
+ * End:
+ */

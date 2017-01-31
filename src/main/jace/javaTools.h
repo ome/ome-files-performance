@@ -38,6 +38,8 @@ As such, if you wish to distribute this software with Bio-Formats itself,
 your combined work must be distributed under the terms of the GPL.
 */
 
+#pragma once
+
 #include <string>
 #include <vector>
 #include <iostream>
@@ -115,3 +117,9 @@ class MYAPI_API JavaTools
      */
     static void createJVM(string jarFolder, bool headless, int memory, vector<string> extraClasspath, vector<string> extraJavaLibraryPath, vector<string> extraOptions);
 };
+
+/*
+ * Local Variables:
+ * mode:C++
+ * End:
+ */
