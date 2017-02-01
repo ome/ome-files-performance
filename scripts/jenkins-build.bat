@@ -81,8 +81,8 @@ call mvn -P metadata -Dtest.iterations=10 -Dtest.input=%DATA_DIR%\mitocheck\0000
 
 REM Run Java pixels performance tests
 
-call mvn -P pixels -Dtest.iterations=5 -Dtest.input=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff -Dtest.output=bbbc.ome.tiff -Dtest.results=%WORKSPACE%\results\bbbc-pixeldata-win-java.tsv exec:java
-call mvn -P pixels -Dtest.iterations=5 -Dtest.input=%DATA_DIR%\mitocheck\00001_01.ome.tiff -Dtest.output=mitocheck.ome.tiff -Dtest.results=%WORKSPACE%\results\mitocheck-pixeldata-win-java.tsv exec:java
+call mvn -P pixels -Dtest.iterations=1 -Dtest.input=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff -Dtest.output=bbbc.ome.tiff -Dtest.results=%WORKSPACE%\results\bbbc-pixeldata-win-java.tsv exec:java
+call mvn -P pixels -Dtest.iterations=1 -Dtest.input=%DATA_DIR%\mitocheck\00001_01.ome.tiff -Dtest.output=mitocheck.ome.tiff -Dtest.results=%WORKSPACE%\results\mitocheck-pixeldata-win-java.tsv exec:java
 
 REM Execute C++ performance tests
 cd "%WORKSPACE%"
@@ -93,6 +93,6 @@ install\bin\metadata-performance 10 %DATA_DIR%\BBBC\NIRHTa-001.ome.tiff bbbc.ome
 install\bin\metadata-performance 10 %DATA_DIR%\mitocheck\00001_01.ome.tiff mitocheck.ome.xml results/mitocheck-metadata-win-cpp.tsv
 
 REM Run C++ pixels performance tests
-install\bin\pixels-performance 5 %DATA_DIR%\BBBC\NIRHTa-001.ome.tiff bbbc.ome.tiff results/bbbc-pixeldata-win-cpp.tsv
-install\bin\pixels-performance 5 %DATA_DIR%\mitocheck\00001_01.ome.tiff mitocheck.ome.tiff results/mitocheck-pixeldata-win-cpp.tsv
+install\bin\pixels-performance 1 %DATA_DIR%\BBBC\NIRHTa-001.ome.tiff bbbc.ome.tiff results/bbbc-pixeldata-win-cpp.tsv
+install\bin\pixels-performance 1 %DATA_DIR%\mitocheck\00001_01.ome.tiff mitocheck.ome.tiff results/mitocheck-pixeldata-win-cpp.tsv
 
