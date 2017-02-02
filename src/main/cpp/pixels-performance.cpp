@@ -133,6 +133,7 @@ int main(int argc, char *argv[])
 
           timepoint write_start;
           timepoint write_init;
+          timepoint close_start;
 
           {
             std::cout << "pass " << i << ": write init..." << std::flush;
@@ -181,7 +182,7 @@ int main(int argc, char *argv[])
                   }
                 std::cout << " done\n" << std::flush;
               }
-
+            close_start = timepoint();
             writer->close();
           }
 
@@ -189,7 +190,8 @@ int main(int argc, char *argv[])
 
           result(results, "pixeldata.write", infile, write_start, write_end);
           result(results, "pixeldata.write.init", infile, write_start, write_init);
-          result(results, "pixeldata.write.pixels", infile, write_init, write_end);
+          result(results, "pixeldata.write.pixels", infile, write_init, close_start);
+          result(results, "pixeldata.write.close", infile, close_start, write_end);
 
         }
       return 0;
