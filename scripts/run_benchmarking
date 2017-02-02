@@ -2,18 +2,20 @@
 
 # Clean results folder
 mkdir -p /data/results
+mkdir -p /data/out
 rm /data/results/*
+rm /data/out/*
 
 # Java tests
-mvn -P metadata -Dtest.iterations=10 -Dtest.input=/data/BBBC/NIRHTa-001.ome.tiff -Dtest.output=bbbc.ome.xml -Dtest.results=/data/results/bbbc-metadata-java.tsv exec:java
-mvn -P metadata -Dtest.iterations=10 -Dtest.input=/data/mitocheck/00001_01.ome.tiff -Dtest.output=mitocheck.ome.xml -Dtest.results=/data/results/mitocheck-metadata-java.tsv exec:java
+mvn -P metadata -Dtest.iterations=10 -Dtest.input=/data/BBBC/NIRHTa-001.ome.tiff -Dtest.output=/data/out/bbbc-java.ome.xml -Dtest.results=/data/results/bbbc-metadata-java.tsv exec:java
+mvn -P metadata -Dtest.iterations=10 -Dtest.input=/data/mitocheck/00001_01.ome.tiff -Dtest.output=/data/out/mitocheck-java.ome.xml -Dtest.results=/data/results/mitocheck-metadata-java.tsv exec:java
 
-mvn -P pixels -Dtest.iterations=5 -Dtest.input=/data/BBBC/NIRHTa-001.ome.tiff -Dtest.output=bbbc.ome.tiff -Dtest.results=/data/results/bbbc-pixeldata-java.tsv exec:java
-mvn -P pixels -Dtest.iterations=5 -Dtest.input=/data/mitocheck/00001_01.ome.tiff -Dtest.output=mitocheck.ome.tiff -Dtest.results=/data/results/mitocheck-pixeldata-java.tsv exec:java
+mvn -P pixels -Dtest.iterations=3 -Dtest.input=/data/BBBC/NIRHTa-001.ome.tiff -Dtest.output=/data/out/bbbc-java.ome.tiff -Dtest.results=/data/results/bbbc-pixeldata-java.tsv exec:java
+mvn -P pixels -Dtest.iterations=3 -Dtest.input=/data/mitocheck/00001_01.ome.tiff -Dtest.output=/data/out/mitocheck-java.ome.tiff -Dtest.results=/data/results/mitocheck-pixeldata-java.tsv exec:java
 
 # C++ tests
-/install/bin/metadata-performance 10 /data/BBBC/NIRHTa-001.ome.tiff bbbc.ome.xml /data/results/bbbc-metadata-cpp.tsv
-/install/bin/metadata-performance 10 /data/mitocheck/00001_01.ome.tiff mitocheck.ome.xml /data/results/mitocheck-metadata-cpp.tsv
+/install/bin/metadata-performance 10 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-cpp.ome.xml /data/results/bbbc-metadata-cpp.tsv
+/install/bin/metadata-performance 10 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-cpp.ome.xml /data/results/mitocheck-metadata-cpp.tsv
 
-/install/bin/pixels-performance 5 /data/BBBC/NIRHTa-001.ome.tiff bbbc.ome.tiff /data/results/bbbc-pixeldata-cpp.tsv
-/install/bin/pixels-performance 5 /data/mitocheck/00001_01.ome.tiff mitocheck.ome.tiff /data/results/mitocheck-pixeldata-cpp.tsv
+/install/bin/pixels-performance 3 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-cpp.ome.tiff /data/results/bbbc-pixeldata-cpp.tsv
+/install/bin/pixels-performance 3 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-cpp.ome.tiff /data/results/mitocheck-pixeldata-cpp.tsv
