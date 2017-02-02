@@ -77,7 +77,7 @@ call mvn clean install || exit /b
 REM Run Java metadata performance tests
 
 call mvn -P metadata -Dtest.iterations=10 -Dtest.input=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff -Dtest.output=bbbc-java.ome.xml -Dtest.results=%WORKSPACE%\results\bbbc-metadata-win-java.tsv exec:java
-call mvn -P metadata -Dtest.iterations=10 -Dtest.input=%DATA_DIR%\mitocheck\00001_01.ome.tiff -Dtest.output=mitocheck-java.ome.xml -Dtest.results=%WORKSPACE%\results\mitocheck-win-java.tsv exec:java
+call mvn -P metadata -Dtest.iterations=10 -Dtest.input=%DATA_DIR%\mitocheck\00001_01.ome.tiff -Dtest.output=mitocheck-java.ome.xml -Dtest.results=%WORKSPACE%\results\mitocheck-metadata-win-java.tsv exec:java
 
 REM Run Java pixels performance tests
 
