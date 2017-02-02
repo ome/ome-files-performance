@@ -130,6 +130,7 @@ public final class PixelsPerformance {
 
         Timepoint write_start = new Timepoint();
         Timepoint write_init = null;
+        Timepoint close_start = null;
 
           {
             System.out.print("pass " + i + ": write init...");
@@ -163,6 +164,7 @@ public final class PixelsPerformance {
                 System.out.println("done");
                 System.out.flush();
               }
+            close_start = new Timepoint();
             writer.close();
           }
 
@@ -170,7 +172,8 @@ public final class PixelsPerformance {
 
           result.add("pixeldata.write", infile, write_start, write_end);
           result.add("pixeldata.write.init", infile, write_start, write_init);
-          result.add("pixeldata.write.pixels", infile, write_init, write_end);
+          result.add("pixeldata.write.pixels", infile, write_init, close_start);
+          result.add("pixeldata.write.close", infile, close_start, write_end);
       }
 
       result.close();
