@@ -20,4 +20,4 @@ RUN cmake --build . --target install
 WORKDIR /git/ome-files-performance
 RUN mvn clean install
 
-CMD ["/bin/bash"]
+ENTRYPOINT ["/bin/bash", "/git/ome-files-performance/scripts/run_benchmarking"]
