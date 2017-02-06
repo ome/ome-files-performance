@@ -44,7 +44,7 @@ mkdir install
 mkdir results
 
 cd %WORKSPACE%\bio-formats-jace
-mvn -DskipTests clean package cppwrap:wrap dependency:copy-dependencies
+call mvn -DskipTests clean package cppwrap:wrap dependency:copy-dependencies
 mkdir build
 cd build
 cmake -G "Ninja" ^
