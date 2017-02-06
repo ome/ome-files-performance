@@ -65,6 +65,9 @@ mkdir results
 
 cd %WORKSPACE%\bio-formats-jace
 call mvn -DskipTests clean package cppwrap:wrap dependency:copy-dependencies
+REM Correct broken and outdated Boost checks
+copy %WORKSPACE%\source\cmake/JACEPrerequisites.cmake target\cppwrap\jace\Prerequisites.cmake
+
 mkdir %WORKSPACE%\bio-formats-jace-build
 cd %WORKSPACE%\bio-formats-jace-build
 cmake -G "Ninja" ^
