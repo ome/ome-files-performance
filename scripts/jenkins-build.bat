@@ -30,7 +30,7 @@ set verbose=OFF
 
 set "OME_HOME=%OME_FILES_BUNDLE%"
 set "DATA_DIR=D:\data_performance"
-set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%MAVEN_PATH%\bin;%PATH%"
+set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%MAVEN_PATH%\bin;%JAVA_HOME%\bin;%PATH%"
 
 cd "%WORKSPACE%"
 if exist "build" (
