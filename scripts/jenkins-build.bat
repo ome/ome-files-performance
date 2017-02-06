@@ -42,8 +42,8 @@ if exist "install" (
 if exist "results" (
     rmdir /s /q "results"
 )
-if exist "bio-formats-jace\build" (
-    rmdir /s /q "bio-formats-jace\build"
+if exist "bio-formats-jace-build" (
+    rmdir /s /q "bio-formats-jace-build"
 )
 mkdir build
 mkdir install
@@ -51,8 +51,8 @@ mkdir results
 
 cd %WORKSPACE%\bio-formats-jace
 call mvn -DskipTests clean package cppwrap:wrap dependency:copy-dependencies
-mkdir build
-cd build
+mkdir %WORKSPACE%\bio-formats-jace-build
+cd %WORKSPACE%\bio-formats-jace-build
 cmake -G "Ninja" ^
   -DCMAKE_VERBOSE_MAKEFILE:BOOL=%verbose% ^
   -DCMAKE_BUILD_TYPE=%build_type% ^
@@ -60,11 +60,11 @@ cmake -G "Ninja" ^
   -DCMAKE_PROGRAM_PATH=%OME_FILES_BUNDLE%\bin ^
   -DCMAKE_LIBRARY_PATH=%OME_FILES_BUNDLE%\lib ^
   -DBOOST_ROOT=%OME_FILES_BUNDLE% ^
-  ..\target\cppwrap ^
+  %WORKSPACE%\bio-formats-jace\target\cppwrap ^
   || exit /b
 cmake --build . || exit /b
 
-set "PATH=%WORKSPACE%\bio-formats-jace\build\dist\bio-formats-jace;%PATH%"
+set "PATH=%WORKSPACE%\bio-formats-jace-build\dist\bio-formats-jace;%PATH%"
 
 cd %WORKSPACE%\build
 
@@ -82,7 +82,7 @@ cmake -G "Ninja" ^
   -DCMAKE_VERBOSE_MAKEFILE:BOOL=%verbose% ^
   -DCMAKE_INSTALL_PREFIX:PATH=%installdir% ^
   -DCMAKE_BUILD_TYPE=%build_type% ^
-  -DCMAKE_PREFIX_PATH=%OME_FILES_BUNDLE%;%WORKSPACE%\bio-formats-jace\build\dist\bio-formats-jace ^
+  -DCMAKE_PREFIX_PATH=%OME_FILES_BUNDLE%;%WORKSPACE%\bio-formats-jace-build\dist\bio-formats-jace ^
   -DCMAKE_PROGRAM_PATH=%OME_FILES_BUNDLE%\bin ^
   -DCMAKE_LIBRARY_PATH=%OME_FILES_BUNDLE%\lib ^
   -DBOOST_ROOT=%OME_FILES_BUNDLE% ^
