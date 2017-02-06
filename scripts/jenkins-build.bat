@@ -90,6 +90,7 @@ cmake -G "Ninja" ^
   -DCMAKE_PROGRAM_PATH=%OME_FILES_BUNDLE%\bin ^
   -DCMAKE_LIBRARY_PATH=%OME_FILES_BUNDLE%\lib ^
   -DBOOST_ROOT=%OME_FILES_BUNDLE% ^
+  -DBoost_ADDITIONAL_VERSIONS=1.62 ^
   %sourcedir% ^
   || exit /b
 
