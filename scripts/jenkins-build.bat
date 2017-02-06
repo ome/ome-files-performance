@@ -32,6 +32,16 @@ set "OME_HOME=%OME_FILES_BUNDLE%"
 set "DATA_DIR=D:\data_performance"
 set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%MAVEN_PATH%\bin;%JAVA_HOME%\bin;%PATH%"
 
+if [%build_version%] == [11] (
+    call "%VS110COMNTOOLS%..\..\VC\vcvarsall.bat" %build_arch%
+)
+if [%build_version%] == [12] (
+    call "%VS120COMNTOOLS%..\..\VC\vcvarsall.bat" %build_arch%
+)
+if [%build_version%] == [14] (
+    call "%VS140COMNTOOLS%..\..\VC\vcvarsall.bat" %build_arch%
+)
+
 cd "%WORKSPACE%"
 if exist "build" (
     rmdir /s /q "build"
@@ -67,16 +77,6 @@ cmake --build . || exit /b
 set "PATH=%WORKSPACE%\bio-formats-jace-build\dist\bio-formats-jace;%PATH%"
 
 cd %WORKSPACE%\build
-
-if [%build_version%] == [11] (
-    call "%VS110COMNTOOLS%..\..\VC\vcvarsall.bat" %build_arch%
-)
-if [%build_version%] == [12] (
-    call "%VS120COMNTOOLS%..\..\VC\vcvarsall.bat" %build_arch%
-)
-if [%build_version%] == [14] (
-    call "%VS140COMNTOOLS%..\..\VC\vcvarsall.bat" %build_arch%
-)
 
 cmake -G "Ninja" ^
   -DCMAKE_VERBOSE_MAKEFILE:BOOL=%verbose% ^
