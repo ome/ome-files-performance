@@ -57,10 +57,14 @@ typedef boost::chrono::duration<boost::chrono::process_times<boost::chrono::mill
  */
 struct timepoint
 {
-  timepoint():
+timepoint():
+  system(boost::chrono::high_resolution_clock::now()),
+    thread(boost::chrono::thread_clock::now()),
     process(boost::chrono::process_cpu_clock::now())
   {}
 
+  boost::chrono::high_resolution_clock::time_point system;
+  boost::chrono::thread_clock::time_point thread;
   boost::chrono::process_cpu_clock::time_point process;
 };
 

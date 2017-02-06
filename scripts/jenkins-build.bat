@@ -30,20 +30,11 @@ set verbose=OFF
 
 set "OME_HOME=%OME_FILES_BUNDLE%"
 set "DATA_DIR=D:\data_performance"
+set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%MAVEN_PATH%\bin;%JAVA_HOME%\bin;%PATH%"
 
-cd "%WORKSPACE%"
-if exist "build" (
-    rmdir /s /q "build"
-)
-if exist "install" (
-    rmdir /s /q "install"
-)
-mkdir build
-mkdir install
-mkdir results
-cd build
-
-set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%MAVEN_PATH%\bin;%PATH%"
+echo "OME-Files Bundle: %OME_FILES_BUNDLE%"
+java -version
+javac -version
 
 if [%build_version%] == [11] (
     call "%VS110COMNTOOLS%..\..\VC\vcvarsall.bat" %build_arch%
@@ -55,11 +46,52 @@ if [%build_version%] == [14] (
     call "%VS140COMNTOOLS%..\..\VC\vcvarsall.bat" %build_arch%
 )
 
+cd "%WORKSPACE%"
+if exist "build" (
+    rmdir /s /q "build"
+)
+if exist "install" (
+    rmdir /s /q "install"
+)
+if exist "results" (
+    rmdir /s /q "results"
+)
+REM if exist "bio-formats-jace-build" (
+REM    rmdir /s /q "bio-formats-jace-build"
+REM )
+mkdir build
+mkdir install
+mkdir results
+
+REM cd %WORKSPACE%\bio-formats-jace
+REM call mvn -DskipTests clean package cppwrap:wrap dependency:copy-dependencies
+REM Correct broken and outdated Boost checks
+REM copy %WORKSPACE%\source\cmake\JACEPrerequisites.cmake target\cppwrap\jace\Prerequisites.cmake || exit /b
+
+REM mkdir %WORKSPACE%\bio-formats-jace-build
+REM cd %WORKSPACE%\bio-formats-jace-build
+REM cmake -G "Visual Studio 14 2015 Win64" ^
+REM   -DCMAKE_VERBOSE_MAKEFILE:BOOL=%verbose% ^
+REM   -DCMAKE_BUILD_TYPE=%build_type% ^
+REM   -DCMAKE_PREFIX_PATH=%OME_FILES_BUNDLE% ^
+REM   -DCMAKE_PROGRAM_PATH=%OME_FILES_BUNDLE%\bin ^
+REM   -DCMAKE_LIBRARY_PATH=%OME_FILES_BUNDLE%\lib ^
+REM   -DJ2L_WIN_BUILD_DEBUG=OFF ^
+REM   -DBOOST_ROOT=%OME_FILES_BUNDLE% ^
+REM   "-DBoost_ADDITIONAL_VERSIONS=1.62;1.62.0;1.63;1.63.0" ^
+REM   %WORKSPACE%\bio-formats-jace\target\cppwrap ^
+REM   || exit /b
+REM cmake --build . || exit /b
+REM
+REM set "PATH=%WORKSPACE%\bio-formats-jace-build\dist\bio-formats-jace;%PATH%"
+
+cd %WORKSPACE%\build
+
 cmake -G "Ninja" ^
   -DCMAKE_VERBOSE_MAKEFILE:BOOL=%verbose% ^
   -DCMAKE_INSTALL_PREFIX:PATH=%installdir% ^
   -DCMAKE_BUILD_TYPE=%build_type% ^
-  -DCMAKE_PREFIX_PATH=%OME_FILES_BUNDLE% ^
+  "-DCMAKE_PREFIX_PATH=%OME_FILES_BUNDLE%;%WORKSPACE%\bio-formats-jace-build\dist\bio-formats-jace" ^
   -DCMAKE_PROGRAM_PATH=%OME_FILES_BUNDLE%\bin ^
   -DCMAKE_LIBRARY_PATH=%OME_FILES_BUNDLE%\lib ^
   -DBOOST_ROOT=%OME_FILES_BUNDLE% ^
