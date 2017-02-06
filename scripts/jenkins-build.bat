@@ -30,6 +30,7 @@ set verbose=OFF
 
 set "OME_HOME=%OME_FILES_BUNDLE%"
 set "DATA_DIR=D:\data_performance"
+set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%MAVEN_PATH%\bin;%PATH%"
 
 cd "%WORKSPACE%"
 if exist "build" (
@@ -57,9 +58,9 @@ cmake -G "Ninja" ^
   || exit /b
 cmake --build . || exit /b
 
-cd %WORKSPACE%\build
+set "PATH=%WORKSPACE%\bio-formats-jace\build\dist\bio-formats-jace;%PATH%"
 
-set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%MAVEN_PATH%\bin;%WORKSPACE%\bio-formats-jace\build\dist\bio-formats-jace;%PATH%"
+cd %WORKSPACE%\build
 
 if [%build_version%] == [11] (
     call "%VS110COMNTOOLS%..\..\VC\vcvarsall.bat" %build_arch%
