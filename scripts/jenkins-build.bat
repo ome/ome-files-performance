@@ -39,6 +39,12 @@ if exist "build" (
 if exist "install" (
     rmdir /s /q "install"
 )
+if exist "results" (
+    rmdir /s /q "results"
+)
+if exist "bio-formats-jace\build" (
+    rmdir /s /q "bio-formats-jace\build"
+)
 mkdir build
 mkdir install
 mkdir results
