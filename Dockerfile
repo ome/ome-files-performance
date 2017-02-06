@@ -12,8 +12,6 @@ ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
 #  Bio-Formats JACE bindings
 RUN git clone https://github.com/ome/bio-formats-jace /git/bio-formats-jace
 WORKDIR /git/bio-formats-jace
-# Workaround for versions
-RUN sed -i -e "s/5.2.1/5.2.4/g" pom.xml
 RUN mvn -DskipTests clean package cppwrap:wrap dependency:copy-dependencies
 
 COPY cmake/JACEPrerequisites.cmake /git/bio-formats-jace/target/cppwrap
