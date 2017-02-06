@@ -70,7 +70,7 @@ copy %WORKSPACE%\source\cmake\JACEPrerequisites.cmake target\cppwrap\jace\Prereq
 
 mkdir %WORKSPACE%\bio-formats-jace-build
 cd %WORKSPACE%\bio-formats-jace-build
-cmake -G "Ninja" ^
+cmake -G "Visual Studio 14 2015 Win64" ^
   -DCMAKE_VERBOSE_MAKEFILE:BOOL=%verbose% ^
   -DCMAKE_BUILD_TYPE=%build_type% ^
   -DCMAKE_PREFIX_PATH=%OME_FILES_BUNDLE% ^
