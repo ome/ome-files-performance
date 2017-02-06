@@ -41,9 +41,25 @@ if exist "install" (
 mkdir build
 mkdir install
 mkdir results
-cd build
 
-set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%MAVEN_PATH%\bin;%PATH%"
+cd %WORKSPACE%\bio-formats-jace
+mvn -DskipTests clean package cppwrap:wrap dependency:copy-dependencies
+mkdir build
+cd build
+cmake -G "Ninja" ^
+  -DCMAKE_VERBOSE_MAKEFILE:BOOL=%verbose% ^
+  -DCMAKE_BUILD_TYPE=%build_type% ^
+  -DCMAKE_PREFIX_PATH=%OME_FILES_BUNDLE%;%WORKSPACE%\bio-formats-jace\build\dist\bio-formats-jace ^
+  -DCMAKE_PROGRAM_PATH=%OME_FILES_BUNDLE%\bin ^
+  -DCMAKE_LIBRARY_PATH=%OME_FILES_BUNDLE%\lib ^
+  -DBOOST_ROOT=%OME_FILES_BUNDLE% ^
+  ..\target\cppwrap ^
+  || exit /b
+cmake --build . || exit /b
+
+cd %WORKSPACE%\build
+
+set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%MAVEN_PATH%\bin;%WORKSPACE%\bio-formats-jace\build\dist\bio-formats-jace;%PATH%"
 
 if [%build_version%] == [11] (
     call "%VS110COMNTOOLS%..\..\VC\vcvarsall.bat" %build_arch%
@@ -59,7 +75,7 @@ cmake -G "Ninja" ^
   -DCMAKE_VERBOSE_MAKEFILE:BOOL=%verbose% ^
   -DCMAKE_INSTALL_PREFIX:PATH=%installdir% ^
   -DCMAKE_BUILD_TYPE=%build_type% ^
-  -DCMAKE_PREFIX_PATH=%OME_FILES_BUNDLE% ^
+  -DCMAKE_PREFIX_PATH=%OME_FILES_BUNDLE%;%WORKSPACE%\bio-formats-jace\build\dist\bio-formats-jace ^
   -DCMAKE_PROGRAM_PATH=%OME_FILES_BUNDLE%\bin ^
   -DCMAKE_LIBRARY_PATH=%OME_FILES_BUNDLE%\lib ^
   -DBOOST_ROOT=%OME_FILES_BUNDLE% ^
