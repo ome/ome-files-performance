@@ -43,8 +43,7 @@
 #include <iostream>
 #include <vector>
 
-#include <boost/container/vector.hpp>
-
+#include <ome/compat/array.h>
 #include <ome/common/log.h>
 
 #include <ome/files/FormatException.h>
@@ -80,7 +79,8 @@ int main(int argc, char *argv[])
           ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> omexmlmeta = ome::compat::make_shared<ome::xml::meta::OMEXMLMetadata>();
           ome::compat::shared_ptr< ::ome::xml::meta::MetadataStore> store = ome::compat::dynamic_pointer_cast< ::ome::xml::meta::MetadataStore>(omexmlmeta);
           ome::compat::shared_ptr< ::ome::xml::meta::MetadataRetrieve> retrieve;
-          boost::container::vector<boost::container::vector<ome::files::VariantPixelBuffer> > pixels;
+          std::vector<std::vector<ome::compat::shared_ptr<ome::files::VariantPixelBuffer> > > pixels;
+          std::vector<bool> interleaved;
 
           timepoint read_start;
           timepoint read_init;
@@ -95,6 +95,7 @@ int main(int argc, char *argv[])
             read_init = timepoint();
 
             pixels.resize(reader.getSeriesCount());
+            interleaved.resize(reader.getSeriesCount());
 
             for (ome::files::dimension_size_type series = 0;
                  series < reader.getSeriesCount();
@@ -103,16 +104,21 @@ int main(int argc, char *argv[])
                 std::cout << "pass " << i << ": read series " << series << ": " << std::flush;
                 reader.setSeries(series);
 
-                boost::container::vector<ome::files::VariantPixelBuffer>& planes = pixels.at(series);
-                planes.resize(reader.getImageCount(), ome::files::VariantPixelBuffer());
+                std::vector<ome::compat::shared_ptr<ome::files::VariantPixelBuffer> >& planes = pixels.at(series);
+                planes.resize(reader.getImageCount());
+                interleaved.at(series) = reader.isInterleaved();
 
                 for (ome::files::dimension_size_type plane = 0;
                      plane < reader.getImageCount();
                      ++plane)
                   {
                     reader.setPlane(plane);
-                    ome::files::VariantPixelBuffer& buf = planes.at(plane);
-                    reader.openBytes(plane, buf);
+                    ome::compat::shared_ptr<ome::files::VariantPixelBuffer>& buf = planes.at(plane);
+                    buf = ome::compat::make_shared<ome::files::VariantPixelBuffer>
+                      (boost::extents[1][1][1][1][1][1][1][1][1],
+                       reader.getPixelType(),
+                       ome::files::PixelBufferBase::make_storage_order(reader.getDimensionOrder(), reader.isInterleaved()));
+                    reader.openBytes(plane, *buf);
                     std::cout << '.' << std::flush;
                   }
                 std::cout << " done\n" << std::flush;
@@ -139,7 +145,7 @@ int main(int argc, char *argv[])
             std::cout << "pass " << i << ": write init..." << std::flush;
             ome::compat::shared_ptr<ome::files::FormatWriter> writer = ome::compat::make_shared<ome::files::out::OMETIFFWriter>();
             writer->setMetadataRetrieve(retrieve);
-            writer->setInterleaved(pixels.at(0).at(0).storage_order().ordering(0) == ome::files::DIM_SUBCHANNEL);
+            writer->setInterleaved(interleaved.at(0));
             writer->setId(outfile);
             std::cout << "done\n" << std::flush;
 
@@ -150,10 +156,10 @@ int main(int argc, char *argv[])
                  ++series)
               {
                 std::cout << "pass " << i << ": write series " << series << ": " << std::flush;
-                writer->setInterleaved(pixels.at(series).at(0).storage_order().ordering(0) == ome::files::DIM_SUBCHANNEL);
+                writer->setInterleaved(interleaved.at(series));
                 writer->setSeries(series);
 
-                boost::container::vector<ome::files::VariantPixelBuffer>& planes = pixels.at(series);
+                std::vector<ome::compat::shared_ptr<ome::files::VariantPixelBuffer> >& planes = pixels.at(series);
 
                 for (ome::files::dimension_size_type plane = 0;
                      plane < planes.size();
@@ -161,23 +167,8 @@ int main(int argc, char *argv[])
                   {
                     writer->setPlane(plane);
 
-                    ome::files::VariantPixelBuffer& buf = planes.at(plane);
-                    // Workaround for bad interleaved assumptions in the reader and writer)
-                    ome::compat::array<ome::files::VariantPixelBuffer::size_type, 9> source_shape;
-                    const ome::files::VariantPixelBuffer::size_type *source_shape_ptr(buf.shape());
-                    std::copy(source_shape_ptr, source_shape_ptr + ome::files::PixelBufferBase::dimensions,
-                              source_shape.begin());
-                    if(source_shape[ome::files::DIM_SUBCHANNEL] == 1) // not RGB
-                      {
-                        ome::files::PixelBufferBase::storage_order_type order(ome::files::PixelBufferBase::make_storage_order(ome::xml::model::enums::DimensionOrder::XYZTC, false));
-                        ome::files::VariantPixelBuffer reordered_buf(source_shape, buf.pixelType(), order);
-                        reordered_buf = buf;
-                        writer->saveBytes(plane, reordered_buf);
-                      }
-                    else
-                      {
-                        writer->saveBytes(plane, buf);
-                      }
+                    ome::compat::shared_ptr<ome::files::VariantPixelBuffer>& buf = planes.at(plane);
+                    writer->saveBytes(plane, *buf);
                     std::cout << '.' << std::flush;
                   }
                 std::cout << " done\n" << std::flush;
