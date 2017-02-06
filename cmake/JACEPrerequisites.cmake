@@ -65,3 +65,5 @@ message(STATUS "")
 if(WIN32)
   link_directories(${Boost_STRIPPED_LIB_DIR})
 endif(WIN32)
+
+add_definitions(-DBOOST_ALL_DYN_LINK)
