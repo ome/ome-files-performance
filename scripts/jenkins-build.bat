@@ -32,6 +32,10 @@ set "OME_HOME=%OME_FILES_BUNDLE%"
 set "DATA_DIR=D:\data_performance"
 set "PATH=C:\Tools\ninja;%OME_FILES_BUNDLE%\bin;%MAVEN_PATH%\bin;%JAVA_HOME%\bin;%PATH%"
 
+echo "OME-Files Bundle: %OME_FILES_BUNDLE%"
+java -version
+javac -version
+
 if [%build_version%] == [11] (
     call "%VS110COMNTOOLS%..\..\VC\vcvarsall.bat" %build_arch%
 )
@@ -66,7 +70,7 @@ cd %WORKSPACE%\bio-formats-jace-build
 cmake -G "Ninja" ^
   -DCMAKE_VERBOSE_MAKEFILE:BOOL=%verbose% ^
   -DCMAKE_BUILD_TYPE=%build_type% ^
-  -DCMAKE_PREFIX_PATH=%OME_FILES_BUNDLE%;%WORKSPACE%\bio-formats-jace\build\dist\bio-formats-jace ^
+  -DCMAKE_PREFIX_PATH=%OME_FILES_BUNDLE% ^
   -DCMAKE_PROGRAM_PATH=%OME_FILES_BUNDLE%\bin ^
   -DCMAKE_LIBRARY_PATH=%OME_FILES_BUNDLE%\lib ^
   -DBOOST_ROOT=%OME_FILES_BUNDLE% ^
@@ -82,7 +86,7 @@ cmake -G "Ninja" ^
   -DCMAKE_VERBOSE_MAKEFILE:BOOL=%verbose% ^
   -DCMAKE_INSTALL_PREFIX:PATH=%installdir% ^
   -DCMAKE_BUILD_TYPE=%build_type% ^
-  -DCMAKE_PREFIX_PATH=%OME_FILES_BUNDLE%;%WORKSPACE%\bio-formats-jace-build\dist\bio-formats-jace ^
+  "-DCMAKE_PREFIX_PATH=%OME_FILES_BUNDLE%;%WORKSPACE%\bio-formats-jace-build\dist\bio-formats-jace" ^
   -DCMAKE_PROGRAM_PATH=%OME_FILES_BUNDLE%\bin ^
   -DCMAKE_LIBRARY_PATH=%OME_FILES_BUNDLE%\lib ^
   -DBOOST_ROOT=%OME_FILES_BUNDLE% ^
