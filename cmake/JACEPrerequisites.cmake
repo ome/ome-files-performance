@@ -47,6 +47,12 @@ endif(IS_DIRECTORY "${Boost_INCLUDE_DIR}")
 if(WIN32)
   set(BOOST_ROOT ${Boost_INCLUDE_DIR})
 endif(WIN32)
+find_package(Boost COMPONENTS system filesystem thread REQUIRED)
+
+# HACK - Make linking to Boost work on Windows systems.
+string(REGEX REPLACE "/[^/]*$" ""
+  Boost_STRIPPED_LIB_DIR "${Boost_THREAD_LIBRARY_DEBUG}")
+
 if(EXISTS "${Boost_THREAD_LIBRARY_DEBUG}")
   message(STATUS "boost lib dir : ${Boost_STRIPPED_LIB_DIR}")
   message(STATUS "thread lib    : ${Boost_THREAD_LIBRARY_DEBUG}")
@@ -55,4 +61,7 @@ else(EXISTS "${Boost_THREAD_LIBRARY_DEBUG}")
 endif(EXISTS "${Boost_THREAD_LIBRARY_DEBUG}")
 message(STATUS "")
 
-add_definitions(-DBOOST_ALL_DYN_LINK -DBOOST_ALL_NO_LIB)
+# HACK - Make linking to Boost work on Windows systems.
+if(WIN32)
+  link_directories(${Boost_STRIPPED_LIB_DIR})
+endif(WIN32)
