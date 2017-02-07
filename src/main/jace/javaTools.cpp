@@ -235,7 +235,7 @@ void JavaTools::createJVM(string jarFolder, bool headless, int memory,
         {
           string tmpName(dir->d_name);
 
-          if(tmpName.find(".jar") != string::npos || tmpName.find(".xml") != string::npos)
+          if(tmpName.find(".jar") != string::npos)
           {
             if(classpath.length() >= 1)
             {
@@ -244,7 +244,8 @@ void JavaTools::createJVM(string jarFolder, bool headless, int memory,
             classpath += jarFolder + SLASH + dir->d_name;
           }
         }
-
+        classpath += PATHSTEP;
+        classpath += jarFolder;
         closedir(d);
       }
 
