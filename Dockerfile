@@ -25,6 +25,7 @@ RUN cmake -DCMAKE_BUILD_TYPE=Release \
   /git/bio-formats-jace/target/cppwrap
 RUN cmake --build .
 ENV BF_JACE_HOME /build-jace/dist/bio-formats-jace
+COPY src/main/resources/logback.xml $BF_JACE_HOME/jar
 
 # Build OME Files performance component
 COPY . /git/ome-files-performance
