@@ -14,6 +14,7 @@ rm /data/out/*
 # mvn -P pixels -Dtest.iterations=3 -Dtest.input=/data/mitocheck/00001_01.ome.tiff -Dtest.output=/data/out/mitocheck-java.ome.tiff -Dtest.results=/data/results/mitocheck-pixeldata-linux-java.tsv exec:java
 
 # JACE tests
+cd $BF_JACE_HOME
 /install/bin/metadata-performance-jace 10 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-jace.ome.xml /data/results/bbbc-metadata-linux-jace.tsv
 /install/bin/metadata-performance-jace 10 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-jace.ome.xml /data/results/mitocheck-metadata-linux-jace.tsv
 
