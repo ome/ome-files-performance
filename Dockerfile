@@ -14,8 +14,6 @@ RUN git clone https://github.com/ome/bio-formats-jace /git/bio-formats-jace
 WORKDIR /git/bio-formats-jace
 RUN mvn -DskipTests clean package cppwrap:wrap dependency:copy-dependencies
 
-COPY cmake/JACEPrerequisites.cmake /git/bio-formats-jace/target/cppwrap
-
 # Build JACE performance component
 WORKDIR /build-jace
 RUN cmake -DCMAKE_BUILD_TYPE=Release \
@@ -41,7 +39,7 @@ RUN cmake -DCMAKE_INSTALL_PREFIX:PATH=/install \
 RUN cmake --build .
 RUN cmake --build . --target install
 
-# Builf Bio-Formats performance component
+# Build Bio-Formats performance component
 WORKDIR /git/ome-files-performance
 RUN mvn clean install
 
