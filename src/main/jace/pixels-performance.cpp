@@ -44,7 +44,6 @@
 #include <iostream>
 #include <vector>
 
-#include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -101,7 +100,7 @@ int main(int argc, char *argv[])
           IMetadata meta = service->createOMEXMLMetadata();
           // ByteArray isn't copyable or assignable, so we use a
           // shared_ptr to allow storage in a container.
-          boost::container::vector<boost::container::vector<boost::shared_ptr<ByteArray> > > pixels;
+          std::vector<std::vector<boost::shared_ptr<ByteArray> > > pixels;
 
           timepoint read_start;
           timepoint read_init;
@@ -125,7 +124,7 @@ int main(int argc, char *argv[])
                 std::cout << "pass " << i << ": read series " << series << ": " << std::flush;
                 reader.setSeries(series);
 
-                boost::container::vector<boost::shared_ptr<ByteArray> >& planes = pixels.at(series);
+                std::vector<boost::shared_ptr<ByteArray> >& planes = pixels.at(series);
                 planes.resize(reader.getImageCount());
 
                 for (jint plane = 0;
@@ -170,7 +169,7 @@ int main(int argc, char *argv[])
                 std::cout << "pass " << i << ": write series " << series << ": " << std::flush;
                 writer.setSeries(series);
 
-                boost::container::vector<boost::shared_ptr<ByteArray> >& planes = pixels.at(series);
+                std::vector<boost::shared_ptr<ByteArray> >& planes = pixels.at(series);
 
                 for (jint plane = 0;
                      plane < static_cast<jint>(planes.size());
