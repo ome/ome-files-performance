@@ -137,6 +137,10 @@ int main(int argc, char *argv[])
               throw ome::files::FormatException("MetadataStore does not implement MetadataRetrieve");
             }
 
+          // To keep the logic the same as for JACE, even though it's unnecessary here
+          if(boost::filesystem::exists(outfile))
+            boost::filesystem::remove(outfile);
+
           timepoint write_start;
           timepoint write_init;
           timepoint close_start;
