@@ -66,5 +66,5 @@ result(std::ostream& os,
      << boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().user // process user time
      << '\t'
      << boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().system // process system time
-     << '\t' << '\n';
+     << '\n';
 }

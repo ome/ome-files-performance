@@ -244,7 +244,8 @@ void JavaTools::createJVM(string jarFolder, bool headless, int memory,
             classpath += jarFolder + SLASH + dir->d_name;
           }
         }
-
+        classpath += PATHSTEP;
+        classpath += jarFolder;
         closedir(d);
       }
 
