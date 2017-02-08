@@ -51,9 +51,9 @@
 
 // for Bio-Formats C++ bindings
 #include <jace/javacast.h>
-#include <formats-api-5.2.4.h>
-#include <formats-bsd-5.2.4.h>
-#include <formats-common-5.2.4.h>
+#include <formats-api-5.3.3.h>
+#include <formats-bsd-5.3.3.h>
+#include <ome-common-5.3.1.h>
 
 using namespace jace::proxy;
 using jace::java_cast;
