@@ -145,6 +145,10 @@ int main(int argc, char *argv[])
           result(results, "pixeldata.read.init", infile, read_start, read_init);
           result(results, "pixeldata.read.pixels", infile, read_init, read_end);
 
+          // The Java writer doesn't automatically truncate the output file.
+          if(boost::filesystem::exists(outfile))
+            boost::filesystem::remove(outfile);
+
           timepoint write_start;
           timepoint write_init;
 
