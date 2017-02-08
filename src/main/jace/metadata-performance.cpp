@@ -44,8 +44,6 @@
 #include <iostream>
 
 #include <boost/filesystem.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 
 // for Bio-Formats C++ bindings
 #include <formats-api-5.2.4.h>
@@ -81,7 +79,7 @@ int main(int argc, char *argv[])
       boost::filesystem::path resultfile(argv[4]);
 
       JavaTools::createJVM();
-      boost::shared_ptr<OMEXMLService> service = boost::make_shared<OMEXMLServiceImpl>();
+      std::unique_ptr<OMEXMLService> service = std::make_unique<OMEXMLServiceImpl>();
 
       std::ofstream results(resultfile.string().c_str());
 

@@ -43,10 +43,9 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <memory>
 
 #include <boost/filesystem.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 
 // for Bio-Formats C++ bindings
 #include <jace/javacast.h>
@@ -89,7 +88,7 @@ int main(int argc, char *argv[])
       boost::filesystem::path resultfile(argv[4]);
 
       JavaTools::createJVM(4096);
-      boost::shared_ptr<OMEXMLService> service = boost::make_shared<OMEXMLServiceImpl>();
+      std::unique_ptr<OMEXMLService> service = std::make_unique<OMEXMLServiceImpl>();
 
       std::ofstream results(resultfile.string().c_str());
 
@@ -99,8 +98,8 @@ int main(int argc, char *argv[])
         {
           IMetadata meta = service->createOMEXMLMetadata();
           // ByteArray isn't copyable or assignable, so we use a
-          // shared_ptr to allow storage in a container.
-          std::vector<std::vector<boost::shared_ptr<ByteArray> > > pixels;
+          // unique_ptr to allow storage in a container.
+          std::vector<std::vector<std::unique_ptr<ByteArray>>> pixels;
 
           timepoint read_start;
           timepoint read_init;
@@ -124,14 +123,14 @@ int main(int argc, char *argv[])
                 std::cout << "pass " << i << ": read series " << series << ": " << std::flush;
                 reader.setSeries(series);
 
-                std::vector<boost::shared_ptr<ByteArray> >& planes = pixels.at(series);
+                std::vector<std::unique_ptr<ByteArray>>& planes = pixels.at(series);
                 planes.resize(reader.getImageCount());
 
                 for (jint plane = 0;
                      plane < reader.getImageCount();
                      ++plane)
                   {
-                    planes.at(plane) = boost::make_shared<ByteArray>(reader.openBytes(plane));                    
+                    planes.at(plane) = std::make_unique<ByteArray>(reader.openBytes(plane));
                     std::cout << '.' << std::flush;
                   }
                 std::cout << " done\n" << std::flush;
@@ -169,7 +168,7 @@ int main(int argc, char *argv[])
                 std::cout << "pass " << i << ": write series " << series << ": " << std::flush;
                 writer.setSeries(series);
 
-                std::vector<boost::shared_ptr<ByteArray> >& planes = pixels.at(series);
+                std::vector<unique_ptr<ByteArray>>& planes = pixels.at(series);
 
                 for (jint plane = 0;
                      plane < static_cast<jint>(planes.size());
