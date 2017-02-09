@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
           timepoint read_start;
 
           std::cout << "pass " << i << ": read init...";
-          if(infile.extension() == ".tiff")
+          if(infile.extension() == ".tiff" || infile.extension() == ".tif")
             {
               // OME-TIFF file
               try
