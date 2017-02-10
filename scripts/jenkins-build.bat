@@ -110,11 +110,13 @@ REM Run Java metadata performance tests
 
 call mvn -P metadata -Dtest.iterations=10 -Dtest.input=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff -Dtest.output=bbbc-java.ome.xml -Dtest.results=%WORKSPACE%\results\bbbc-metadata-win-java.tsv exec:java
 call mvn -P metadata -Dtest.iterations=10 -Dtest.input=%DATA_DIR%\mitocheck\00001_01.ome.tiff -Dtest.output=mitocheck-java.ome.xml -Dtest.results=%WORKSPACE%\results\mitocheck-metadata-win-java.tsv exec:java
+call mvn -P metadata -Dtest.iterations=10 -Dtest.input=%DATA_DIR%\tubhiswt-4D\tubhiswt_C0_TP0.ome.tif -Dtest.output=tubhiswt-java.ome.xml -Dtest.results=%WORKSPACE%\results\tubhiswt-metadata-win-java.tsv exec:java
 
 REM Run Java pixels performance tests
 
 call mvn -P pixels -Dtest.iterations=3 -Dtest.input=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff -Dtest.output=bbbc-java.ome.tiff -Dtest.results=%WORKSPACE%\results\bbbc-pixeldata-win-java.tsv exec:java
 call mvn -P pixels -Dtest.iterations=3 -Dtest.input=%DATA_DIR%\mitocheck\00001_01.ome.tiff -Dtest.output=mitocheck-java.ome.tiff -Dtest.results=%WORKSPACE%\results\mitocheck-pixeldata-win-java.tsv exec:java
+call mvn -P pixels -Dtest.iterations=3 -Dtest.input=%DATA_DIR%\tubhiswt-4D\tubhiswt_C0_TP0.ome.tif -Dtest.output=tubhiswt-java.ome.tiff -Dtest.results=%WORKSPACE%\results\tubhiswt-pixeldata-win-java.tsv exec:java
 
 REM Execute C++ performance tests
 cd "%WORKSPACE%"
@@ -123,8 +125,10 @@ REM Run C++ metadata tests
 
 install\bin\metadata-performance 10 %DATA_DIR%\BBBC\NIRHTa-001.ome.tiff bbbc-cpp.ome.xml results/bbbc-metadata-win-cpp.tsv
 install\bin\metadata-performance 10 %DATA_DIR%\mitocheck\00001_01.ome.tiff mitocheck-cpp.ome.xml results/mitocheck-metadata-win-cpp.tsv
+install\bin\metadata-performance 10 %DATA_DIR%\tubhiswt-4D\tubhiswt_C0_TP0.ome.tif tubhiswt-cpp.ome.xml results/tubhiswt-metadata-win-cpp.tsv
 
 REM Run C++ pixels performance tests
 install\bin\pixels-performance 3 %DATA_DIR%\BBBC\NIRHTa-001.ome.tiff bbbc-cpp.ome.tiff results/bbbc-pixeldata-win-cpp.tsv
 install\bin\pixels-performance 3 %DATA_DIR%\mitocheck\00001_01.ome.tiff mitocheck-cpp.ome.tiff results/mitocheck-pixeldata-win-cpp.tsv
+install\bin\pixels-performance 3 %DATA_DIR%\tubhiswt-4D\tubhiswt_C0_TP0.ome.tif tubhiswt-cpp.ome.tiff results/tubhiswt-pixeldata-win-cpp.tsv
 

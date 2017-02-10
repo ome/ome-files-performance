@@ -81,7 +81,8 @@ public final class MetadataPerformance {
 
         System.out.print("pass " + i + ": read init...");
         String omexml;
-        if(infile.toString().endsWith(".tiff")) { // OME-TIFF file
+        if(infile.toString().endsWith(".tiff") ||
+           infile.toString().endsWith(".tif")) { // OME-TIFF file
           omexml = new TiffParser(infile.toString()).getComment();
         } else { // XML file
           omexml = DataTools.readFile(infile.toString());// read infile
