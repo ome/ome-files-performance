@@ -22,10 +22,10 @@ cd $BF_JACE_HOME
 /install/bin/metadata-performance-jace 10 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-jace.ome.xml /data/results/bbbc-metadata-linux-jace.tsv
 /install/bin/metadata-performance-jace 10 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-jace.ome.xml /data/results/mitocheck-metadata-linux-jace.tsv
 # Throws boost: mutex exception
-# /install/bin/metadata-performance-jace 10 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-jace.ome.xml /data/results/tubhiswt-metadata-linux-jace.tsv
+/install/bin/metadata-performance-jace 10 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-jace.ome.xml /data/results/tubhiswt-metadata-linux-jace.tsv || true
 
 # Currently takes ~1h30 to complete per OME-TIFF - needs investigation
-# /install/bin/pixels-performance-jace 3 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-jace.ome.tiff /data/results/bbbc-pixeldata-linux-jace.tsv
+/install/bin/pixels-performance-jace 3 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-jace.ome.tiff /data/results/bbbc-pixeldata-linux-jace.tsv
 /install/bin/pixels-performance-jace 3 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-jace.ome.tiff /data/results/mitocheck-pixeldata-linux-jace.tsv
 /install/bin/pixels-performance-jace 3 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-jace.ome.tiff /data/results/tubhiswt-pixeldata-linux-jace.tsv
 
