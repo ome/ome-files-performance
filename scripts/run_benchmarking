@@ -9,31 +9,31 @@ rm /data/results/* || echo "No results"
 rm /data/out/* || echo "No output"
 
 # Java tests
-mvn -P metadata -Dtest.iterations=10 -Dtest.input=/data/BBBC/NIRHTa-001.ome.tiff -Dtest.output=/data/out/bbbc-java.ome.xml -Dtest.results=/data/results/bbbc-metadata-linux-java.tsv exec:java
-mvn -P metadata -Dtest.iterations=10 -Dtest.input=/data/mitocheck/00001_01.ome.tiff -Dtest.output=/data/out/mitocheck-java.ome.xml -Dtest.results=/data/results/mitocheck-metadata-linux-java.tsv exec:java
-mvn -P metadata -Dtest.iterations=10 -Dtest.input=/data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif -Dtest.output=/data/out/tubhiswt-java.ome.xml -Dtest.results=/data/results/tubhiswt-metadata-linux-java.tsv exec:java
+mvn -P metadata -Dtest.iterations=20 -Dtest.input=/data/BBBC/NIRHTa-001.ome.tiff -Dtest.output=/data/out/bbbc-java.ome.xml -Dtest.results=/data/results/bbbc-metadata-linux-java.tsv exec:java
+mvn -P metadata -Dtest.iterations=20 -Dtest.input=/data/mitocheck/00001_01.ome.tiff -Dtest.output=/data/out/mitocheck-java.ome.xml -Dtest.results=/data/results/mitocheck-metadata-linux-java.tsv exec:java
+mvn -P metadata -Dtest.iterations=20 -Dtest.input=/data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif -Dtest.output=/data/out/tubhiswt-java.ome.xml -Dtest.results=/data/results/tubhiswt-metadata-linux-java.tsv exec:java
 
-mvn -P pixels -Dtest.iterations=3 -Dtest.input=/data/BBBC/NIRHTa-001.ome.tiff -Dtest.output=/data/out/bbbc-java.ome.tiff -Dtest.results=/data/results/bbbc-pixeldata-linux-java.tsv exec:java
-mvn -P pixels -Dtest.iterations=3 -Dtest.input=/data/mitocheck/00001_01.ome.tiff -Dtest.output=/data/out/mitocheck-java.ome.tiff -Dtest.results=/data/results/mitocheck-pixeldata-linux-java.tsv exec:java
-mvn -P pixels -Dtest.iterations=3 -Dtest.input=/data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif -Dtest.output=/data/out/tubhiswt-java.ome.tiff -Dtest.results=/data/results/tubhiswt-pixeldata-linux-java.tsv exec:java
+mvn -P pixels -Dtest.iterations=20 -Dtest.input=/data/BBBC/NIRHTa-001.ome.tiff -Dtest.output=/data/out/bbbc-java.ome.tiff -Dtest.results=/data/results/bbbc-pixeldata-linux-java.tsv exec:java
+mvn -P pixels -Dtest.iterations=20 -Dtest.input=/data/mitocheck/00001_01.ome.tiff -Dtest.output=/data/out/mitocheck-java.ome.tiff -Dtest.results=/data/results/mitocheck-pixeldata-linux-java.tsv exec:java
+mvn -P pixels -Dtest.iterations=20 -Dtest.input=/data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif -Dtest.output=/data/out/tubhiswt-java.ome.tiff -Dtest.results=/data/results/tubhiswt-pixeldata-linux-java.tsv exec:java
 
 # JACE tests
 cd $BF_JACE_HOME
-/install/bin/metadata-performance-jace 10 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-jace.ome.xml /data/results/bbbc-metadata-linux-jace.tsv
-/install/bin/metadata-performance-jace 10 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-jace.ome.xml /data/results/mitocheck-metadata-linux-jace.tsv
+/install/bin/metadata-performance-jace 20 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-jace.ome.xml /data/results/bbbc-metadata-linux-jace.tsv
+/install/bin/metadata-performance-jace 20 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-jace.ome.xml /data/results/mitocheck-metadata-linux-jace.tsv
 # Throws boost: mutex exception
-/install/bin/metadata-performance-jace 10 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-jace.ome.xml /data/results/tubhiswt-metadata-linux-jace.tsv || true
+/install/bin/metadata-performance-jace 20 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-jace.ome.xml /data/results/tubhiswt-metadata-linux-jace.tsv || true
 
 # Takes ~1h30 to complete and crashes at the second run with an OOM
 /install/bin/pixels-performance-jace 1 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-jace.ome.tiff /data/results/bbbc-pixeldata-linux-jace.tsv
-/install/bin/pixels-performance-jace 3 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-jace.ome.tiff /data/results/mitocheck-pixeldata-linux-jace.tsv
-/install/bin/pixels-performance-jace 3 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-jace.ome.tiff /data/results/tubhiswt-pixeldata-linux-jace.tsv
+/install/bin/pixels-performance-jace 20 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-jace.ome.tiff /data/results/mitocheck-pixeldata-linux-jace.tsv
+/install/bin/pixels-performance-jace 20 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-jace.ome.tiff /data/results/tubhiswt-pixeldata-linux-jace.tsv
 
 # C++ tests
-/install/bin/metadata-performance 10 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-cpp.ome.xml /data/results/bbbc-metadata-linux-cpp.tsv
-/install/bin/metadata-performance 10 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-cpp.ome.xml /data/results/mitocheck-metadata-linux-cpp.tsv
-/install/bin/metadata-performance 10 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-cpp.ome.xml /data/results/tubhiswt-metadata-linux-cpp.tsv
+/install/bin/metadata-performance 20 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-cpp.ome.xml /data/results/bbbc-metadata-linux-cpp.tsv
+/install/bin/metadata-performance 20 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-cpp.ome.xml /data/results/mitocheck-metadata-linux-cpp.tsv
+/install/bin/metadata-performance 20 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-cpp.ome.xml /data/results/tubhiswt-metadata-linux-cpp.tsv
 
-/install/bin/pixels-performance 3 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-cpp.ome.tiff /data/results/bbbc-pixeldata-linux-cpp.tsv
-/install/bin/pixels-performance 3 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-cpp.ome.tiff /data/results/mitocheck-pixeldata-linux-cpp.tsv
-/install/bin/pixels-performance 3 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-cpp.ome.tiff /data/results/tubhiswt-pixeldata-linux-cpp.tsv
+/install/bin/pixels-performance 20 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-cpp.ome.tiff /data/results/bbbc-pixeldata-linux-cpp.tsv
+/install/bin/pixels-performance 20 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-cpp.ome.tiff /data/results/mitocheck-pixeldata-linux-cpp.tsv
+/install/bin/pixels-performance 20 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-cpp.ome.tiff /data/results/tubhiswt-pixeldata-linux-cpp.tsv
