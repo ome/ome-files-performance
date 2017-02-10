@@ -64,7 +64,7 @@ find_package(OMECompat 5.2.0 REQUIRED)
 find_package(OMECommon 5.2.0 REQUIRED)
 find_package(OMEXML 5.2.0 REQUIRED)
 find_package(OMEFiles 0.2.3 REQUIRED)
-find_package(BioFormatsJACE 5.2.1)
+find_package(BioFormatsJACE 5.3.0)
 find_package(JNI)
 
 add_subdirectory(src/main/cpp)
