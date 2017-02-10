@@ -30,7 +30,6 @@ COPY . /git/ome-files-performance
 
 WORKDIR /build-ome-files
 RUN cmake -DCMAKE_INSTALL_PREFIX:PATH=/install \
-  -DCMAKE_CXX_STANDARD=11 \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_PREFIX_PATH="$OME_FILES_BUNDLE;$BF_JACE_HOME" \
   -DCMAKE_PROGRAM_PATH=$OME_FILES_BUNDLE/bin \

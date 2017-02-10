@@ -41,6 +41,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 #include <ome/common/log.h>
 
@@ -74,7 +75,7 @@ int main(int argc, char *argv[])
 
       for(int i = 0; i < iterations; ++i)
         {
-          ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta;
+          std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta;
 
           timepoint read_start;
 
@@ -84,8 +85,8 @@ int main(int argc, char *argv[])
               // OME-TIFF file
               try
                 {
-                  ome::compat::shared_ptr<ome::files::tiff::TIFF> tiff = ome::files::tiff::TIFF::open(infile, "r");
-                  ome::compat::shared_ptr<ome::files::tiff::IFD> ifd (tiff->getDirectoryByIndex(0));
+                  std::shared_ptr<ome::files::tiff::TIFF> tiff = ome::files::tiff::TIFF::open(infile, "r");
+                  std::shared_ptr<ome::files::tiff::IFD> ifd (tiff->getDirectoryByIndex(0));
                   if (ifd)
                     {
                       std::string omexml;
