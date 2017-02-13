@@ -42,5 +42,9 @@ RUN cmake --build . --target install
 WORKDIR /git/ome-files-performance
 RUN mvn clean install
 
+# Set locale to UTF-8
+RUN locale-gen en_US.UTF-8
+ENV LANG en_US.UTF-8
+
 ENV LD_LIBRARY_PATH $BF_JACE_HOME:$JAVA_HOME/jre/lib/amd64/server
 ENTRYPOINT ["/bin/bash", "/git/ome-files-performance/scripts/run_benchmarking"]
