@@ -156,6 +156,7 @@ int main(int argc, char *argv[])
             FormatWriter writer = java_cast<FormatWriter>(ometiffwriter);
             writer.setMetadataRetrieve(meta);
             writer.setInterleaved(true);
+            ometiffwriter.setBigTiff(true);
             writer.setId(outfile.string());
             std::cout << "done\n" << std::flush;
 

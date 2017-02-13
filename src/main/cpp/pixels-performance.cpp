@@ -151,6 +151,7 @@ int main(int argc, char *argv[])
             std::unique_ptr<ome::files::FormatWriter> writer = std::make_unique<ome::files::out::OMETIFFWriter>();
             writer->setMetadataRetrieve(retrieve);
             writer->setInterleaved(interleaved.at(0));
+            dynamic_cast<ome::files::out::OMETIFFWriter &>(*writer.get()).setBigTIFF(true);
             writer->setId(outfile);
             std::cout << "done\n" << std::flush;
 

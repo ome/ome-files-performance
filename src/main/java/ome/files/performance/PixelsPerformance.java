@@ -139,6 +139,7 @@ public final class PixelsPerformance {
             writer.setMetadataRetrieve(meta);
             writer.setWriteSequentially(true);
             writer.setInterleaved(true);
+            ((OMETiffWriter)writer).setBigTiff(true);
             writer.setId(outfile.toString());
             System.out.println("done");
             System.out.flush();
