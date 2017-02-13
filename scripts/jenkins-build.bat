@@ -53,6 +53,9 @@ if exist "build" (
 if exist "install" (
     rmdir /s /q "install"
 )
+if exist "out" (
+    rmdir /s /q "out"
+)
 if exist "results" (
     rmdir /s /q "results"
 )
@@ -61,6 +64,7 @@ REM    rmdir /s /q "bio-formats-jace-build"
 REM )
 mkdir build
 mkdir install
+mkdir our
 mkdir results
 
 REM cd %WORKSPACE%\bio-formats-jace
@@ -108,27 +112,27 @@ call mvn clean install || exit /b
 
 REM Run Java metadata performance tests
 
-call mvn -P metadata -Dtest.iterations=20 -Dtest.input=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff -Dtest.output=bbbc-java.ome.xml -Dtest.results=%WORKSPACE%\results\bbbc-metadata-win-java.tsv exec:java
-call mvn -P metadata -Dtest.iterations=20 -Dtest.input=%DATA_DIR%\mitocheck\00001_01.ome.tiff -Dtest.output=mitocheck-java.ome.xml -Dtest.results=%WORKSPACE%\results\mitocheck-metadata-win-java.tsv exec:java
-call mvn -P metadata -Dtest.iterations=20 -Dtest.input=%DATA_DIR%\tubhiswt-4D\tubhiswt_C0_TP0.ome.tif -Dtest.output=tubhiswt-java.ome.xml -Dtest.results=%WORKSPACE%\results\tubhiswt-metadata-win-java.tsv exec:java
+call mvn -P metadata -Dtest.iterations=20 -Dtest.input=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff -Dtest.output=%WORKSPACE%\out\bbbc-java.ome.xml -Dtest.results=%WORKSPACE%\results\bbbc-metadata-win-java.tsv exec:java
+call mvn -P metadata -Dtest.iterations=20 -Dtest.input=%DATA_DIR%\mitocheck\00001_01.ome.tiff -Dtest.output=%WORKSPACE%\out\mitocheck-java.ome.xml -Dtest.results=%WORKSPACE%\results\mitocheck-metadata-win-java.tsv exec:java
+call mvn -P metadata -Dtest.iterations=20 -Dtest.input=%DATA_DIR%\tubhiswt-4D\tubhiswt_C0_TP0.ome.tif -Dtest.output=%WORKSPACE%\out\tubhiswt-java.ome.xml -Dtest.results=%WORKSPACE%\results\tubhiswt-metadata-win-java.tsv exec:java
 
 REM Run Java pixels performance tests
 
-call mvn -P pixels -Dtest.iterations=20 -Dtest.input=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff -Dtest.output=bbbc-java.ome.tiff -Dtest.results=%WORKSPACE%\results\bbbc-pixeldata-win-java.tsv exec:java
-call mvn -P pixels -Dtest.iterations=20 -Dtest.input=%DATA_DIR%\mitocheck\00001_01.ome.tiff -Dtest.output=mitocheck-java.ome.tiff -Dtest.results=%WORKSPACE%\results\mitocheck-pixeldata-win-java.tsv exec:java
-call mvn -P pixels -Dtest.iterations=20 -Dtest.input=%DATA_DIR%\tubhiswt-4D\tubhiswt_C0_TP0.ome.tif -Dtest.output=tubhiswt-java.ome.tiff -Dtest.results=%WORKSPACE%\results\tubhiswt-pixeldata-win-java.tsv exec:java
+call mvn -P pixels -Dtest.iterations=20 -Dtest.input=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff -Dtest.output=%WORKSPACE%\out\bbbc-java.ome.tiff -Dtest.results=%WORKSPACE%\results\bbbc-pixeldata-win-java.tsv exec:java
+call mvn -P pixels -Dtest.iterations=20 -Dtest.input=%DATA_DIR%\mitocheck\00001_01.ome.tiff -Dtest.output=%WORKSPACE%\out\mitocheck-java.ome.tiff -Dtest.results=%WORKSPACE%\results\mitocheck-pixeldata-win-java.tsv exec:java
+call mvn -P pixels -Dtest.iterations=20 -Dtest.input=%DATA_DIR%\tubhiswt-4D\tubhiswt_C0_TP0.ome.tif -Dtest.output=%WORKSPACE%\out\tubhiswt-java.ome.tiff -Dtest.results=%WORKSPACE%\results\tubhiswt-pixeldata-win-java.tsv exec:java
 
 REM Execute C++ performance tests
 cd "%WORKSPACE%"
 
 REM Run C++ metadata tests
 
-install\bin\metadata-performance 20 %DATA_DIR%\BBBC\NIRHTa-001.ome.tiff bbbc-cpp.ome.xml results/bbbc-metadata-win-cpp.tsv
-install\bin\metadata-performance 20 %DATA_DIR%\mitocheck\00001_01.ome.tiff mitocheck-cpp.ome.xml results/mitocheck-metadata-win-cpp.tsv
-install\bin\metadata-performance 20 %DATA_DIR%\tubhiswt-4D\tubhiswt_C0_TP0.ome.tif tubhiswt-cpp.ome.xml results/tubhiswt-metadata-win-cpp.tsv
+install\bin\metadata-performance 20 %DATA_DIR%\BBBC\NIRHTa-001.ome.tiff %WORKSPACE%\out\bbbc-cpp.ome.xml %WORKSPACE%\results\bbbc-metadata-win-cpp.tsv
+install\bin\metadata-performance 20 %DATA_DIR%\mitocheck\00001_01.ome.tiff %WORKSPACE%\out\mitocheck-cpp.ome.xml %WORKSPACE%\results\mitocheck-metadata-win-cpp.tsv
+install\bin\metadata-performance 20 %DATA_DIR%\tubhiswt-4D\tubhiswt_C0_TP0.ome.tif %WORKSPACE%\out\tubhiswt-cpp.ome.xml %WORKSPACE%\results\tubhiswt-metadata-win-cpp.tsv
 
 REM Run C++ pixels performance tests
-install\bin\pixels-performance 20 %DATA_DIR%\BBBC\NIRHTa-001.ome.tiff bbbc-cpp.ome.tiff results/bbbc-pixeldata-win-cpp.tsv
-install\bin\pixels-performance 20 %DATA_DIR%\mitocheck\00001_01.ome.tiff mitocheck-cpp.ome.tiff results/mitocheck-pixeldata-win-cpp.tsv
-install\bin\pixels-performance 20 %DATA_DIR%\tubhiswt-4D\tubhiswt_C0_TP0.ome.tif tubhiswt-cpp.ome.tiff results/tubhiswt-pixeldata-win-cpp.tsv
+install\bin\pixels-performance 20 %DATA_DIR%\BBBC\NIRHTa-001.ome.tiff %WORKSPACE%\out\bbbc-cpp.ome.tiff %WORKSPACE%\results\bbbc-pixeldata-win-cpp.tsv
+install\bin\pixels-performance 20 %DATA_DIR%\mitocheck\00001_01.ome.tiff %WORKSPACE%\out\mitocheck-cpp.ome.tiff %WORKSPACE%\results\mitocheck-pixeldata-win-cpp.tsv
+install\bin\pixels-performance 20 %DATA_DIR%\tubhiswt-4D\tubhiswt_C0_TP0.ome.tif %WORKSPACE%\out\tubhiswt-cpp.ome.tiff %WORKSPACE%\results\tubhiswt-pixeldata-win-cpp.tsv
 
