@@ -64,7 +64,7 @@ REM    rmdir /s /q "bio-formats-jace-build"
 REM )
 mkdir build
 mkdir install
-mkdir our
+mkdir out
 mkdir results
 
 REM cd %WORKSPACE%\bio-formats-jace
