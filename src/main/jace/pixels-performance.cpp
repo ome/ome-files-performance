@@ -53,6 +53,8 @@
 #include <formats-bsd-5.3.3.h>
 #include <ome-common-5.3.1.h>
 
+#include <jace/proxy/ome/xml/model/primitives/PositiveInteger.h>
+
 using namespace jace::proxy;
 using jace::java_cast;
 using jace::JNIException;
@@ -66,11 +68,14 @@ using loci::formats::FormatWriter;
 using loci::formats::MetadataTools;
 using loci::formats::in::OMETiffReader;
 using loci::formats::out::OMETiffWriter;
+using loci::formats::out::TiffWriter;
 using loci::formats::meta::IMetadata;
 using loci::formats::meta::MetadataRetrieve;
 using loci::formats::meta::MetadataStore;
 using loci::formats::services::OMEXMLService;
 using loci::formats::services::OMEXMLServiceImpl;
+
+using loci::formats::tiff::IFD;
 
 int main(int argc, char *argv[])
 {
@@ -174,8 +179,16 @@ int main(int argc, char *argv[])
                      plane < static_cast<jint>(planes.size());
                      ++plane)
                   {
+                    int sizeX = meta.getPixelsSizeX(series).getNumberValue().intValue();
+                    IFD ifd;
+                    int rows = 65535 / sizeX;
+                    if (rows < 1) {
+                      rows = 1;
+                    }
+                    ifd.putIFDValue(IFD::ROWS_PER_STRIP(), static_cast<::jace::proxy::types::JInt>(rows));
                     ByteArray& buf = *(planes.at(plane));
-                    writer.saveBytes(plane, buf);
+                    TiffWriter tiffwriter = java_cast<TiffWriter>(ometiffwriter);
+                    tiffwriter.saveBytes(plane, buf, ifd);
                     std::cout << '.' << std::flush;
                   }
                 std::cout << " done\n" << std::flush;
