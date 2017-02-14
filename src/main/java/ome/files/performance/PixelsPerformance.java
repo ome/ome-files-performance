@@ -55,9 +55,11 @@ import loci.formats.services.OMEXMLService;
 import loci.formats.services.OMEXMLServiceImpl;
 import loci.formats.in.OMETiffReader;
 import loci.formats.out.OMETiffWriter;
+import loci.formats.out.TiffWriter;
 import loci.formats.FormatReader;
 import loci.formats.FormatWriter;
 
+import loci.formats.tiff.IFD;
 import loci.formats.tiff.TiffParser;
 
 public final class PixelsPerformance {
@@ -139,6 +141,7 @@ public final class PixelsPerformance {
             writer.setMetadataRetrieve(meta);
             writer.setWriteSequentially(true);
             writer.setInterleaved(true);
+            ((OMETiffWriter)writer).setBigTiff(true);
             writer.setId(outfile.toString());
             System.out.println("done");
             System.out.flush();
@@ -156,8 +159,15 @@ public final class PixelsPerformance {
 
                 for (int plane = 0; plane < planes.size(); ++plane)
                   {
+                    int sizeX = meta.getPixelsSizeX(series).getValue().intValue();
+                    IFD ifd = new IFD();
+                    int rows = 65536 / sizeX;
+                    if (rows < 1) {
+                      rows = 1;
+                    }
+                    ifd.put(IFD.ROWS_PER_STRIP, rows);
                     byte[] data = planes.get(plane);
-                    writer.saveBytes(plane, data);
+                    ((TiffWriter) writer).saveBytes(plane, data, ifd);
                     System.out.print(".");
                     System.out.flush();
                   }
