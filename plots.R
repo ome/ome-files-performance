@@ -1,5 +1,26 @@
 library(dplyr)
 library(ggplot2)
+library(scales)
+
+##########
+# From https://groups.google.com/d/msg/ggplot2/a_xhMoQyxZ4/OQHLPGsRtAQJ (with some modification)
+fancy_scientific <- function(l) {
+     # turn in to character string in scientific notation
+     print(l)
+     l <- format(l, scientific = TRUE)
+     print(l)
+     # Use verbatim zero value
+     l <- gsub("0e\\+00", "0", l)
+     # quote the part before the exponent to keep all the digits
+     l <- gsub("^(.*)e", "'\\1'e", l)
+     print(l)
+     # turn the 'e+' into plotmath format
+     l <- gsub("e\\+?", "%*%10^", l)
+     print(l)
+     # return this as an expression
+     parse(text=l)
+}
+##########
 
 dataset.name <- function(filename) {
     t <- "Unknown"
@@ -78,6 +99,7 @@ plot.figure1 <- function() {
     cat("Creating ", filename, "\n")
     p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
       ylab("Execution time (ms)") + labs(title="Figure 1: Metadata performance") +
+      scale_y_continuous(labels=fancy_scientific) +
       geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) +
       facet_wrap(~ Dataset, scales = "free_y")
     ggsave(filename=filename,
@@ -94,6 +116,7 @@ plot.figure2 <- function() {
     cat("Creating ", filename, "\n")
     p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
       ylab("Execution time (ms)") + labs(title="Figure 2: Pixel data performance") +
+      scale_y_continuous(labels=fancy_scientific) +
       geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) +
       facet_wrap(~ Dataset, scales = "free_y")
     ggsave(filename=filename,
@@ -103,13 +126,13 @@ plot.figure2 <- function() {
 plot.figure3 <- function() {
     df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
     df <- subset(df, test.name == 'read' | test.name == 'write')
-    df$test.name <- gsub("$", "er", df$test.name)
     df$Test <- factor(df$test.name)
 
     filename <- "cpp-fig3.pdf"
     cat("Creating ", filename, "\n")
     p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
       ylab("Execution time (ms)") + labs(title="Figure 3: Reader and writer aggregate performance") +
+      scale_y_continuous(labels=fancy_scientific) +
       geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) +
       facet_wrap(~ Dataset, scales = "free_y")
     ggsave(filename=filename,
