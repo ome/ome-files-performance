@@ -94,12 +94,13 @@ realtime.compare <- function(datanames, testname, includejace) {
 
 plot.figure1 <- function() {
     df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "metadata", TRUE)
+    # Convert from ms to s
+    df$proc.real = df$proc.real / 1000
 
     filename <- "cpp-fig1.pdf"
     cat("Creating ", filename, "\n")
     p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
-      ylab("Execution time (ms)") + labs(title="Figure 1: Metadata performance") +
-      scale_y_continuous(labels=fancy_scientific) +
+      ylab("Execution time (s)") + labs(title="Figure 1: Metadata performance") +
       geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) +
       facet_wrap(~ Dataset, scales = "free_y")
     ggsave(filename=filename,
@@ -108,6 +109,9 @@ plot.figure1 <- function() {
 
 plot.figure2 <- function() {
     df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
+    # Convert from ms to s
+    df$proc.real = df$proc.real / 1000
+    # Only plot pixel read/write
     df <- subset(df, test.name == 'read.pixels' | test.name == 'write.pixels')
     df$test.name <- gsub(".pixels", "", df$test.name)
     df$Test <- factor(df$test.name)
@@ -115,8 +119,7 @@ plot.figure2 <- function() {
     filename <- "cpp-fig2.pdf"
     cat("Creating ", filename, "\n")
     p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
-      ylab("Execution time (ms)") + labs(title="Figure 2: Pixel data performance") +
-      scale_y_continuous(labels=fancy_scientific) +
+      ylab("Execution time (s)") + labs(title="Figure 2: Pixel data performance") +
       geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) +
       facet_wrap(~ Dataset, scales = "free_y")
     ggsave(filename=filename,
@@ -125,14 +128,16 @@ plot.figure2 <- function() {
 
 plot.figure3 <- function() {
     df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
+    # Convert from ms to s
+    df$proc.real = df$proc.real / 1000
+    # Only plot aggregate read/write
     df <- subset(df, test.name == 'read' | test.name == 'write')
     df$Test <- factor(df$test.name)
 
     filename <- "cpp-fig3.pdf"
     cat("Creating ", filename, "\n")
     p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
-      ylab("Execution time (ms)") + labs(title="Figure 3: Reader and writer aggregate performance") +
-      scale_y_continuous(labels=fancy_scientific) +
+      ylab("Execution time (s)") + labs(title="Figure 3: Reader and writer aggregate performance") +
       geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) +
       facet_wrap(~ Dataset, scales = "free_y")
     ggsave(filename=filename,
