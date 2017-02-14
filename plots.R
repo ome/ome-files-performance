@@ -92,12 +92,15 @@ realtime.compare <- function(datanames, testname, includejace) {
     plot.dataset(df, testname, includejace)
 }
 
-plot.figure1 <- function() {
-    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "metadata", TRUE)
+plot.figure1 <- function(includejace) {
+    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "metadata", includejace)
     # Convert from ms to s
     df$proc.real = df$proc.real / 1000
 
     filename <- "cpp-fig1.pdf"
+    if (includejace == TRUE) {
+        filename <- "cpp-fig1-withjace.pdf"
+    }
     cat("Creating ", filename, "\n")
     p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
       ylab("Execution time (s)") + labs(title="Figure 1: Metadata performance") +
@@ -107,8 +110,8 @@ plot.figure1 <- function() {
            plot=p, width=6, height=3)
 }
 
-plot.figure2 <- function() {
-    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
+plot.figure2 <- function(includejace) {
+    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", includejace)
     # Convert from ms to s
     df$proc.real = df$proc.real / 1000
     # Only plot pixel read/write
@@ -117,6 +120,9 @@ plot.figure2 <- function() {
     df$Test <- factor(df$test.name)
 
     filename <- "cpp-fig2.pdf"
+    if (includejace == TRUE) {
+        filename <- "cpp-fig2-withjace.pdf"
+    }
     cat("Creating ", filename, "\n")
     p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
       ylab("Execution time (s)") + labs(title="Figure 2: Pixel data performance") +
@@ -126,8 +132,8 @@ plot.figure2 <- function() {
            plot=p, width=6, height=3)
 }
 
-plot.figure3 <- function() {
-    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
+plot.figure3 <- function(includejace) {
+    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", includejace)
     # Convert from ms to s
     df$proc.real = df$proc.real / 1000
     # Only plot aggregate read/write
@@ -135,6 +141,9 @@ plot.figure3 <- function() {
     df$Test <- factor(df$test.name)
 
     filename <- "cpp-fig3.pdf"
+    if (includejace == TRUE) {
+        filename <- "cpp-fig3-withjace.pdf"
+    }
     cat("Creating ", filename, "\n")
     p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
       ylab("Execution time (s)") + labs(title="Figure 3: Reader and writer aggregate performance") +
@@ -150,6 +159,9 @@ realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "metadata", TRUE)
 realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", FALSE)
 realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
 
-plot.figure1()
-plot.figure2()
-plot.figure3()
+plot.figure1(TRUE)
+plot.figure2(TRUE)
+plot.figure3(TRUE)
+plot.figure1(FALSE)
+plot.figure2(FALSE)
+plot.figure3(FALSE)
