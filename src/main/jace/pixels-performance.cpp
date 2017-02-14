@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
                   {
                     int sizeX = meta.getPixelsSizeX(series).getNumberValue().intValue();
                     IFD ifd;
-                    int rows = 65535 / sizeX;
+                    int rows = 65536 / sizeX;
                     if (rows < 1) {
                       rows = 1;
                     }

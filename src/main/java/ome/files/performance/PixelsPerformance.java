@@ -161,7 +161,7 @@ public final class PixelsPerformance {
                   {
                     int sizeX = meta.getPixelsSizeX(series).getValue().intValue();
                     IFD ifd = new IFD();
-                    int rows = 65535 / sizeX;
+                    int rows = 65536 / sizeX;
                     if (rows < 1) {
                       rows = 1;
                     }
