@@ -92,76 +92,108 @@ realtime.compare <- function(datanames, testname, includejace) {
     plot.dataset(df, testname, includejace)
 }
 
-plot.figure1 <- function(includejace) {
-    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "metadata", includejace)
-    # Convert from ms to s
-    df$proc.real = df$proc.real / 1000
+figure.boxdefaults <- function(df, title) {
+    p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
+      ylab("Execution time (ms)") + labs(title=title) +
+      scale_y_continuous(trans = 'log10',
+                         breaks = trans_breaks('log10', function(x) 10^x),
+                         labels = trans_format('log10', math_format(10^.x))) +
+      theme(panel.grid.minor.y = element_blank()) +
+      scale_colour_brewer(palette = "Set1") +
+      geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) +
+      facet_wrap(~ Dataset)
+}
+
+figure.bardefaults <- function(df, title) {
+    p <- ggplot(aes(y = proc.real, x = Test, fill=Implementation), data = df) +
+        ylab("Execution time (ms)") + labs(title=title) +
+        scale_y_continuous(trans = 'log10',
+                           breaks = trans_breaks('log10', function(x) 10^x),
+                           labels = trans_format('log10', math_format(10^.x))) +
+        theme(panel.grid.minor.y = element_blank()) +
+        scale_fill_manual(values=c("red", "darkred", "green", "blue", "darkblue")) +
+        geom_bar(stat = "summary", fun.y = "mean", position="dodge") +
+        facet_grid(Category ~ Dataset, scales="free")
+}
+
+figure.data() <- function() {
+    # metadata read/write
+    dfmeta <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "metadata", TRUE)
+    dfmeta$cat <- "metadata"
+    # pixel read/write
+    dfpix <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
+    dfpix <- subset(dfpix, test.name == 'read.pixels' | test.name == 'write.pixels')
+    dfpix$test.name <- gsub(".pixels", "", dfpix$test.name)
+    dfpix$Test <- factor(dfpix$test.name)
+    dfpix$cat <- "pixeldata"
+
+    # Only plot aggregate read/write
+    dfagg <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
+    dfagg <- subset(dfagg, test.name == 'read' | test.name == 'write')
+    dfagg$Test <- factor(dfagg$test.name)
+
+    df <- bind_rows(dfmeta, dfpix, dfagg)
+}
+
+plot.figure1 <- function() {
+
+    df$Language <- factor(df$test.lang)
+    df$Platform <- factor(df$plat)
+    df$Test <- factor(df$test.name)
+    df$Filename <- factor(df$test.file)
+    df$Dataset <- factor(df$dataset)
+    df$Category <- factor(df$cat)
 
     filename <- "cpp-fig1.pdf"
-    if (includejace == TRUE) {
-        filename <- "cpp-fig1-withjace.pdf"
-    }
     cat("Creating ", filename, "\n")
-    p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
-      ylab("Execution time (s)") + labs(title="Figure 1: Metadata performance") +
-      geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) +
-      facet_wrap(~ Dataset, scales = "free_y")
+    p <- figure.bardefaults(df, "Figure 1: Performance")
+    ggsave(filename=filename,
+           plot=p, width=6, height=6)
+}
+
+plot.suppfigure1 <- function() {
+    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "metadata", TRUE)
+
+    filename <- "cpp-suppfig1.pdf"
+    cat("Creating ", filename, "\n")
+    p <- figure.boxdefaults(df, "Figure 1: Metadata performance")
     ggsave(filename=filename,
            plot=p, width=6, height=3)
 }
-
-plot.figure2 <- function(includejace) {
-    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", includejace)
-    # Convert from ms to s
-    df$proc.real = df$proc.real / 1000
+plot.suppfigure2 <- function() {
+    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
     # Only plot pixel read/write
     df <- subset(df, test.name == 'read.pixels' | test.name == 'write.pixels')
     df$test.name <- gsub(".pixels", "", df$test.name)
     df$Test <- factor(df$test.name)
 
-    filename <- "cpp-fig2.pdf"
-    if (includejace == TRUE) {
-        filename <- "cpp-fig2-withjace.pdf"
-    }
+    filename <- "cpp-suppfig2.pdf"
     cat("Creating ", filename, "\n")
-    p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
-      ylab("Execution time (s)") + labs(title="Figure 2: Pixel data performance") +
-      geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) +
-      facet_wrap(~ Dataset, scales = "free_y")
+    p <- figure.boxdefaults(df, "Figure 2: Pixel data performance")
     ggsave(filename=filename,
            plot=p, width=6, height=3)
 }
 
-plot.figure3 <- function(includejace) {
-    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", includejace)
-    # Convert from ms to s
-    df$proc.real = df$proc.real / 1000
+plot.suppfigure3 <- function() {
+    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
     # Only plot aggregate read/write
     df <- subset(df, test.name == 'read' | test.name == 'write')
     df$Test <- factor(df$test.name)
 
-    filename <- "cpp-fig3.pdf"
-    if (includejace == TRUE) {
-        filename <- "cpp-fig3-withjace.pdf"
-    }
+    filename <- "cpp-suppfig3.pdf"
     cat("Creating ", filename, "\n")
-    p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
-      ylab("Execution time (s)") + labs(title="Figure 3: Reader and writer aggregate performance") +
-      geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) +
-      facet_wrap(~ Dataset, scales = "free_y")
+    p <- figure.boxdefaults(df, "Figure 3: Reader and writer aggregate performance")
     ggsave(filename=filename,
            plot=p, width=6, height=3)
 }
 
 
-realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "metadata", FALSE)
-realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "metadata", TRUE)
-realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", FALSE)
-realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
+#realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "metadata", FALSE)
+#realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "metadata", TRUE)
+#realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", FALSE)
+#realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
 
-plot.figure1(TRUE)
-plot.figure2(TRUE)
-plot.figure3(TRUE)
-plot.figure1(FALSE)
-plot.figure2(FALSE)
-plot.figure3(FALSE)
+plot.figure1()
+plot.suppfigure1()
+plot.suppfigure2()
+plot.suppfigure3()
