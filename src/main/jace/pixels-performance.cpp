@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
       boost::filesystem::path outfile(argv[3]);
       boost::filesystem::path resultfile(argv[4]);
 
-      JavaTools::createJVM(4096);
+      JavaTools::createJVM(8192);
       std::unique_ptr<OMEXMLService> service = std::make_unique<OMEXMLServiceImpl>();
 
       std::ofstream results(resultfile.string().c_str());
