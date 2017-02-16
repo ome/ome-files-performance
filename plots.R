@@ -69,7 +69,7 @@ read.dataset <- function(datanames, testname, includejace) {
     df$Platform <- factor(df$plat)
     df$Test <- factor(df$test.name)
     df$Filename <- factor(df$test.file)
-    df$Dataset <- factor(df$dataset, ordered=TRUE)
+    df$Dataset <- factor(df$dataset, levels = c("tubhiswt", "BBBC", "MitoCheck"))
 
     df$Implementation <- interaction(df$Language, df$Platform, sep="/", lex.order=TRUE)
 
@@ -139,7 +139,7 @@ figure.data <- function() {
     df$Platform <- factor(df$plat)
     df$Test <- factor(df$test.name)
     df$Filename <- factor(df$test.file)
-    df$Dataset <- factor(df$dataset, ordered=TRUE)
+    df$Dataset <- factor(df$dataset, levels = c("tubhiswt", "BBBC", "MitoCheck"))
     df$Category <- factor(df$cat)
 
     df$Implementation <- interaction(df$Language, df$Platform, sep="/", lex.order=TRUE)
