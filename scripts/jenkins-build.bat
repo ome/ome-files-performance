@@ -114,7 +114,7 @@ set iterations=20
 set outdir=%WORKSPACE%\out
 set resultsdir=%WORKSPACE%\results
 
-FOR %%T IN (list bbbc mitocheck tubhiswt) (
+for %%T in (list bbbc mitocheck tubhiswt) do (
     set test=%%T
     set input=unknown
     if [!test!] == [bbbc] (

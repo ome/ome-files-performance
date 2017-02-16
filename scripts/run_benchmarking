@@ -2,10 +2,8 @@
 set -e
 set -x
 
-datapath=/data/images/ptest
-#datapath="/data"
-binpath=/tmp/inst
-#binpath="/install/bin"
+datapath="/data"
+binpath="/install/bin"
 resultpath="${datapath}/results"
 outpath="${datapath}/out"
 iterations=20
