@@ -69,7 +69,7 @@ read.dataset <- function(datanames, testname, includejace) {
     df$Platform <- factor(df$plat)
     df$Test <- factor(df$test.name)
     df$Filename <- factor(df$test.file)
-    df$Dataset <- factor(df$dataset)
+    df$Dataset <- factor(df$dataset, ordered=TRUE)
 
     df$Implementation <- interaction(df$Language, df$Platform, sep="/", lex.order=TRUE)
 
@@ -99,7 +99,7 @@ figure.boxdefaults <- function(df, title, logscale) {
                            breaks = trans_breaks('log10', function(x) 10^x),
                            labels = trans_format('log10', math_format(10^.x))) +
         theme(panel.grid.minor.y = element_blank()) +
-        scale_colour_brewer(palette = "Set1") +
+        scale_colour_brewer(palette = "Dark2") +
         geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) +
         facet_wrap(~ Dataset)
 }
@@ -109,26 +109,26 @@ figure.bardefaults <- function(df, title) {
         summarise(proc.real = mean(proc.real))
 
     p <- ggplot(aes(y = proc.real, x = Test, fill=Implementation), data = summary) +
-        ylab("Execution time (ms)") + labs(title=title) +
+        labs(title=title) +
         theme(panel.grid.minor.y = element_blank()) +
-        scale_fill_manual(values=c("red", "darkred", "green", "blue", "darkblue")) +
+        scale_fill_brewer(palette = "Dark2") +
         geom_bar(stat = "identity", position="dodge") +
-        facet_grid(Category ~ Dataset, scales="free")
+        facet_grid(Category ~ Dataset)
 }
 
 figure.data <- function() {
     # metadata read/write
-    dfmeta <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "metadata", TRUE)
+    dfmeta <- read.dataset(c("tubhiswt", "bbbc", "mitocheck"), "metadata", TRUE)
     dfmeta$cat <- "metadata"
     # pixel read/write
-    dfpix <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
+    dfpix <- read.dataset(c("tubhiswt", "bbbc", "mitocheck"), "pixeldata", TRUE)
     dfpix <- subset(dfpix, test.name == 'read.pixels' | test.name == 'write.pixels')
     dfpix$test.name <- gsub(".pixels", "", dfpix$test.name)
     dfpix$Test <- factor(dfpix$test.name)
     dfpix$cat <- "pixeldata"
 
     # Only plot aggregate read/write
-    dfagg <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
+    dfagg <- read.dataset(c("tubhiswt", "bbbc", "mitocheck"), "pixeldata", TRUE)
     dfagg <- subset(dfagg, test.name == 'read' | test.name == 'write')
     dfagg$Test <- factor(dfagg$test.name)
     dfagg$cat <- "aggregate"
@@ -139,7 +139,7 @@ figure.data <- function() {
     df$Platform <- factor(df$plat)
     df$Test <- factor(df$test.name)
     df$Filename <- factor(df$test.file)
-    df$Dataset <- factor(df$dataset)
+    df$Dataset <- factor(df$dataset, ordered=TRUE)
     df$Category <- factor(df$cat)
 
     df$Implementation <- interaction(df$Language, df$Platform, sep="/", lex.order=TRUE)
@@ -154,7 +154,8 @@ plot.figure1 <- function() {
     filename <- "cpp-fig1.pdf"
     cat("Creating ", filename, "\n")
     p <- figure.bardefaults(df, "Figure 1: Performance") +
-        scale_y_continuous(trans = 'log10',
+    ylab("Execution time (ms)") +
+    scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
                            labels = trans_format('log10', math_format(10^.x)))
     ggsave(filename=filename,
@@ -183,6 +184,7 @@ plot.figure1norm <- function() {
     filename <- "cpp-fig1norm.pdf"
     cat("Creating ", filename, "\n")
     p <- figure.bardefaults(df.norm, "Figure 1: Performance (norm)") +
+        ylab("Performance ratio") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
                            labels = trans_format('log10', math_format(10^.x)))
@@ -225,10 +227,10 @@ plot.suppfigure3 <- function() {
 }
 
 
-#realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "metadata", FALSE)
-#realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "metadata", TRUE)
-#realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", FALSE)
-#realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
+#realtime.compare(c("tubhiswt", "bbbc", "mitocheck"), "metadata", FALSE)
+#realtime.compare(c("tubhiswt", "bbbc", "mitocheck"), "metadata", TRUE)
+#realtime.compare(c("tubhiswt", "bbbc", "mitocheck"), "pixeldata", FALSE)
+#realtime.compare(c("tubhiswt", "bbbc", "mitocheck"), "pixeldata", TRUE)
 
 plot.figure1()
 plot.figure1norm()
