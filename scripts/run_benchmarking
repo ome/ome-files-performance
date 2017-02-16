@@ -2,38 +2,77 @@
 set -e
 set -x
 
+datapath=/data/images/ptest
+#datapath="/data"
+binpath=/tmp/inst
+#binpath="/install/bin"
+resultpath="${datapath}/results"
+outpath="${datapath}/out"
+iterations=20
+
 # Clean results folder
-mkdir -p /data/results
-mkdir -p /data/out
-rm /data/results/* || echo "No results"
-rm /data/out/* || echo "No output"
+mkdir -p "${resultpath}"
+mkdir -p "${outpath}"
+rm "${resultpath}"/* || echo "No results"
+rm "${outpath}"/* || echo "No output"
 
-# Java tests
-mvn -P metadata -Dtest.iterations=20 -Dtest.input=/data/BBBC/NIRHTa-001.ome.tiff -Dtest.output=/data/out/bbbc-java.ome.xml -Dtest.results=/data/results/bbbc-metadata-linux-java.tsv exec:java
-mvn -P metadata -Dtest.iterations=20 -Dtest.input=/data/mitocheck/00001_01.ome.tiff -Dtest.output=/data/out/mitocheck-java.ome.xml -Dtest.results=/data/results/mitocheck-metadata-linux-java.tsv exec:java
-mvn -P metadata -Dtest.iterations=20 -Dtest.input=/data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif -Dtest.output=/data/out/tubhiswt-java.ome.xml -Dtest.results=/data/results/tubhiswt-metadata-linux-java.tsv exec:java
+for test in bbbc mitocheck tubhiswt; do
+    input=unknown
+    case "$test" in
+        bbbc)
+            input=${datapath}/BBBC/NIRHTa-001.ome.tiff
+        ;;
+        mitocheck)
+            input=${datapath}/mitocheck/00001_01.ome.tiff
+        ;;
+        tubhiswt)
+            input=${datapath}/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif
+        ;;
+    esac
 
-mvn -P pixels -Dtest.iterations=20 -Dtest.input=/data/BBBC/NIRHTa-001.ome.tiff -Dtest.output=/data/out/bbbc-java.ome.tiff -Dtest.results=/data/results/bbbc-pixeldata-linux-java.tsv exec:java
-mvn -P pixels -Dtest.iterations=20 -Dtest.input=/data/mitocheck/00001_01.ome.tiff -Dtest.output=/data/out/mitocheck-java.ome.tiff -Dtest.results=/data/results/mitocheck-pixeldata-linux-java.tsv exec:java
-mvn -P pixels -Dtest.iterations=20 -Dtest.input=/data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif -Dtest.output=/data/out/tubhiswt-java.ome.tiff -Dtest.results=/data/results/tubhiswt-pixeldata-linux-java.tsv exec:java
+    # Java tests
+    (
+        mvn -P metadata -Dtest.iterations=${iterations} -Dtest.input="$input" -Dtest.output=${outpath}/${test}-java.ome.xml -Dtest.results=${resultpath}/${test}-metadata-linux-java.tsv exec:java
+        for i in $(seq ${iterations}); do
+            mvn -P metadata -Dtest.iterations=1 -Dtest.input="$input" -Dtest.output=${outpath}/${test}-java-${i}.ome.xml -Dtest.results=${resultpath}/${test}-metadata-linux-java-${i}.tsv exec:java
+        done
 
-# C++ tests
-/install/bin/metadata-performance 20 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-cpp.ome.xml /data/results/bbbc-metadata-linux-cpp.tsv
-/install/bin/metadata-performance 20 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-cpp.ome.xml /data/results/mitocheck-metadata-linux-cpp.tsv
-/install/bin/metadata-performance 20 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-cpp.ome.xml /data/results/tubhiswt-metadata-linux-cpp.tsv
+        mvn -P pixels -Dtest.iterations=${iterations} -Dtest.input="$input" -Dtest.output=${outpath}/${test}-java.ome.tiff -Dtest.results=${resultpath}/${test}-pixeldata-linux-java.tsv exec:java
+        for i in $(seq ${iterations}); do
+            mvn -P pixels -Dtest.iterations=1 -Dtest.input="$input" -Dtest.output=${outpath}/${test}-java-${i}.ome.tiff -Dtest.results=${resultpath}/${test}-pixeldata-linux-java-${i}.tsv exec:java
+        done
+    )
 
-/install/bin/pixels-performance 20 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-cpp.ome.tiff /data/results/bbbc-pixeldata-linux-cpp.tsv
-/install/bin/pixels-performance 20 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-cpp.ome.tiff /data/results/mitocheck-pixeldata-linux-cpp.tsv
-/install/bin/pixels-performance 20 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-cpp.ome.tiff /data/results/tubhiswt-pixeldata-linux-cpp.tsv
+    # C++ tests
+    (
+        ${binpath}/metadata-performance ${iterations} "$input" ${outpath}/${test}-cpp.ome.xml ${resultpath}/${test}-metadata-linux-cpp.tsv
+        for i in $(seq ${iterations}); do
+            ${binpath}/metadata-performance 1 "$input" ${outpath}/${test}-cpp-${1}.ome.xml ${resultpath}/${test}-metadata-linux-cpp-${1}.tsv
+        done
 
-# JACE tests
-cd $BF_JACE_HOME
-/install/bin/metadata-performance-jace 20 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-jace.ome.xml /data/results/bbbc-metadata-linux-jace.tsv
-/install/bin/metadata-performance-jace 20 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-jace.ome.xml /data/results/mitocheck-metadata-linux-jace.tsv
-# Throws boost: mutex exception
-/install/bin/metadata-performance-jace 20 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-jace.ome.xml /data/results/tubhiswt-metadata-linux-jace.tsv || true
+        ${binpath}/pixels-performance ${iterations} "$input" ${outpath}/${test}-cpp.ome.tiff ${resultpath}/${test}-pixeldata-linux-cpp.tsv
+        for i in $(seq ${iterations}); do
+            ${binpath}/pixels-performance 1 "$input" ${outpath}/${test}-cpp-${i}.ome.tiff ${resultpath}/${test}-pixeldata-linux-cpp-${i}.tsv
+        done
+    )
 
-/install/bin/pixels-performance-jace 20 /data/mitocheck/00001_01.ome.tiff /data/out/mitocheck-jace.ome.tiff /data/results/mitocheck-pixeldata-linux-jace.tsv
-/install/bin/pixels-performance-jace 20 /data/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif /data/out/tubhiswt-jace.ome.tiff /data/results/tubhiswt-pixeldata-linux-jace.tsv
-# NB: takes ~1h30 to complete
-/install/bin/pixels-performance-jace 6 /data/BBBC/NIRHTa-001.ome.tiff /data/out/bbbc-jace.ome.tiff /data/results/bbbc-pixeldata-linux-jace.tsv
+    # JACE tests
+    (
+        cd $BF_JACE_HOME
+        # Can throw boost: mutex exception
+        ${binpath}/metadata-performance-jace ${iterations} "$input" ${outpath}/${test}-jace.ome.xml ${resultpath}/${test}-metadata-linux-jace.tsv || true
+        for i in $(seq ${iterations}); do
+            ${binpath}/metadata-performance-jace 1 "$input" ${outpath}/${test}-jace-${i}.ome.xml ${resultpath}/${test}-metadata-linux-jace-${i}.tsv || true
+        done
+
+        jace_iterations=${iterations}
+        # NB: takes ~1h30 to complete
+        if [ "$test" == "BBBC" ]; then
+            jace_iterations=6
+        fi
+        ${binpath}/pixels-performance-jace ${jace_iterations} "$input" ${outpath}/${test}-jace.ome.tiff ${resultpath}/${test}-pixeldata-linux-jace.tsv
+        for i in $(seq ${jace_iterations}); do
+            ${binpath}/pixels-performance-jace 1 "$input" ${outpath}/${test}-jace-${1}.ome.tiff ${resultpath}/${test}-pixeldata-linux-jace-${1}.tsv
+        done
+    )
+done
