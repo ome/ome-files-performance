@@ -92,31 +92,31 @@ realtime.compare <- function(datanames, testname, includejace) {
     plot.dataset(df, testname, includejace)
 }
 
-figure.boxdefaults <- function(df, title) {
+figure.boxdefaults <- function(df, title, logscale) {
     p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
       ylab("Execution time (ms)") + labs(title=title) +
-      scale_y_continuous(trans = 'log10',
-                         breaks = trans_breaks('log10', function(x) 10^x),
-                         labels = trans_format('log10', math_format(10^.x))) +
-      theme(panel.grid.minor.y = element_blank()) +
-      scale_colour_brewer(palette = "Set1") +
-      geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) +
-      facet_wrap(~ Dataset)
-}
-
-figure.bardefaults <- function(df, title) {
-    p <- ggplot(aes(y = proc.real, x = Test, fill=Implementation), data = df) +
-        ylab("Execution time (ms)") + labs(title=title) +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
                            labels = trans_format('log10', math_format(10^.x))) +
         theme(panel.grid.minor.y = element_blank()) +
+        scale_colour_brewer(palette = "Set1") +
+        geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) +
+        facet_wrap(~ Dataset)
+}
+
+figure.bardefaults <- function(df, title) {
+    summary <- group_by(df, Implementation, Test, Dataset, Category) %>%
+        summarise(proc.real = mean(proc.real))
+
+    p <- ggplot(aes(y = proc.real, x = Test, fill=Implementation), data = summary) +
+        ylab("Execution time (ms)") + labs(title=title) +
+        theme(panel.grid.minor.y = element_blank()) +
         scale_fill_manual(values=c("red", "darkred", "green", "blue", "darkblue")) +
-        geom_bar(stat = "summary", fun.y = "mean", position="dodge") +
+        geom_bar(stat = "identity", position="dodge") +
         facet_grid(Category ~ Dataset, scales="free")
 }
 
-figure.data() <- function() {
+figure.data <- function() {
     # metadata read/write
     dfmeta <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "metadata", TRUE)
     dfmeta$cat <- "metadata"
@@ -131,11 +131,9 @@ figure.data() <- function() {
     dfagg <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
     dfagg <- subset(dfagg, test.name == 'read' | test.name == 'write')
     dfagg$Test <- factor(dfagg$test.name)
+    dfagg$cat <- "aggregate"
 
     df <- bind_rows(dfmeta, dfpix, dfagg)
-}
-
-plot.figure1 <- function() {
 
     df$Language <- factor(df$test.lang)
     df$Platform <- factor(df$plat)
@@ -144,28 +142,69 @@ plot.figure1 <- function() {
     df$Dataset <- factor(df$dataset)
     df$Category <- factor(df$cat)
 
+    df$Implementation <- interaction(df$Language, df$Platform, sep="/", lex.order=TRUE)
+
+    df
+}
+
+plot.figure1 <- function() {
+    df <- figure.data()
+#    df <- subset(df, Category != 'aggregate')
+
     filename <- "cpp-fig1.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df, "Figure 1: Performance")
+    p <- figure.bardefaults(df, "Figure 1: Performance") +
+        scale_y_continuous(trans = 'log10',
+                           breaks = trans_breaks('log10', function(x) 10^x),
+                           labels = trans_format('log10', math_format(10^.x)))
+    ggsave(filename=filename,
+           plot=p, width=6, height=6)
+}
+
+plot.figure1norm <- function() {
+    df <- figure.data()
+#    df <- subset(df, Category != 'aggregate')
+
+#    df <- group_by(df, Implementation, Test, Filename, Dataset, Category) %>%
+#        mutate_each(funs(./mean(.[Implementation == "Java/Linux"])), +proc.real)
+                                        #    tapply(df$proc.real, interaction(df$Implementation, df$Test, df$Filename, df$Dataset, df$Category), mean)
+
+    ana <- group_by(filter(df, Implementation == "Java/Linux"), Implementation, Test, Dataset, Category) %>%
+        summarise(proc.real.mean = mean(proc.real))
+
+    df.norm <- left_join(df, ana, by = c("Test", "Dataset", "Category")) %>%
+        mutate(proc.real = proc.real / proc.real.mean)
+    df.norm$Implementation <- df.norm$Implementation.x
+
+    ana2 <- group_by(df.norm, Implementation, Test, Dataset, Category) %>%
+        summarise(proc.real.mean = mean(proc.real))
+#    select(df.norm, Filesname=) [,c("Test", "Dataset", "Category", "Implementation", "proc.real", "proc.real.mean")]  
+
+    filename <- "cpp-fig1norm.pdf"
+    cat("Creating ", filename, "\n")
+    p <- figure.bardefaults(df.norm, "Figure 1: Performance (norm)") +
+        scale_y_continuous(trans = 'log10',
+                           breaks = trans_breaks('log10', function(x) 10^x),
+                           labels = trans_format('log10', math_format(10^.x)))
+
     ggsave(filename=filename,
            plot=p, width=6, height=6)
 }
 
 plot.suppfigure1 <- function() {
-    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "metadata", TRUE)
+    df <- figure.data()
+    df <- subset(df, Category == 'metadata')
 
     filename <- "cpp-suppfig1.pdf"
     cat("Creating ", filename, "\n")
     p <- figure.boxdefaults(df, "Figure 1: Metadata performance")
+
     ggsave(filename=filename,
            plot=p, width=6, height=3)
 }
 plot.suppfigure2 <- function() {
-    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
-    # Only plot pixel read/write
-    df <- subset(df, test.name == 'read.pixels' | test.name == 'write.pixels')
-    df$test.name <- gsub(".pixels", "", df$test.name)
-    df$Test <- factor(df$test.name)
+    df <- figure.data()
+    df <- subset(df, Category == 'pixeldata')
 
     filename <- "cpp-suppfig2.pdf"
     cat("Creating ", filename, "\n")
@@ -175,10 +214,8 @@ plot.suppfigure2 <- function() {
 }
 
 plot.suppfigure3 <- function() {
-    df <- read.dataset(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
-    # Only plot aggregate read/write
-    df <- subset(df, test.name == 'read' | test.name == 'write')
-    df$Test <- factor(df$test.name)
+    df <- figure.data()
+    df <- subset(df, Category == 'aggregate')
 
     filename <- "cpp-suppfig3.pdf"
     cat("Creating ", filename, "\n")
@@ -194,6 +231,7 @@ plot.suppfigure3 <- function() {
 #realtime.compare(c("bbbc", "mitocheck", "tubhiswt"), "pixeldata", TRUE)
 
 plot.figure1()
+plot.figure1norm()
 plot.suppfigure1()
 plot.suppfigure2()
 plot.suppfigure3()
