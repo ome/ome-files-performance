@@ -104,16 +104,19 @@ figure.boxdefaults <- function(df, title, logscale) {
         facet_wrap(~ Dataset)
 }
 
-figure.bardefaults <- function(df, title) {
+figure.bardefaults <- function(df, title, free) {
     summary <- group_by(df, Implementation, Test, Dataset, Category) %>%
         summarise(proc.real = mean(proc.real))
 
+    scales <- "fixed"
+    if(free)
+        scales <- "free_y"
     p <- ggplot(aes(y = proc.real, x = Test, fill=Implementation), data = summary) +
         labs(title=title) +
         theme(panel.grid.minor.y = element_blank()) +
         scale_fill_brewer(palette = "Dark2") +
         geom_bar(stat = "identity", position="dodge") +
-        facet_grid(Category ~ Dataset)
+        facet_grid(Category ~ Dataset, scales=scales)
 }
 
 figure.data <- function() {
@@ -153,9 +156,9 @@ plot.figure1 <- function() {
 
     filename <- "cpp-fig1.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df, "Figure 1: Performance") +
+    p <- figure.bardefaults(df, "Figure 1: Performance", TRUE) +
     ylab("Execution time (ms)") +
-    scale_y_continuous(trans = 'log10',
+        scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
                            labels = trans_format('log10', math_format(10^.x)))
     ggsave(filename=filename,
@@ -183,7 +186,7 @@ plot.figure1norm <- function() {
 
     filename <- "cpp-fig1norm.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df.norm, "Figure 1: Performance (norm)") +
+    p <- figure.bardefaults(df.norm, "Figure 1: Performance (norm)", FALSE) +
         ylab("Performance ratio") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
