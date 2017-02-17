@@ -70,7 +70,7 @@ for test in bbbc mitocheck tubhiswt; do
         fi
         ${binpath}/pixels-performance-jace ${jace_iterations} "$input" ${outpath}/${test}-jace.ome.tiff ${resultpath}/${test}-pixeldata-linux-jace.tsv
         for i in $(seq ${jace_iterations}); do
-            ${binpath}/pixels-performance-jace 1 "$input" ${outpath}/${test}-jace-${i}.ome.tiff ${resultpath}/${test}-pixeldata-linux-jace-${i}.tsv
+            ${binpath}/pixels-performance-jace 1 "$input" ${outpath}/${test}-jace.ome.tiff ${resultpath}/${test}-pixeldata-linux-jace-${i}.tsv
         done
     )
 done
