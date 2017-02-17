@@ -132,13 +132,13 @@ for %%T in (bbbc mitocheck tubhiswt) do (
     REM Run Java metadata performance tests
     call mvn -P metadata -Dtest.iterations=%iterations% -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.xml -Dtest.results=%resultsdir%\!test!-metadata-win-java.tsv exec:java
     for /L %%I IN (1,1,!iterations!) do (
-        call mvn -P metadata -Dtest.iterations=1 -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java-%%I.ome.xml -Dtest.results=%resultsdir%\!test!-metadata-win-java-%%I.tsv exec:java
+        call mvn -P metadata -Dtest.iterations=1 -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.xml -Dtest.results=%resultsdir%\!test!-metadata-win-java-%%I.tsv exec:java
     )
 
     REM Run Java pixels performance tests
     call mvn -P pixels -Dtest.iterations=%iterations% -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.tiff -Dtest.results=%resultsdir%\!test!-pixeldata-win-java.tsv exec:java
     for /L %%I IN (1,1,!iterations!) do (
-        call mvn -P pixels -Dtest.iterations=1 -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java-%%I.ome.tiff -Dtest.results=%resultsdir%\!test!-pixeldata-win-java-%%I.tsv exec:java
+        call mvn -P pixels -Dtest.iterations=1 -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.tiff -Dtest.results=%resultsdir%\!test!-pixeldata-win-java-%%I.tsv exec:java
     )
 
     REM Execute C++ performance tests
@@ -147,12 +147,12 @@ for %%T in (bbbc mitocheck tubhiswt) do (
     REM Run C++ metadata tests
     install\bin\metadata-performance %iterations% !input!  %outdir%\!test!-cpp.ome.xml %resultsdir%\!test!-metadata-win-cpp.tsv
     for /L %%I IN (1,1,!iterations!) do (
-        install\bin\metadata-performance 1 !input!  %outdir%\!test!-cpp-%%I.ome.xml %resultsdir%\!test!-metadata-win-cpp-%%I.tsv
+        install\bin\metadata-performance 1 !input!  %outdir%\!test!-cpp.ome.xml %resultsdir%\!test!-metadata-win-cpp-%%I.tsv
     )
 
     REM Run C++ pixels performance tests
     install\bin\pixels-performance %iterations% !input! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-pixeldata-win-cpp.tsv
     for /L %%I IN (1,1,!iterations!) do (
-        install\bin\pixels-performance 1 !input! %outdir%\!test!-cpp-%%I.ome.tiff %resultsdir%\!test!-pixeldata-win-cpp-%%I.tsv
+        install\bin\pixels-performance 1 !input! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-pixeldata-win-cpp-%%I.tsv
     )
 )
