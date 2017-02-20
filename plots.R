@@ -36,19 +36,48 @@ dataset.name <- function(filename) {
     t
 }
 
-read.dataset <- function(datanames, testname, includejace) {
+read.dataset <- function(datanames, testname, separate,
+                         includejace) {
     df <- data.frame()
     for(dataname in datanames) {
         for(platform in c("linux", "win")) {
-            df.cpp <- read.table(paste(dataname, testname, platform, "cpp.tsv", sep="-"),
-                                 header=TRUE, sep="\t", stringsAsFactors=FALSE)
+            if(separate == TRUE) {
+                df.cpp <- data.frame()
+                for(filename in paste(paste(dataname, testname, platform, "cpp", seq(1,20,1), sep="-"), "tsv", sep=".")) {
+                    df.cpp.tmp <- read.table(filename,
+                                             header=TRUE, sep="\t", stringsAsFactors=FALSE)
+                    df.cpp <- bind_rows(df.cpp, df.cpp.tmp)
+                }
+            } else {
+                df.cpp <- read.table(paste(dataname, testname, platform, "cpp.tsv", sep="-"),
+                                     header=TRUE, sep="\t", stringsAsFactors=FALSE)
+            }
             df.jace <- data.frame()
             if (includejace == TRUE && platform == "linux") {
-                df.jace <- read.table(paste(dataname, testname, platform, "jace.tsv", sep="-"),
+                if(separate == TRUE) {
+                    for(filename in paste(paste(dataname, testname, platform, "jace", seq(1,20,1), sep="-"), "tsv", sep=".")) {
+                        if(file.exists(filename)) {
+                            df.jace.tmp <- read.table(filename,
+                                                      header=TRUE, sep="\t", stringsAsFactors=FALSE)
+                            df.jace <- bind_rows(df.jace, df.jace.tmp)
+                        }
+                    }
+                } else {
+                    df.jace <- read.table(paste(dataname, testname, platform, "jace.tsv", sep="-"),
+                                          header=TRUE, sep="\t", stringsAsFactors=FALSE)
+                }
+            }
+            if(separate == TRUE) {
+                df.java <- data.frame()
+                for(filename in paste(paste(dataname, testname, platform, "java", seq(1,20,1), sep="-"), "tsv", sep=".")) {
+                    df.java.tmp <- read.table(filename,
+                                             header=TRUE, sep="\t", stringsAsFactors=FALSE)
+                    df.java <- bind_rows(df.java, df.java.tmp)
+                }
+            } else {
+                df.java <- read.table(paste(dataname, testname, platform, "java.tsv", sep="-"),
                                       header=TRUE, sep="\t", stringsAsFactors=FALSE)
             }
-            df.java <- read.table(paste(dataname, testname, platform, "java.tsv", sep="-"),
-                                  header=TRUE, sep="\t", stringsAsFactors=FALSE)
             names(df.java)[names(df.java) == 'real'] <- 'proc.real'
 
             platdf <- bind_rows(df.cpp, df.jace, df.java)
@@ -87,8 +116,8 @@ plot.dataset <- function(df, testname, includejace) {
            plot=p, width=6, height=8)
 }
 
-realtime.compare <- function(datanames, testname, includejace) {
-    df <- read.dataset(datanames, testname, includejace)
+realtime.compare <- function(datanames, testname, separate, includejace) {
+    df <- read.dataset(datanames, testname, separate, includejace)
     plot.dataset(df, testname, includejace)
 }
 
@@ -101,7 +130,7 @@ figure.boxdefaults <- function(df, title, logscale) {
         theme(panel.grid.minor.y = element_blank()) +
         scale_colour_brewer(palette = "Dark2") +
         geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) +
-        facet_wrap(~ Dataset)
+        facet_grid(Category ~ Dataset, scales="free_y")
 }
 
 figure.bardefaults <- function(df, title, free) {
@@ -119,19 +148,19 @@ figure.bardefaults <- function(df, title, free) {
         facet_grid(Category ~ Dataset, scales=scales)
 }
 
-figure.data <- function() {
+figure.data <- function(separate) {
     # metadata read/write
-    dfmeta <- read.dataset(c("tubhiswt", "bbbc", "mitocheck"), "metadata", TRUE)
+    dfmeta <- read.dataset(c("tubhiswt", "bbbc", "mitocheck"), "metadata", separate, TRUE)
     dfmeta$cat <- "metadata"
     # pixel read/write
-    dfpix <- read.dataset(c("tubhiswt", "bbbc", "mitocheck"), "pixeldata", TRUE)
+    dfpix <- read.dataset(c("tubhiswt", "bbbc", "mitocheck"), "pixeldata", separate, TRUE)
     dfpix <- subset(dfpix, test.name == 'read.pixels' | test.name == 'write.pixels')
     dfpix$test.name <- gsub(".pixels", "", dfpix$test.name)
     dfpix$Test <- factor(dfpix$test.name)
     dfpix$cat <- "pixeldata"
 
     # Only plot aggregate read/write
-    dfagg <- read.dataset(c("tubhiswt", "bbbc", "mitocheck"), "pixeldata", TRUE)
+    dfagg <- read.dataset(c("tubhiswt", "bbbc", "mitocheck"), "pixeldata", separate, TRUE)
     dfagg <- subset(dfagg, test.name == 'read' | test.name == 'write')
     dfagg$Test <- factor(dfagg$test.name)
     dfagg$cat <- "aggregate"
@@ -143,31 +172,16 @@ figure.data <- function() {
     df$Test <- factor(df$test.name)
     df$Filename <- factor(df$test.file)
     df$Dataset <- factor(df$dataset, levels = c("tubhiswt", "BBBC", "MitoCheck"))
-    df$Category <- factor(df$cat)
+    df$Category <- factor(df$cat, levels = c("metadata", "pixeldata", "aggregate"))
 
     df$Implementation <- interaction(df$Language, df$Platform, sep="/", lex.order=TRUE)
 
     df
 }
 
-plot.figure1 <- function() {
-    df <- figure.data()
-#    df <- subset(df, Category != 'aggregate')
-
-    filename <- "cpp-fig1.pdf"
-    cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df, "Figure 1: Performance", TRUE) +
-    ylab("Execution time (ms)") +
-        scale_y_continuous(trans = 'log10',
-                           breaks = trans_breaks('log10', function(x) 10^x),
-                           labels = trans_format('log10', math_format(10^.x)))
-    ggsave(filename=filename,
-           plot=p, width=6, height=6)
-}
-
-plot.figure1norm <- function() {
-    df <- figure.data()
-#    df <- subset(df, Category != 'aggregate')
+plot.figure2 <- function() {
+    df <- figure.data(TRUE)
+    df <- subset(df, Category != 'aggregate')
 
 #    df <- group_by(df, Implementation, Test, Filename, Dataset, Category) %>%
 #        mutate_each(funs(./mean(.[Implementation == "Java/Linux"])), +proc.real)
@@ -184,59 +198,111 @@ plot.figure1norm <- function() {
         summarise(proc.real.mean = mean(proc.real))
 #    select(df.norm, Filesname=) [,c("Test", "Dataset", "Category", "Implementation", "proc.real", "proc.real.mean")]  
 
-    filename <- "cpp-fig1norm.pdf"
+    filename <- "files-fig2.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df.norm, "Figure 1: Performance (norm)", FALSE) +
+    p <- figure.bardefaults(df.norm, "Figure 2: Relative performance", FALSE) +
         ylab("Performance ratio") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
+                           labels = trans_format('log10', math_format(10^.x)),
+                           limits=c(-100,100))
+
+    ggsave(filename=filename,
+           plot=p, width=6, height=4)
+}
+
+plot.suppfigure1 <- function() {
+    df <- figure.data(TRUE)
+    df <- subset(df, Category != 'aggregate')
+
+    filename <- "files-suppfig1.pdf"
+    cat("Creating ", filename, "\n")
+    p <- figure.bardefaults(df, "Supplementary Figure 1: Absolute performance", TRUE) +
+    ylab("Execution time (ms)") +
+        scale_y_continuous(trans = 'log10',
+                           breaks = trans_breaks('log10', function(x) 10^x),
                            labels = trans_format('log10', math_format(10^.x)))
+    ggsave(filename=filename,
+           plot=p, width=6, height=4)
+}
+
+plot.suppfigure2 <- function() {
+    df <- figure.data(FALSE)
+    df <- subset(df, Category != 'aggregate')
+
+#    df <- group_by(df, Implementation, Test, Filename, Dataset, Category) %>%
+#        mutate_each(funs(./mean(.[Implementation == "Java/Linux"])), +proc.real)
+                                        #    tapply(df$proc.real, interaction(df$Implementation, df$Test, df$Filename, df$Dataset, df$Category), mean)
+
+    ana <- group_by(filter(df, Implementation == "Java/Linux"), Implementation, Test, Dataset, Category) %>%
+        summarise(proc.real.mean = mean(proc.real))
+
+    df.norm <- left_join(df, ana, by = c("Test", "Dataset", "Category")) %>%
+        mutate(proc.real = proc.real / proc.real.mean)
+    df.norm$Implementation <- df.norm$Implementation.x
+
+    ana2 <- group_by(df.norm, Implementation, Test, Dataset, Category) %>%
+        summarise(proc.real.mean = mean(proc.real))
+#    select(df.norm, Filesname=) [,c("Test", "Dataset", "Category", "Implementation", "proc.real", "proc.real.mean")]  
+
+    filename <- "files-suppfig2.pdf"
+    cat("Creating ", filename, "\n")
+    p <- figure.bardefaults(df.norm, "Supplementary Figure 2: Relative performance (repeated)", FALSE) +
+        ylab("Performance ratio") +
+        scale_y_continuous(trans = 'log10',
+                           breaks = trans_breaks('log10', function(x) 10^x),
+                           labels = trans_format('log10', math_format(10^.x)),
+                           limits=c(-100,100))
+
+    ggsave(filename=filename,
+           plot=p, width=6, height=4)
+}
+
+plot.suppfigure3 <- function() {
+    df <- figure.data(FALSE)
+    df <- subset(df, Category != 'aggregate')
+
+    filename <- "files-suppfig3.pdf"
+    cat("Creating ", filename, "\n")
+    p <- figure.bardefaults(df, "Supplementary Figure 3: Absolute performance (repeated)", TRUE) +
+    ylab("Execution time (ms)") +
+        scale_y_continuous(trans = 'log10',
+                           breaks = trans_breaks('log10', function(x) 10^x),
+                           labels = trans_format('log10', math_format(10^.x)))
+    ggsave(filename=filename,
+           plot=p, width=6, height=4)
+}
+
+plot.suppfigure4 <- function() {
+    df <- figure.data(TRUE)
+
+    filename <- "files-suppfig4.pdf"
+    cat("Creating ", filename, "\n")
+    p <- figure.boxdefaults(df, "Supplementary Figure 4: Absolute performance (detail)")
 
     ggsave(filename=filename,
            plot=p, width=6, height=6)
 }
 
-plot.suppfigure1 <- function() {
-    df <- figure.data()
-    df <- subset(df, Category == 'metadata')
+plot.suppfigure5 <- function() {
+    df <- figure.data(FALSE)
 
-    filename <- "cpp-suppfig1.pdf"
+    filename <- "files-suppfig5.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.boxdefaults(df, "Figure 1: Metadata performance")
+    p <- figure.boxdefaults(df, "Supplementary Figure 5: Absolute performance (detail, repeated)")
 
     ggsave(filename=filename,
-           plot=p, width=6, height=3)
+           plot=p, width=6, height=6)
 }
-plot.suppfigure2 <- function() {
-    df <- figure.data()
-    df <- subset(df, Category == 'pixeldata')
-
-    filename <- "cpp-suppfig2.pdf"
-    cat("Creating ", filename, "\n")
-    p <- figure.boxdefaults(df, "Figure 2: Pixel data performance")
-    ggsave(filename=filename,
-           plot=p, width=6, height=3)
-}
-
-plot.suppfigure3 <- function() {
-    df <- figure.data()
-    df <- subset(df, Category == 'aggregate')
-
-    filename <- "cpp-suppfig3.pdf"
-    cat("Creating ", filename, "\n")
-    p <- figure.boxdefaults(df, "Figure 3: Reader and writer aggregate performance")
-    ggsave(filename=filename,
-           plot=p, width=6, height=3)
-}
-
 
 #realtime.compare(c("tubhiswt", "bbbc", "mitocheck"), "metadata", FALSE)
 #realtime.compare(c("tubhiswt", "bbbc", "mitocheck"), "metadata", TRUE)
 #realtime.compare(c("tubhiswt", "bbbc", "mitocheck"), "pixeldata", FALSE)
 #realtime.compare(c("tubhiswt", "bbbc", "mitocheck"), "pixeldata", TRUE)
 
-plot.figure1()
-plot.figure1norm()
+plot.figure2()
 plot.suppfigure1()
 plot.suppfigure2()
 plot.suppfigure3()
+plot.suppfigure4()
+plot.suppfigure5()
