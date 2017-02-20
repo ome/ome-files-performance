@@ -205,7 +205,7 @@ plot.figure2 <- function() {
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
                            labels = trans_format('log10', math_format(10^.x)),
-                           limits=c(-100,100))
+                           limits=c(0.01,100))
 
     ggsave(filename=filename,
            plot=p, width=6, height=4)
@@ -252,7 +252,7 @@ plot.suppfigure2 <- function() {
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
                            labels = trans_format('log10', math_format(10^.x)),
-                           limits=c(-100,100))
+                           limits=c(0.01,100))
 
     ggsave(filename=filename,
            plot=p, width=6, height=4)
