@@ -1,0 +1,3 @@
+test.lang	test.name	test.file	system.time	thread.time	proc.real	proc.user	proc.system
+JACE	metadata.read	00001_01.ome.tiff	1255	1232	1260	2750	130
+JACE	metadata.write	00001_01.ome.tiff	8479	8065	8480	12720	770

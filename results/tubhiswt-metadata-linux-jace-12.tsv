@@ -1,0 +1,3 @@
+test.lang	test.name	test.file	system.time	thread.time	proc.real	proc.user	proc.system
+JACE	metadata.read	tubhiswt_C0_TP0.ome.tif	608	607	610	1340	10
+JACE	metadata.write	tubhiswt_C0_TP0.ome.tif	1133	939	1130	2410	20
