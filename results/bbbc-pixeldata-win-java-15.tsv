@@ -1,0 +1,8 @@
+test.lang	test.name	test.file	real	proc.cpu	proc.user	proc.system
+Java	pixeldata.read	NIRHTa-001.ome.tiff	164082	160462	105378	55083
+Java	pixeldata.read.init	NIRHTa-001.ome.tiff	3526	3494	2480	1014
+Java	pixeldata.read.pixels	NIRHTa-001.ome.tiff	160556	156968	102898	54069
+Java	pixeldata.write	NIRHTa-001.ome.tiff	181078	101759	70668	31090
+Java	pixeldata.write.init	NIRHTa-001.ome.tiff	12	15	15	0
+Java	pixeldata.write.pixels	NIRHTa-001.ome.tiff	175865	96595	67704	28891
+Java	pixeldata.write.close	NIRHTa-001.ome.tiff	5199	5148	2948	2199
