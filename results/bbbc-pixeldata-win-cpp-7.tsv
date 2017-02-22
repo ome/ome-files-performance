@@ -1,8 +1,8 @@
 test.lang	test.name	test.file	proc.real	proc.user	proc.system
-C++	pixeldata.read	NIRHTa-001.ome.tiff	15878	7254	8595
-C++	pixeldata.read.init	NIRHTa-001.ome.tiff	4533	3712	811
-C++	pixeldata.read.pixels	NIRHTa-001.ome.tiff	11345	3541	7784
-C++	pixeldata.write	NIRHTa-001.ome.tiff	86651	12901	73694
-C++	pixeldata.write.init	NIRHTa-001.ome.tiff	1753	1731	15
-C++	pixeldata.write.pixels	NIRHTa-001.ome.tiff	83454	9750	73663
-C++	pixeldata.write.close	NIRHTa-001.ome.tiff	1444	1419	15
+C++	pixeldata.read	NIRHTa-001.ome.tiff	15626	7035	8580
+C++	pixeldata.read.init	NIRHTa-001.ome.tiff	4534	3572	951
+C++	pixeldata.read.pixels	NIRHTa-001.ome.tiff	11092	3463	7628
+C++	pixeldata.write	NIRHTa-001.ome.tiff	85335	11856	73460
+C++	pixeldata.write.init	NIRHTa-001.ome.tiff	1704	1684	15
+C++	pixeldata.write.pixels	NIRHTa-001.ome.tiff	82158	8751	73382
+C++	pixeldata.write.close	NIRHTa-001.ome.tiff	1473	1419	62

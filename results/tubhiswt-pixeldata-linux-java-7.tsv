@@ -1,8 +1,8 @@
 test.lang	test.name	test.file	real	proc.cpu	proc.user	proc.system
-Java	pixeldata.read	tubhiswt_C0_TP0.ome.tif	3973	3801	3250	551
-Java	pixeldata.read.init	tubhiswt_C0_TP0.ome.tif	769	766	750	16
-Java	pixeldata.read.pixels	tubhiswt_C0_TP0.ome.tif	3204	3034	2500	534
-Java	pixeldata.write	tubhiswt_C0_TP0.ome.tif	6990	6939	5380	1559
-Java	pixeldata.write.init	tubhiswt_C0_TP0.ome.tif	4	4	10	-5
-Java	pixeldata.write.pixels	tubhiswt_C0_TP0.ome.tif	6303	6253	4760	1493
-Java	pixeldata.write.close	tubhiswt_C0_TP0.ome.tif	682	681	610	71
+Java	pixeldata.read	tubhiswt_C0_TP0.ome.tif	4074	3918	3290	628
+Java	pixeldata.read.init	tubhiswt_C0_TP0.ome.tif	745	741	710	31
+Java	pixeldata.read.pixels	tubhiswt_C0_TP0.ome.tif	3329	3176	2580	596
+Java	pixeldata.write	tubhiswt_C0_TP0.ome.tif	7152	7105	5400	1705
+Java	pixeldata.write.init	tubhiswt_C0_TP0.ome.tif	4	4	0	4
+Java	pixeldata.write.pixels	tubhiswt_C0_TP0.ome.tif	6490	6445	4820	1625
+Java	pixeldata.write.close	tubhiswt_C0_TP0.ome.tif	657	656	580	76

@@ -1,3 +1,3 @@
 test.lang	test.name	test.file	proc.real	proc.user	proc.system
-C++	metadata.read	NIRHTa-001.ome.tiff	2135	1965	171
-C++	metadata.write	NIRHTa-001.ome.tiff	1386	1372	15
+C++	metadata.read	NIRHTa-001.ome.tiff	2225	2121	109
+C++	metadata.write	NIRHTa-001.ome.tiff	1467	1404	62

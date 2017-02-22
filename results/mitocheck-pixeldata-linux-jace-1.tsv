@@ -1,8 +1,8 @@
 test.lang	test.name	test.file	system.time	thread.time	proc.real	proc.user	proc.system
-JACE	pixeldata.read	00001_01.ome.tiff	2974	2906	2980	5330	720
-JACE	pixeldata.read.init	00001_01.ome.tiff	1665	1664	1670	3320	70
-JACE	pixeldata.read.pixels	00001_01.ome.tiff	1308	1241	1310	2010	650
-JACE	pixeldata.write	00001_01.ome.tiff	6888	6762	6890	8880	2080
-JACE	pixeldata.write.init	00001_01.ome.tiff	5	5	10	0	0
-JACE	pixeldata.write.pixels	00001_01.ome.tiff	5018	4895	5020	5320	2020
-JACE	pixeldata.write.close	00001_01.ome.tiff	1864	1860	1860	3560	60
+JACE	pixeldata.read	00001_01.ome.tiff	2964	2895	2970	5000	960
+JACE	pixeldata.read.init	00001_01.ome.tiff	1641	1640	1650	3170	80
+JACE	pixeldata.read.pixels	00001_01.ome.tiff	1323	1254	1320	1830	880
+JACE	pixeldata.write	00001_01.ome.tiff	7087	6956	7080	9340	1940
+JACE	pixeldata.write.init	00001_01.ome.tiff	5	5	0	10	0
+JACE	pixeldata.write.pixels	00001_01.ome.tiff	5118	4990	5120	5790	1790
+JACE	pixeldata.write.close	00001_01.ome.tiff	1963	1960	1960	3540	150

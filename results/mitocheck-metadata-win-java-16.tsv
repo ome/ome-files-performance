@@ -1,3 +1,3 @@
 test.lang	test.name	test.file	real	proc.cpu	proc.user	proc.system
-Java	metadata.read	00001_01.ome.tiff	1181	1154	1092	62
-Java	metadata.write	00001_01.ome.tiff	6531	6318	6302	15
+Java	metadata.read	00001_01.ome.tiff	1179	1138	1092	46
+Java	metadata.write	00001_01.ome.tiff	6588	6380	6333	46

@@ -1,3 +1,3 @@
 test.lang	test.name	test.file	real	proc.cpu	proc.user	proc.system
-Java	metadata.read	NIRHTa-001.ome.tiff	994	982	936	46
-Java	metadata.write	NIRHTa-001.ome.tiff	3095	2870	2839	31
+Java	metadata.read	NIRHTa-001.ome.tiff	981	982	920	62
+Java	metadata.write	NIRHTa-001.ome.tiff	3043	2808	2792	15

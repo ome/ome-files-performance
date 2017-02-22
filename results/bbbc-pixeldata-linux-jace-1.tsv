@@ -1,8 +1,8 @@
 test.lang	test.name	test.file	system.time	thread.time	proc.real	proc.user	proc.system
-JACE	pixeldata.read	NIRHTa-001.ome.tiff	112470	109040	112470	157970	12140
-JACE	pixeldata.read.init	NIRHTa-001.ome.tiff	2769	2768	2770	4810	200
-JACE	pixeldata.read.pixels	NIRHTa-001.ome.tiff	109700	106272	109700	153160	11940
-JACE	pixeldata.write	NIRHTa-001.ome.tiff	4236159	4209201	4236160	2814370	1781120
+JACE	pixeldata.read	NIRHTa-001.ome.tiff	110239	107138	110240	150790	11490
+JACE	pixeldata.read.init	NIRHTa-001.ome.tiff	2733	2732	2730	4730	190
+JACE	pixeldata.read.pixels	NIRHTa-001.ome.tiff	107505	104406	107510	146060	11300
+JACE	pixeldata.write	NIRHTa-001.ome.tiff	4357476	4333226	4357480	2788760	1889820
 JACE	pixeldata.write.init	NIRHTa-001.ome.tiff	15	15	20	20	0
-JACE	pixeldata.write.pixels	NIRHTa-001.ome.tiff	4232379	4205436	4232380	2809970	1780090
-JACE	pixeldata.write.close	NIRHTa-001.ome.tiff	3764	3749	3760	4380	1030
+JACE	pixeldata.write.pixels	NIRHTa-001.ome.tiff	4353587	4329353	4353580	2784390	1888710
+JACE	pixeldata.write.close	NIRHTa-001.ome.tiff	3872	3857	3880	4350	1110

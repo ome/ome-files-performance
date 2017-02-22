@@ -1,3 +1,3 @@
 test.lang	test.name	test.file	proc.real	proc.user	proc.system
-C++	metadata.read	tubhiswt_C0_TP0.ome.tif	174	171	0
-C++	metadata.write	tubhiswt_C0_TP0.ome.tif	111	109	0
+C++	metadata.read	tubhiswt_C0_TP0.ome.tif	176	124	46
+C++	metadata.write	tubhiswt_C0_TP0.ome.tif	113	124	0

@@ -1,8 +1,8 @@
 test.lang	test.name	test.file	real	proc.cpu	proc.user	proc.system
-Java	pixeldata.read	00001_01.ome.tiff	2857	2736	2570	166
-Java	pixeldata.read.init	00001_01.ome.tiff	1588	1559	1520	39
-Java	pixeldata.read.pixels	00001_01.ome.tiff	1268	1176	1050	126
-Java	pixeldata.write	00001_01.ome.tiff	4493	4470	4080	390
-Java	pixeldata.write.init	00001_01.ome.tiff	4	4	0	4
-Java	pixeldata.write.pixels	00001_01.ome.tiff	2805	2784	2440	344
-Java	pixeldata.write.close	00001_01.ome.tiff	1683	1681	1640	41
+Java	pixeldata.read	00001_01.ome.tiff	2727	2611	2470	141
+Java	pixeldata.read.init	00001_01.ome.tiff	1503	1473	1440	33
+Java	pixeldata.read.pixels	00001_01.ome.tiff	1224	1138	1030	108
+Java	pixeldata.write	00001_01.ome.tiff	4543	4515	4120	395
+Java	pixeldata.write.init	00001_01.ome.tiff	4	4	10	-5
+Java	pixeldata.write.pixels	00001_01.ome.tiff	2839	2813	2450	363
+Java	pixeldata.write.close	00001_01.ome.tiff	1700	1697	1660	37
