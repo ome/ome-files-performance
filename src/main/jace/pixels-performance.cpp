@@ -49,8 +49,8 @@
 
 // for Bio-Formats C++ bindings
 #include <jace/javacast.h>
-#include <formats-api-5.3.3.h>
-#include <formats-bsd-5.3.3.h>
+#include <formats-api-5.3.4.h>
+#include <formats-bsd-5.3.4.h>
 #include <ome-common-5.3.1.h>
 
 #include <jace/proxy/ome/xml/model/primitives/PositiveInteger.h>
