@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+if [ -d analysis ]; then
+    rm -rf analysis
+fi
+mkdir analysis
+
+R --vanilla BATCH < scripts/plots.R
