@@ -44,12 +44,13 @@ read.dataset <- function(datanames, testname, separate,
             if(separate == TRUE) {
                 df.cpp <- data.frame()
                 for(filename in paste(paste(dataname, testname, platform, "cpp", seq(1,20,1), sep="-"), "tsv", sep=".")) {
-                    df.cpp.tmp <- read.table(filename,
+                    df.cpp.tmp <- read.table(paste("results", filename, sep="/"),
                                              header=TRUE, sep="\t", stringsAsFactors=FALSE)
                     df.cpp <- bind_rows(df.cpp, df.cpp.tmp)
                 }
             } else {
-                df.cpp <- read.table(paste(dataname, testname, platform, "cpp.tsv", sep="-"),
+                filename <- paste(dataname, testname, platform, "cpp.tsv", sep="-")
+                df.cpp <- read.table(paste("results", filename, sep="/"),
                                      header=TRUE, sep="\t", stringsAsFactors=FALSE)
             }
             df.jace <- data.frame()
@@ -57,25 +58,27 @@ read.dataset <- function(datanames, testname, separate,
                 if(separate == TRUE) {
                     for(filename in paste(paste(dataname, testname, platform, "jace", seq(1,20,1), sep="-"), "tsv", sep=".")) {
                         if(file.exists(filename)) {
-                            df.jace.tmp <- read.table(filename,
+                            df.jace.tmp <- read.table(paste("results", filename, sep="/"),
                                                       header=TRUE, sep="\t", stringsAsFactors=FALSE)
                             df.jace <- bind_rows(df.jace, df.jace.tmp)
                         }
                     }
                 } else {
-                    df.jace <- read.table(paste(dataname, testname, platform, "jace.tsv", sep="-"),
+                    filename <- paste(dataname, testname, platform, "jace.tsv", sep="-")
+                    df.jace <- read.table(paste("results", filename, sep="/"),
                                           header=TRUE, sep="\t", stringsAsFactors=FALSE)
                 }
             }
             if(separate == TRUE) {
                 df.java <- data.frame()
                 for(filename in paste(paste(dataname, testname, platform, "java", seq(1,20,1), sep="-"), "tsv", sep=".")) {
-                    df.java.tmp <- read.table(filename,
+                    df.java.tmp <- read.table(paste("results", filename, sep="/"),
                                              header=TRUE, sep="\t", stringsAsFactors=FALSE)
                     df.java <- bind_rows(df.java, df.java.tmp)
                 }
             } else {
-                df.java <- read.table(paste(dataname, testname, platform, "java.tsv", sep="-"),
+                filename <- paste(dataname, testname, platform, "java.tsv", sep="-")
+                df.java <- read.table(paste("results", filename, sep="/"),
                                       header=TRUE, sep="\t", stringsAsFactors=FALSE)
             }
             names(df.java)[names(df.java) == 'real'] <- 'proc.real'
@@ -106,9 +109,9 @@ read.dataset <- function(datanames, testname, separate,
 }
 
 plot.dataset <- function(df, testname, includejace) {
-    filename <- paste(testname, "realtime.pdf", sep="-")
+    filename <- paste(testname, "analysis/realtime.pdf", sep="-")
     if (includejace == TRUE) {
-        filename <- paste(testname, "realtime-withjace.pdf", sep="-")
+        filename <- paste(testname, "analysis/realtime-withjace.pdf", sep="-")
     }
     cat("Creating ", filename, "\n")
     p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) + ylab("Execution time (ms)") + labs(title=paste(testname)) + theme(axis.text.x=element_text(angle = 45, hjust = 1.0, vjust = 1.0)) + geom_boxplot(lwd=0.25, fatten = 2, outlier.size=0.5) + facet_wrap(~ Dataset, ncol= 1, scales = "free_y")
@@ -205,7 +208,7 @@ plot.figure2 <- function() {
 
     df <- subset(df, Category != 'aggregate')
 
-    filename <- "files-fig2.pdf"
+    filename <- "analysis/files-fig2.pdf"
     cat("Creating ", filename, "\n")
     p <- figure.bardefaults(df, "Figure 2: Relative performance", FALSE) +
         ylab("Performance ratio") +
@@ -222,7 +225,7 @@ plot.suppfigure1 <- function() {
     df <- figure.data(FALSE, TRUE)
     df <- subset(df, Category != 'aggregate')
 
-    filename <- "files-suppfig1.pdf"
+    filename <- "analysis/files-suppfig1.pdf"
     cat("Creating ", filename, "\n")
     p <- figure.bardefaults(df, "Supplementary Figure 1: Absolute performance", TRUE) +
     ylab("Execution time (ms)") +
@@ -237,7 +240,7 @@ plot.suppfigure2 <- function() {
     df <- figure.data(TRUE, FALSE)
     df <- subset(df, Category != 'aggregate')
 
-    filename <- "files-suppfig2.pdf"
+    filename <- "analysis/files-suppfig2.pdf"
     cat("Creating ", filename, "\n")
     p <- figure.bardefaults(df, "Supplementary Figure 2: Relative performance (repeated)", FALSE) +
         ylab("Performance ratio") +
@@ -254,7 +257,7 @@ plot.suppfigure3 <- function() {
     df <- figure.data(FALSE, FALSE)
     df <- subset(df, Category != 'aggregate')
 
-    filename <- "files-suppfig3.pdf"
+    filename <- "analysis/files-suppfig3.pdf"
     cat("Creating ", filename, "\n")
     p <- figure.bardefaults(df, "Supplementary Figure 3: Absolute performance (repeated)", TRUE) +
     ylab("Execution time (ms)") +
@@ -268,7 +271,7 @@ plot.suppfigure3 <- function() {
 plot.suppfigure4 <- function() {
     df <- figure.data(FALSE, TRUE)
 
-    filename <- "files-suppfig4.pdf"
+    filename <- "analysis/files-suppfig4.pdf"
     cat("Creating ", filename, "\n")
     p <- figure.boxdefaults(df, "Supplementary Figure 4: Absolute performance (detail)")
 
@@ -279,7 +282,7 @@ plot.suppfigure4 <- function() {
 plot.suppfigure5 <- function() {
     df <- figure.data(FALSE, FALSE)
 
-    filename <- "files-suppfig5.pdf"
+    filename <- "analysis/files-suppfig5.pdf"
     cat("Creating ", filename, "\n")
     p <- figure.boxdefaults(df, "Supplementary Figure 5: Absolute performance (detail, repeated)")
 
@@ -288,7 +291,7 @@ plot.suppfigure5 <- function() {
 }
 
 save.suppdata <- function(separate) {
-    source.stats <- read.table("datasets.tsv",
+    source.stats <- read.table("results/datasets.tsv",
                                header=TRUE, sep="\t")
     source.stats$XMLComplexity <- source.stats$Elements + source.stats$Attributes
 
@@ -309,9 +312,9 @@ save.suppdata <- function(separate) {
     msdf$DataRate <- (msdf$XMLSize / 1000) / ( msdf$proc.real.mean / 1000)
     msdf$DataRateSD <- msdf$DataRate * msdf$proc.real.sdratio
     if(separate==TRUE) {
-        write.table(msdf, file="summary-metadata-separate.tsv", sep="\t", row.names=FALSE)
+        write.table(msdf, file="analysis/summary-metadata-separate.tsv", sep="\t", row.names=FALSE)
     } else {
-        write.table(msdf, file="summary-metadata-repeated.tsv", sep="\t", row.names=FALSE)
+        write.table(msdf, file="analysis/summary-metadata-repeated.tsv", sep="\t", row.names=FALSE)
     }
 
     psdf <- subset(sdf, Category == 'pixeldata')
@@ -323,9 +326,9 @@ save.suppdata <- function(separate) {
     psdf$DataRate <- psdf$PixelSize / (psdf$proc.real.mean / 1000)
     psdf$DataRateSD <- psdf$DataRate * psdf$proc.real.sdratio
     if(separate==TRUE) {
-        write.table(psdf, file="summary-pixeldata-separate.tsv", sep="\t", row.names=FALSE)
+        write.table(psdf, file="analysis/summary-pixeldata-separate.tsv", sep="\t", row.names=FALSE)
     } else {
-        write.table(psdf, file="summary-pixeldata-repeated.tsv", sep="\t", row.names=FALSE)
+        write.table(psdf, file="analysis/summary-pixeldata-repeated.tsv", sep="\t", row.names=FALSE)
     }
 }
 
