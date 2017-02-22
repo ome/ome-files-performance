@@ -301,9 +301,13 @@ save.suppdata <- function(separate) {
 
     msdf <- left_join(msdf, source.stats, by = c("Dataset"))
 
-    msdf$Performance <- msdf$XMLComplexity / msdf$proc.real.mean
     msdf$proc.real.sdratio <- msdf$proc.real.sd / msdf$proc.real.mean
-    msdf$PerformanceSD <- msdf$Performance * msdf$proc.real.sdratio
+    # Rate in kiloitems/s
+    msdf$ItemRate <- (msdf$XMLComplexity / 1000) / ( msdf$proc.real.mean / 1000)
+    msdf$ItemRateSD <- msdf$ItemRate * msdf$proc.real.sdratio
+    # Rate in KiB/s
+    msdf$DataRate <- (msdf$XMLSize / 1000) / ( msdf$proc.real.mean / 1000)
+    msdf$DataRateSD <- msdf$DataRate * msdf$proc.real.sdratio
     if(separate==TRUE) {
         write.table(msdf, file="summary-metadata-separate.tsv", sep="\t", row.names=FALSE)
     } else {
@@ -314,9 +318,10 @@ save.suppdata <- function(separate) {
 
     psdf <- left_join(psdf, source.stats, by = c("Dataset"))
 
-    psdf$Performance <- psdf$PixelSize / psdf$proc.real.mean
+    # Rate in MiB/s
     psdf$proc.real.sdratio <- psdf$proc.real.sd / psdf$proc.real.mean
-    psdf$PerformanceSD <- psdf$Performance * psdf$proc.real.sdratio
+    psdf$DataRate <- psdf$PixelSize / (psdf$proc.real.mean / 1000)
+    psdf$DataRateSD <- psdf$DataRate * psdf$proc.real.sdratio
     if(separate==TRUE) {
         write.table(psdf, file="summary-pixeldata-separate.tsv", sep="\t", row.names=FALSE)
     } else {
