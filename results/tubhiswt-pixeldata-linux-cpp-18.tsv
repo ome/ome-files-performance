@@ -1,8 +1,8 @@
 test.lang	test.name	test.file	proc.real	proc.user	proc.system
-C++	pixeldata.read	tubhiswt_C0_TP0.ome.tif	570	390	170
-C++	pixeldata.read.init	tubhiswt_C0_TP0.ome.tif	170	150	20
-C++	pixeldata.read.pixels	tubhiswt_C0_TP0.ome.tif	400	240	150
-C++	pixeldata.write	tubhiswt_C0_TP0.ome.tif	840	330	510
-C++	pixeldata.write.init	tubhiswt_C0_TP0.ome.tif	60	50	0
-C++	pixeldata.write.pixels	tubhiswt_C0_TP0.ome.tif	680	190	500
-C++	pixeldata.write.close	tubhiswt_C0_TP0.ome.tif	100	90	10
+C++	pixeldata.read	tubhiswt_C0_TP0.ome.tif	560	390	160
+C++	pixeldata.read.init	tubhiswt_C0_TP0.ome.tif	180	160	10
+C++	pixeldata.read.pixels	tubhiswt_C0_TP0.ome.tif	380	230	150
+C++	pixeldata.write	tubhiswt_C0_TP0.ome.tif	860	320	540
+C++	pixeldata.write.init	tubhiswt_C0_TP0.ome.tif	50	50	0
+C++	pixeldata.write.pixels	tubhiswt_C0_TP0.ome.tif	710	170	540
+C++	pixeldata.write.close	tubhiswt_C0_TP0.ome.tif	100	100	0

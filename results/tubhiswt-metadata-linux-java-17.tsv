@@ -1,3 +1,3 @@
 test.lang	test.name	test.file	real	proc.cpu	proc.user	proc.system
-Java	metadata.read	tubhiswt_C0_TP0.ome.tif	484	482	480	2
-Java	metadata.write	tubhiswt_C0_TP0.ome.tif	1183	936	930	6
+Java	metadata.read	tubhiswt_C0_TP0.ome.tif	496	493	490	3
+Java	metadata.write	tubhiswt_C0_TP0.ome.tif	1138	941	920	21

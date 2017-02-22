@@ -1,3 +1,3 @@
 test.lang	test.name	test.file	proc.real	proc.user	proc.system
-C++	metadata.read	00001_01.ome.tiff	2540	2410	130
-C++	metadata.write	00001_01.ome.tiff	1840	1810	40
+C++	metadata.read	00001_01.ome.tiff	2470	2380	90
+C++	metadata.write	00001_01.ome.tiff	2230	2200	30

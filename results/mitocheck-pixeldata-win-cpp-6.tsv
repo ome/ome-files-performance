@@ -1,8 +1,8 @@
 test.lang	test.name	test.file	proc.real	proc.user	proc.system
-C++	pixeldata.read	00001_01.ome.tiff	3500	3260	234
-C++	pixeldata.read.init	00001_01.ome.tiff	3304	3198	93
-C++	pixeldata.read.pixels	00001_01.ome.tiff	196	62	140
-C++	pixeldata.write	00001_01.ome.tiff	4011	3837	171
-C++	pixeldata.write.init	00001_01.ome.tiff	1714	1700	15
-C++	pixeldata.write.pixels	00001_01.ome.tiff	118	15	109
-C++	pixeldata.write.close	00001_01.ome.tiff	2179	2121	46
+C++	pixeldata.read	00001_01.ome.tiff	3557	3338	218
+C++	pixeldata.read.init	00001_01.ome.tiff	3356	3244	109
+C++	pixeldata.read.pixels	00001_01.ome.tiff	201	93	109
+C++	pixeldata.write	00001_01.ome.tiff	4721	4258	187
+C++	pixeldata.write.init	00001_01.ome.tiff	1754	1731	15
+C++	pixeldata.write.pixels	00001_01.ome.tiff	124	62	62
+C++	pixeldata.write.close	00001_01.ome.tiff	2843	2464	109

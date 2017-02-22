@@ -1,8 +1,8 @@
 test.lang	test.name	test.file	system.time	thread.time	proc.real	proc.user	proc.system
-JACE	pixeldata.read	tubhiswt_C0_TP0.ome.tif	4449	4267	4450	7710	1110
-JACE	pixeldata.read.init	tubhiswt_C0_TP0.ome.tif	839	839	840	1800	40
-JACE	pixeldata.read.pixels	tubhiswt_C0_TP0.ome.tif	3609	3428	3610	5910	1070
-JACE	pixeldata.write	tubhiswt_C0_TP0.ome.tif	41037	40481	41040	29630	15370
-JACE	pixeldata.write.init	tubhiswt_C0_TP0.ome.tif	5	5	0	0	0
-JACE	pixeldata.write.pixels	tubhiswt_C0_TP0.ome.tif	40300	39748	40310	28030	15290
-JACE	pixeldata.write.close	tubhiswt_C0_TP0.ome.tif	731	726	730	1600	80
+JACE	pixeldata.read	tubhiswt_C0_TP0.ome.tif	4788	4610	4790	8230	1180
+JACE	pixeldata.read.init	tubhiswt_C0_TP0.ome.tif	895	893	900	1930	40
+JACE	pixeldata.read.pixels	tubhiswt_C0_TP0.ome.tif	3893	3717	3890	6300	1140
+JACE	pixeldata.write	tubhiswt_C0_TP0.ome.tif	44377	43689	44370	29900	18170
+JACE	pixeldata.write.init	tubhiswt_C0_TP0.ome.tif	6	6	0	10	0
+JACE	pixeldata.write.pixels	tubhiswt_C0_TP0.ome.tif	43651	42965	43650	28320	18090
+JACE	pixeldata.write.close	tubhiswt_C0_TP0.ome.tif	718	717	720	1570	80

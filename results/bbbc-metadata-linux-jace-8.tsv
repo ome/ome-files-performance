@@ -1,3 +1,3 @@
 test.lang	test.name	test.file	system.time	thread.time	proc.real	proc.user	proc.system
-JACE	metadata.read	NIRHTa-001.ome.tiff	1030	1020	1030	2220	30
-JACE	metadata.write	NIRHTa-001.ome.tiff	3442	3188	3440	6750	380
+JACE	metadata.read	NIRHTa-001.ome.tiff	1028	1019	1020	2210	60
+JACE	metadata.write	NIRHTa-001.ome.tiff	3373	3118	3380	6440	390
