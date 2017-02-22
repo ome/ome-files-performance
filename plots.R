@@ -305,9 +305,9 @@ save.suppdata <- function(separate) {
     msdf$proc.real.sdratio <- msdf$proc.real.sd / msdf$proc.real.mean
     msdf$PerformanceSD <- msdf$Performance * msdf$proc.real.sdratio
     if(separate==TRUE) {
-        write.table(msdf, file="summary-metadata-separate.tsv", sep="\t")
+        write.table(msdf, file="summary-metadata-separate.tsv", sep="\t", row.names=FALSE)
     } else {
-        write.table(msdf, file="summary-metadata-repeated.tsv", sep="\t")
+        write.table(msdf, file="summary-metadata-repeated.tsv", sep="\t", row.names=FALSE)
     }
 
     psdf <- subset(sdf, Category == 'pixeldata')
@@ -318,9 +318,9 @@ save.suppdata <- function(separate) {
     psdf$proc.real.sdratio <- psdf$proc.real.sd / psdf$proc.real.mean
     psdf$PerformanceSD <- psdf$Performance * psdf$proc.real.sdratio
     if(separate==TRUE) {
-        write.table(psdf, file="summary-pixeldata-separate.tsv", sep="\t")
+        write.table(psdf, file="summary-pixeldata-separate.tsv", sep="\t", row.names=FALSE)
     } else {
-        write.table(psdf, file="summary-pixeldata-repeated.tsv", sep="\t")
+        write.table(psdf, file="summary-pixeldata-repeated.tsv", sep="\t", row.names=FALSE)
     }
 }
 
