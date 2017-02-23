@@ -24,18 +24,19 @@ The reference datasets used for the benchmark are compose of three public OME-TI
 
 For more references and description, see https://www.openmicroscopy.org/site/support/ome-model/ome-tiff/data.html.
 
-## Benchmark execution and metrics
+## Benchmark tests
 
-For each of the datasets above, the following benchmark pipelines were executed:
+For each of the datasets above, four benchmark tests were executed:
 
--   the metadata is extracted TIFF tag and converted into OME-XML then
-    written down as OME-XML file
--   the pixel data was read from the OME-TIFF datasets using the API then
-    written down as OME-TIFF file
+-   metadata.read: the metadata is extracted from the OME-TIFF tag and
+    converted into the OME Data Model
+-   metadata.write: the metadata is written to disk as an OME-XML file
+-   pixeldata.read: the pixeldata is read from the OME-TIFF and stored in
+    memory
+-   pixeldata.write: the pixeldata is written to disk as another OME-TIFF
 
-For both pipelines, the execution time of the reading and writing steps is
-measured by benchmark script using the standard system utility function and
-stored in a tabular form.
+For each test, the execution time is measured in the benchmark script
+using the standard system utility function and stored in a tabular form.
 
 ## Building and executing the benchmark scripts
 
@@ -49,7 +50,7 @@ standalone OME Files bundle for the chosen Visual Studio version.
 
 In the context of our benchmark, we used
 [Jenkins](https://jenkins.io/index.html) to trigger the Windows benchmark
-builds. The benchmark script is available under [jenkins_build.bat]([scripts/jenkins_build.bat).
+builds. The building and execution script is available under [jenkins_build.bat]([scripts/jenkins_build.bat).
 
 To build the OME Files performance scripts manually, within a `build` directory
 run the following `cmake` command:
@@ -85,7 +86,7 @@ a  `/data` volume and run the Docker image:
     $ docker run --rm -it -v /data:/data ome-files-performance
 
 This will execute the [run_benchmarking](scripts/run_benchmarking) script and
-store the output of the benchmark under `/data/out` and the tabular results 
+store the output of the benchmark under `/data/out` and the tabular results
 under `/data/results`.
 
 ## Benchmark results
@@ -93,11 +94,29 @@ under `/data/results`.
 ### Tabular results
 
 The [results](results) folder contains the final set of results generated using
-the benchmark procedure described above.
+the benchmark tests described above with the following columns:
+
+- `test.lang`: name of the benchmark environment (Java, C++, Jace)
+- `test.name`: name of the benchmark test
+- `test.file`: name of the benchmark dataset
+- `proc.real`/`real`: execution time measured by the benchmark script
 
 ### Metrics
 
-The following metrics have bee
+The following metrics are defined for the assessment of the benchmark:
+
+-   performance is defined as the inverse of the execution time for each
+    benchmark test
+-   relative performance is defined as the ratio of the performance vs the
+    performance of Bio-Formats on Linux for each test
+-   metadata item rate is defined as the number of XML items (elements and
+    attributes) transfered per unit of time expressed in kiloitems/s
+-   metadata rate is defined as the rate of XML transfer per unit of time
+    expressed in KiB/s
+-   pixel data rate is defined as the rate of binary pixel data transfer per
+    unit of time expressed in MiB/s
 
 ## References
 
+- [OME Files documentation](http://www.openmicroscopy.org/site/support/ome-files-cpp/)
+- [Bio-Formats documentation](www.openmicroscopy.org/site/support/bio-formats)
