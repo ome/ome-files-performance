@@ -309,8 +309,8 @@ save.suppdata <- function(separate) {
     # Rate in kiloitems/s
     msdf$ItemRate <- (msdf$XMLComplexity / 1000) / ( msdf$proc.real.mean / 1000)
     msdf$ItemRateSD <- msdf$ItemRate * msdf$proc.real.sdratio
-    # Rate in KiB/s
-    msdf$DataRate <- (msdf$XMLSize / 1000) / ( msdf$proc.real.mean / 1000)
+    # Rate in MiB/s
+    msdf$DataRate <- (msdf$XMLSize / 1024) / ( msdf$proc.real.mean / 1000)
     msdf$DataRateSD <- msdf$DataRate * msdf$proc.real.sdratio
     if(separate==TRUE) {
         write.table(msdf, file="analysis/summary-metadata-separate.tsv", sep="\t", row.names=FALSE)
