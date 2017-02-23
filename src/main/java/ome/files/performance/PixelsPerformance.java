@@ -133,56 +133,56 @@ public final class PixelsPerformance {
         Timepoint write_init = null;
         Timepoint close_start = null;
 
-          {
-            System.out.print("pass " + i + ": write init...");
-            System.out.flush();
-            FormatWriter writer = new TiffWriter();
-            writer.setMetadataRetrieve(meta);
-            writer.setWriteSequentially(true);
-            writer.setInterleaved(true);
-            ((TiffWriter)writer).setBigTiff(true);
-            writer.setId(outfile.toString());
-            System.out.println("done");
-            System.out.flush();
+        {
+          System.out.print("pass " + i + ": write init...");
+          System.out.flush();
+          FormatWriter writer = new TiffWriter();
+          writer.setMetadataRetrieve(meta);
+          writer.setWriteSequentially(true);
+          writer.setInterleaved(true);
+          ((TiffWriter)writer).setBigTiff(true);
+          writer.setId(outfile.toString());
+          System.out.println("done");
+          System.out.flush();
 
-            write_init = new Timepoint();
+          write_init = new Timepoint();
 
-            for (int series = 0; series < pixels.size(); ++series)
-              {
-                System.out.print("pass " + i + ": write series " + series + ": ");
-                System.out.flush();
-                writer.setInterleaved(true);
-                writer.setSeries(series);
+          for (int series = 0; series < pixels.size(); ++series)
+            {
+              System.out.print("pass " + i + ": write series " + series + ": ");
+              System.out.flush();
+              writer.setInterleaved(true);
+              writer.setSeries(series);
 
-                List<byte[]> planes = pixels.get(series);
+              List<byte[]> planes = pixels.get(series);
 
-                for (int plane = 0; plane < planes.size(); ++plane)
-                  {
-                    int sizeX = meta.getPixelsSizeX(series).getValue().intValue();
-                    IFD ifd = new IFD();
-                    int rows = 65536 / sizeX;
-                    if (rows < 1) {
-                      rows = 1;
-                    }
-                    ifd.put(IFD.ROWS_PER_STRIP, rows);
-                    byte[] data = planes.get(plane);
-                    ((TiffWriter) writer).saveBytes(plane, data, ifd);
-                    System.out.print(".");
-                    System.out.flush();
+              for (int plane = 0; plane < planes.size(); ++plane)
+                {
+                  int sizeX = meta.getPixelsSizeX(series).getValue().intValue();
+                  IFD ifd = new IFD();
+                  int rows = 65536 / sizeX;
+                  if (rows < 1) {
+                    rows = 1;
                   }
-                System.out.println("done");
-                System.out.flush();
-              }
-            close_start = new Timepoint();
-            writer.close();
-          }
+                  ifd.put(IFD.ROWS_PER_STRIP, rows);
+                  byte[] data = planes.get(plane);
+                  ((TiffWriter) writer).saveBytes(plane, data, ifd);
+                  System.out.print(".");
+                  System.out.flush();
+                }
+              System.out.println("done");
+              System.out.flush();
+            }
+          close_start = new Timepoint();
+          writer.close();
+        }
 
-          Timepoint write_end = new Timepoint();
+        Timepoint write_end = new Timepoint();
 
-          result.add("pixeldata.write", infile, write_start, write_end);
-          result.add("pixeldata.write.init", infile, write_start, write_init);
-          result.add("pixeldata.write.pixels", infile, write_init, close_start);
-          result.add("pixeldata.write.close", infile, close_start, write_end);
+        result.add("pixeldata.write", infile, write_start, write_end);
+        result.add("pixeldata.write.init", infile, write_start, write_init);
+        result.add("pixeldata.write.pixels", infile, write_init, close_start);
+        result.add("pixeldata.write.close", infile, close_start, write_end);
       }
 
       result.close();
