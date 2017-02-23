@@ -193,7 +193,7 @@ figure.data <- function(normalise, separate) {
         summarise(proc.real.mean = mean(proc.real), proc.real.sd=sd(proc.real))
 
         df.norm <- left_join(df, ana, by = c("Test", "Dataset", "Category")) %>%
-        mutate(proc.real = proc.real / proc.real.mean)
+        mutate(proc.real =  proc.real.mean / proc.real)
         df.norm$Implementation <- df.norm$Implementation.x
 
 #    select(df.norm, Filesname=) [,c("Test", "Dataset", "Category", "Implementation", "proc.real", "proc.real.mean")]
