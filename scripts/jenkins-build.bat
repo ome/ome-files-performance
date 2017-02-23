@@ -141,6 +141,12 @@ for %%T in (bbbc mitocheck tubhiswt) do (
         call mvn -P pixels -Dtest.iterations=1 -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.tiff -Dtest.results=%resultsdir%\!test!-pixeldata-win-java-%%I.tsv exec:java
     )
 
+    REM Run Java ometiff performance tests
+    call mvn -P ometiff -Dtest.iterations=%iterations% -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.tiff -Dtest.results=%resultsdir%\!test!-ometiffdata-win-java.tsv exec:java
+    for /L %%I IN (1,1,!iterations!) do (
+        call mvn -P ometiff -Dtest.iterations=1 -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.tiff -Dtest.results=%resultsdir%\!test!-ometiffdata-win-java-%%I.tsv exec:java
+    )
+
     REM Execute C++ performance tests
     cd "%WORKSPACE%"
 
@@ -154,5 +160,11 @@ for %%T in (bbbc mitocheck tubhiswt) do (
     install\bin\pixels-performance %iterations% !input! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-pixeldata-win-cpp.tsv
     for /L %%I IN (1,1,!iterations!) do (
         install\bin\pixels-performance 1 !input! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-pixeldata-win-cpp-%%I.tsv
+    )
+
+    REM Run C++ ometiff performance tests
+    install\bin\ometiff-performance %iterations% !input! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-ometiffdata-win-cpp.tsv
+    for /L %%I IN (1,1,!iterations!) do (
+        install\bin\ometiff-performance 1 !input! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-ometiffdata-win-cpp-%%I.tsv
     )
 )

@@ -240,6 +240,38 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>ometiff</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.2.1</version>
+            <executions>
+              <execution>
+                <id>metadata</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <mainClass>ome.files.performance.OMETIFFPerformance</mainClass>
+              <arguments>
+                <argument>${test.iterations}</argument>
+                <argument>${test.input}</argument>
+                <argument>${test.output}</argument>
+                <argument>${test.results}</argument>
+              </arguments>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
   <repositories>

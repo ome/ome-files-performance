@@ -49,8 +49,8 @@
 
 #include <ome/files/FormatException.h>
 #include <ome/files/VariantPixelBuffer.h>
-#include <ome/files/in/OMETIFFReader.h>
-#include <ome/files/out/OMETIFFWriter.h>
+#include <ome/files/in/MinimalTIFFReader.h>
+#include <ome/files/out/MinimalTIFFWriter.h>
 
 #include <ome/xml/meta/OMEXMLMetadata.h>
 
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 
           {
             std::cout << "pass " << i << ": read init..." << std::flush;
-            ome::files::in::OMETIFFReader reader;
+            ome::files::in::MinimalTIFFReader reader;
             reader.setMetadataStore(store);
             reader.setId(infile);
             std::cout << "done\n" << std::flush;
@@ -148,10 +148,10 @@ int main(int argc, char *argv[])
 
           {
             std::cout << "pass " << i << ": write init..." << std::flush;
-            std::unique_ptr<ome::files::FormatWriter> writer = std::make_unique<ome::files::out::OMETIFFWriter>();
+            std::unique_ptr<ome::files::FormatWriter> writer = std::make_unique<ome::files::out::MinimalTIFFWriter>();
             writer->setMetadataRetrieve(retrieve);
             writer->setInterleaved(interleaved.at(0));
-            dynamic_cast<ome::files::out::OMETIFFWriter &>(*writer.get()).setBigTIFF(true);
+            dynamic_cast<ome::files::out::MinimalTIFFWriter &>(*writer.get()).setBigTIFF(true);
             writer->setId(outfile);
             std::cout << "done\n" << std::flush;
 

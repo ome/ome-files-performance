@@ -53,7 +53,8 @@ import loci.formats.ome.OMEXMLMetadata;
 import loci.formats.ome.OMEXMLMetadataImpl;
 import loci.formats.services.OMEXMLService;
 import loci.formats.services.OMEXMLServiceImpl;
-import loci.formats.in.MinimalTiffReader;
+import loci.formats.in.OMETiffReader;
+import loci.formats.out.OMETiffWriter;
 import loci.formats.out.TiffWriter;
 import loci.formats.FormatReader;
 import loci.formats.FormatWriter;
@@ -61,7 +62,7 @@ import loci.formats.FormatWriter;
 import loci.formats.tiff.IFD;
 import loci.formats.tiff.TiffParser;
 
-public final class PixelsPerformance {
+public final class OMETIFFPerformance {
 
   public static void main(String[] args) {
     if (args.length != 4)
@@ -93,7 +94,7 @@ public final class PixelsPerformance {
         {
           System.out.print("pass " + i + ": read init...");
           System.out.flush();
-          FormatReader reader = new MinimalTiffReader();
+          FormatReader reader = new OMETiffReader();
           reader.setMetadataStore(meta);
           reader.setId(infile.toString());
           System.out.println("done");
@@ -123,9 +124,9 @@ public final class PixelsPerformance {
 
         Timepoint read_end = new Timepoint();
 
-        result.add("pixeldata.read", infile, read_start, read_end);
-        result.add("pixeldata.read.init", infile, read_start, read_init);
-        result.add("pixeldata.read.pixels", infile, read_init, read_end);
+        result.add("ometiffdata.read", infile, read_start, read_end);
+        result.add("ometiffdata.read.init", infile, read_start, read_init);
+        result.add("ometiffdata.read.pixels", infile, read_init, read_end);
 
         Files.deleteIfExists(outfile);
 
@@ -136,11 +137,11 @@ public final class PixelsPerformance {
           {
             System.out.print("pass " + i + ": write init...");
             System.out.flush();
-            FormatWriter writer = new TiffWriter();
+            FormatWriter writer = new OMETiffWriter();
             writer.setMetadataRetrieve(meta);
             writer.setWriteSequentially(true);
             writer.setInterleaved(true);
-            ((TiffWriter)writer).setBigTiff(true);
+            ((OMETiffWriter)writer).setBigTiff(true);
             writer.setId(outfile.toString());
             System.out.println("done");
             System.out.flush();
@@ -179,10 +180,10 @@ public final class PixelsPerformance {
 
           Timepoint write_end = new Timepoint();
 
-          result.add("pixeldata.write", infile, write_start, write_end);
-          result.add("pixeldata.write.init", infile, write_start, write_init);
-          result.add("pixeldata.write.pixels", infile, write_init, close_start);
-          result.add("pixeldata.write.close", infile, close_start, write_end);
+          result.add("ometiffdata.write", infile, write_start, write_end);
+          result.add("ometiffdata.write.init", infile, write_start, write_init);
+          result.add("ometiffdata.write.pixels", infile, write_init, close_start);
+          result.add("ometiffdata.write.close", infile, close_start, write_end);
       }
 
       result.close();

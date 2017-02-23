@@ -37,44 +37,22 @@
  */
 
 #include "result.h"
-#include "javaTools.h"
 
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <vector>
 #include <memory>
+#include <vector>
 
-#include <boost/filesystem.hpp>
+#include <ome/compat/array.h>
+#include <ome/common/log.h>
 
-// for Bio-Formats C++ bindings
-#include <jace/javacast.h>
-#include <formats-api-5.3.4.h>
-#include <formats-bsd-5.3.4.h>
-#include <ome-common-5.3.1.h>
+#include <ome/files/FormatException.h>
+#include <ome/files/VariantPixelBuffer.h>
+#include <ome/files/in/OMETIFFReader.h>
+#include <ome/files/out/OMETIFFWriter.h>
 
-#include <jace/proxy/ome/xml/model/primitives/PositiveInteger.h>
-
-using namespace jace::proxy;
-using jace::java_cast;
-using jace::JNIException;
-using java::io::IOException;
-using java::lang::Exception;
-using java::lang::String;
-
-using loci::formats::FormatException;
-using loci::formats::FormatReader;
-using loci::formats::FormatWriter;
-using loci::formats::MetadataTools;
-using loci::formats::in::MinimalTiffReader;
-using loci::formats::out::TiffWriter;
-using loci::formats::meta::IMetadata;
-using loci::formats::meta::MetadataRetrieve;
-using loci::formats::meta::MetadataStore;
-using loci::formats::services::OMEXMLService;
-using loci::formats::services::OMEXMLServiceImpl;
-
-using loci::formats::tiff::IFD;
+#include <ome/xml/meta/OMEXMLMetadata.h>
 
 int main(int argc, char *argv[])
 {
@@ -86,13 +64,12 @@ int main(int argc, char *argv[])
 
   try
     {
+      ome::common::setLogLevel(ome::logging::trivial::warning);
+
       int iterations = std::atoi(argv[1]);
       boost::filesystem::path infile(argv[2]);
       boost::filesystem::path outfile(argv[3]);
       boost::filesystem::path resultfile(argv[4]);
-
-      JavaTools::createJVM(8192);
-      std::unique_ptr<OMEXMLService> service = std::make_unique<OMEXMLServiceImpl>();
 
       std::ofstream results(resultfile.string().c_str());
 
@@ -100,41 +77,49 @@ int main(int argc, char *argv[])
 
       for(int i = 0; i < iterations; ++i)
         {
-          IMetadata meta = service->createOMEXMLMetadata();
-          // ByteArray isn't copyable or assignable, so we use a
-          // unique_ptr to allow storage in a container.
-          std::vector<std::vector<std::unique_ptr<ByteArray>>> pixels;
+          std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> omexmlmeta = std::make_shared<ome::xml::meta::OMEXMLMetadata>();
+          std::shared_ptr< ::ome::xml::meta::MetadataStore> store = std::dynamic_pointer_cast< ::ome::xml::meta::MetadataStore>(omexmlmeta);
+          std::shared_ptr< ::ome::xml::meta::MetadataRetrieve> retrieve;
+          std::vector<std::vector<std::unique_ptr<ome::files::VariantPixelBuffer> > > pixels;
+          std::vector<bool> interleaved;
 
           timepoint read_start;
           timepoint read_init;
 
           {
             std::cout << "pass " << i << ": read init..." << std::flush;
-            MinimalTiffReader tiffreader;
-            FormatReader reader = java_cast<FormatReader>(tiffreader);
-            reader.setMetadataStore(meta);
-            reader.setId(infile.string());
+            ome::files::in::OMETIFFReader reader;
+            reader.setMetadataStore(store);
+            reader.setId(infile);
             std::cout << "done\n" << std::flush;
 
             read_init = timepoint();
 
             pixels.resize(reader.getSeriesCount());
+            interleaved.resize(reader.getSeriesCount());
 
-            for (jint series = 0;
+            for (ome::files::dimension_size_type series = 0;
                  series < reader.getSeriesCount();
                  ++series)
               {
                 std::cout << "pass " << i << ": read series " << series << ": " << std::flush;
                 reader.setSeries(series);
 
-                std::vector<std::unique_ptr<ByteArray>>& planes = pixels.at(series);
+                std::vector<std::unique_ptr<ome::files::VariantPixelBuffer> >& planes = pixels.at(series);
                 planes.resize(reader.getImageCount());
+                interleaved.at(series) = reader.isInterleaved();
 
-                for (jint plane = 0;
+                for (ome::files::dimension_size_type plane = 0;
                      plane < reader.getImageCount();
                      ++plane)
                   {
-                    planes.at(plane) = std::make_unique<ByteArray>(reader.openBytes(plane));
+                    reader.setPlane(plane);
+                    std::unique_ptr<ome::files::VariantPixelBuffer>& buf = planes.at(plane);
+                    buf = std::make_unique<ome::files::VariantPixelBuffer>
+                      (boost::extents[1][1][1][1][1][1][1][1][1],
+                       reader.getPixelType(),
+                       ome::files::PixelBufferBase::make_storage_order(reader.getDimensionOrder(), reader.isInterleaved()));
+                    reader.openBytes(plane, *buf);
                     std::cout << '.' << std::flush;
                   }
                 std::cout << " done\n" << std::flush;
@@ -143,11 +128,17 @@ int main(int argc, char *argv[])
 
           timepoint read_end;
 
-          result(results, "pixeldata.read", infile, read_start, read_end);
-          result(results, "pixeldata.read.init", infile, read_start, read_init);
-          result(results, "pixeldata.read.pixels", infile, read_init, read_end);
+          result(results, "ometiffdata.read", infile, read_start, read_end);
+          result(results, "ometiffdata.read.init", infile, read_start, read_init);
+          result(results, "ometiffdata.read.pixels", infile, read_init, read_end);
 
-          // The Java writer doesn't automatically truncate the output file.
+          retrieve = std::dynamic_pointer_cast<ome::xml::meta::MetadataRetrieve>(store);
+          if (!retrieve)
+            {
+              throw ome::files::FormatException("MetadataStore does not implement MetadataRetrieve");
+            }
+
+          // To keep the logic the same as for JACE, even though it's unnecessary here
           if(boost::filesystem::exists(outfile))
             boost::filesystem::remove(outfile);
 
@@ -157,71 +148,50 @@ int main(int argc, char *argv[])
 
           {
             std::cout << "pass " << i << ": write init..." << std::flush;
-            TiffWriter tiffwriter;
-            FormatWriter writer = java_cast<FormatWriter>(tiffwriter);
-            writer.setMetadataRetrieve(meta);
-            writer.setInterleaved(true);
-            tiffwriter.setBigTiff(true);
-            writer.setId(outfile.string());
+            std::unique_ptr<ome::files::FormatWriter> writer = std::make_unique<ome::files::out::OMETIFFWriter>();
+            writer->setMetadataRetrieve(retrieve);
+            writer->setInterleaved(interleaved.at(0));
+            dynamic_cast<ome::files::out::OMETIFFWriter &>(*writer.get()).setBigTIFF(true);
+            writer->setId(outfile);
             std::cout << "done\n" << std::flush;
 
             write_init = timepoint();
 
-            for (jint series = 0;
-                 series < static_cast<jint>(pixels.size());
+            for (ome::files::dimension_size_type series = 0;
+                 series < pixels.size();
                  ++series)
               {
                 std::cout << "pass " << i << ": write series " << series << ": " << std::flush;
-                writer.setSeries(series);
+                writer->setInterleaved(interleaved.at(series));
+                writer->setSeries(series);
 
-                std::vector<unique_ptr<ByteArray>>& planes = pixels.at(series);
+                std::vector<std::unique_ptr<ome::files::VariantPixelBuffer> >& planes = pixels.at(series);
 
-                for (jint plane = 0;
-                     plane < static_cast<jint>(planes.size());
+                for (ome::files::dimension_size_type plane = 0;
+                     plane < planes.size();
                      ++plane)
                   {
-                    int sizeX = meta.getPixelsSizeX(series).getNumberValue().intValue();
-                    IFD ifd;
-                    int rows = 65536 / sizeX;
-                    if (rows < 1) {
-                      rows = 1;
-                    }
-                    ifd.putIFDValue(IFD::ROWS_PER_STRIP(), static_cast<::jace::proxy::types::JInt>(rows));
-                    ByteArray& buf = *(planes.at(plane));
-                    tiffwriter.saveBytes(plane, buf, ifd);
+                    writer->setPlane(plane);
+
+                    std::unique_ptr<ome::files::VariantPixelBuffer>& buf = planes.at(plane);
+                    writer->saveBytes(plane, *buf);
                     std::cout << '.' << std::flush;
                   }
                 std::cout << " done\n" << std::flush;
               }
-
             close_start = timepoint();
-            writer.close();
+            writer->close();
           }
 
           timepoint write_end;
 
-          result(results, "pixeldata.write", infile, write_start, write_end);
-          result(results, "pixeldata.write.init", infile, write_start, write_init);
-          result(results, "pixeldata.write.pixels", infile, write_init, close_start);
-          result(results, "pixeldata.write.close", infile, close_start, write_end);
+          result(results, "ometiffdata.write", infile, write_start, write_end);
+          result(results, "ometiffdata.write.init", infile, write_start, write_init);
+          result(results, "ometiffdata.write.pixels", infile, write_init, close_start);
+          result(results, "ometiffdata.write.close", infile, close_start, write_end);
+
         }
       return 0;
-    }
-  catch (const FormatException& fe)
-    {
-      const_cast<FormatException&>(fe).printStackTrace();
-    }
-  catch (const IOException& ioe)
-    {
-      const_cast<IOException&>(ioe).printStackTrace();
-    }
-  catch (const JNIException& jniException)
-    {
-      cout << "An unexpected JNI error occurred. " << jniException.what() << endl;
-    }
-  catch (const Exception& e)
-    {
-      const_cast<Exception&>(e).printStackTrace();
     }
   catch(const std::exception &e)
     {

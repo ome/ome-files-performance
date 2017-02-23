@@ -39,6 +39,11 @@ for test in bbbc mitocheck tubhiswt; do
         for i in $(seq ${iterations}); do
             mvn -P pixels -Dtest.iterations=1 -Dtest.input="$input" -Dtest.output=${outpath}/${test}-java.ome.tiff -Dtest.results=${resultpath}/${test}-pixeldata-linux-java-${i}.tsv exec:java
         done
+
+        mvn -P ometiff -Dtest.iterations=${iterations} -Dtest.input="$input" -Dtest.output=${outpath}/${test}-java.ome.tiff -Dtest.results=${resultpath}/${test}-ometiffdata-linux-java.tsv exec:java
+        for i in $(seq ${iterations}); do
+            mvn -P ometiff -Dtest.iterations=1 -Dtest.input="$input" -Dtest.output=${outpath}/${test}-java.ome.tiff -Dtest.results=${resultpath}/${test}-ometiffdata-linux-java-${i}.tsv exec:java
+        done
     )
 
     # C++ tests
@@ -51,6 +56,11 @@ for test in bbbc mitocheck tubhiswt; do
         ${binpath}/pixels-performance ${iterations} "$input" ${outpath}/${test}-cpp.ome.tiff ${resultpath}/${test}-pixeldata-linux-cpp.tsv
         for i in $(seq ${iterations}); do
             ${binpath}/pixels-performance 1 "$input" ${outpath}/${test}-cpp.ome.tiff ${resultpath}/${test}-pixeldata-linux-cpp-${i}.tsv
+        done
+
+        ${binpath}/ometiff-performance ${iterations} "$input" ${outpath}/${test}-cpp.ome.tiff ${resultpath}/${test}-ometiffdata-linux-cpp.tsv
+        for i in $(seq ${iterations}); do
+            ${binpath}/ometiff-performance 1 "$input" ${outpath}/${test}-cpp.ome.tiff ${resultpath}/${test}-ometiffdata-linux-cpp-${i}.tsv
         done
     )
 
@@ -71,6 +81,10 @@ for test in bbbc mitocheck tubhiswt; do
         ${binpath}/pixels-performance-jace ${jace_iterations} "$input" ${outpath}/${test}-jace.ome.tiff ${resultpath}/${test}-pixeldata-linux-jace.tsv
         for i in $(seq ${jace_iterations}); do
             ${binpath}/pixels-performance-jace 1 "$input" ${outpath}/${test}-jace.ome.tiff ${resultpath}/${test}-pixeldata-linux-jace-${i}.tsv
+        done
+        ${binpath}/ometiff-performance-jace ${jace_iterations} "$input" ${outpath}/${test}-jace.ome.tiff ${resultpath}/${test}-ometiffdata-linux-jace.tsv
+        for i in $(seq ${jace_iterations}); do
+            ${binpath}/ometiff-performance-jace 1 "$input" ${outpath}/${test}-jace.ome.tiff ${resultpath}/${test}-ometiffdata-linux-jace-${i}.tsv
         done
     )
 done

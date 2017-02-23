@@ -54,6 +54,15 @@ target_link_libraries(pixels-performance
   Boost::disable_autolinking
   Boost::dynamic_linking)
 
-install(TARGETS metadata-performance pixels-performance
+add_executable(ometiff-performance ometiff-performance.cpp result.cpp result.h)
+target_link_libraries(ometiff-performance
+  OME::Files
+  Boost::boost
+  Boost::chrono
+  Boost::filesystem
+  Boost::disable_autolinking
+  Boost::dynamic_linking)
+
+install(TARGETS metadata-performance pixels-performance ometiff-performance
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         COMPONENT "runtime")

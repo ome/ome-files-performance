@@ -66,7 +66,8 @@ using loci::formats::FormatException;
 using loci::formats::FormatReader;
 using loci::formats::FormatWriter;
 using loci::formats::MetadataTools;
-using loci::formats::in::MinimalTiffReader;
+using loci::formats::in::OMETiffReader;
+using loci::formats::out::OMETiffWriter;
 using loci::formats::out::TiffWriter;
 using loci::formats::meta::IMetadata;
 using loci::formats::meta::MetadataRetrieve;
@@ -110,8 +111,8 @@ int main(int argc, char *argv[])
 
           {
             std::cout << "pass " << i << ": read init..." << std::flush;
-            MinimalTiffReader tiffreader;
-            FormatReader reader = java_cast<FormatReader>(tiffreader);
+            OMETiffReader ometiffreader;
+            FormatReader reader = java_cast<FormatReader>(ometiffreader);
             reader.setMetadataStore(meta);
             reader.setId(infile.string());
             std::cout << "done\n" << std::flush;
@@ -143,9 +144,9 @@ int main(int argc, char *argv[])
 
           timepoint read_end;
 
-          result(results, "pixeldata.read", infile, read_start, read_end);
-          result(results, "pixeldata.read.init", infile, read_start, read_init);
-          result(results, "pixeldata.read.pixels", infile, read_init, read_end);
+          result(results, "ometiffdata.read", infile, read_start, read_end);
+          result(results, "ometiffdata.read.init", infile, read_start, read_init);
+          result(results, "ometiffdata.read.pixels", infile, read_init, read_end);
 
           // The Java writer doesn't automatically truncate the output file.
           if(boost::filesystem::exists(outfile))
@@ -157,11 +158,11 @@ int main(int argc, char *argv[])
 
           {
             std::cout << "pass " << i << ": write init..." << std::flush;
-            TiffWriter tiffwriter;
-            FormatWriter writer = java_cast<FormatWriter>(tiffwriter);
+            OMETiffWriter ometiffwriter;
+            FormatWriter writer = java_cast<FormatWriter>(ometiffwriter);
             writer.setMetadataRetrieve(meta);
             writer.setInterleaved(true);
-            tiffwriter.setBigTiff(true);
+            ometiffwriter.setBigTiff(true);
             writer.setId(outfile.string());
             std::cout << "done\n" << std::flush;
 
@@ -188,6 +189,7 @@ int main(int argc, char *argv[])
                     }
                     ifd.putIFDValue(IFD::ROWS_PER_STRIP(), static_cast<::jace::proxy::types::JInt>(rows));
                     ByteArray& buf = *(planes.at(plane));
+                    TiffWriter tiffwriter = java_cast<TiffWriter>(ometiffwriter);
                     tiffwriter.saveBytes(plane, buf, ifd);
                     std::cout << '.' << std::flush;
                   }
@@ -200,10 +202,10 @@ int main(int argc, char *argv[])
 
           timepoint write_end;
 
-          result(results, "pixeldata.write", infile, write_start, write_end);
-          result(results, "pixeldata.write.init", infile, write_start, write_init);
-          result(results, "pixeldata.write.pixels", infile, write_init, close_start);
-          result(results, "pixeldata.write.close", infile, close_start, write_end);
+          result(results, "ometiffdata.write", infile, write_start, write_end);
+          result(results, "ometiffdata.write.init", infile, write_start, write_init);
+          result(results, "ometiffdata.write.pixels", infile, write_init, close_start);
+          result(results, "ometiffdata.write.close", infile, close_start, write_end);
         }
       return 0;
     }
