@@ -16,11 +16,12 @@ under Ubuntu 16.04 using JDK 7.
 
 ## Benchmark datasets
 
-The reference datasets used for the benchmark are compose of three public OME-TIFF filesets representing different aspects of the OME Data model:
+Three public reference OME-TIFF datasets were used, representing different
+aspects of the OME Data model:
 
 -   a typical 5D fluorescence image - see  http://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/tubhiswt-4D/
 -   a plate generated from the public [Broad Bioimage Benchmark Collection](https://data.broadinstitute.org/bbbc/) and exported as an OME-TIFF - see http://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/BBBC/ [BBBC](http://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/BBBC/)
--   a metadata-rich (13K Regions of Interest) time-lapse sequence from the  [Mitocheck](http://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/mitocheck/) project - see http://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/mitocheck/
+-   a metadata-rich (13K Regions of Interest) time-lapse sequence from the [MitoCheck](http://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/mitocheck/) project - see http://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/mitocheck/
 
 For more references and description, see https://www.openmicroscopy.org/site/support/ome-model/ome-tiff/data.html.
 
@@ -28,17 +29,18 @@ For more references and description, see https://www.openmicroscopy.org/site/sup
 
 For each of the datasets above, four benchmark tests were executed:
 
--   metadata.read: the metadata is extracted from the OME-TIFF tag and
-    converted into the OME Data Model
+-   metadata.read: the metadata is extracted from the OME-TIFF ImageDescription tag and converted into OME Data Model objects
 -   metadata.write: the metadata is written to disk as an OME-XML file
 -   pixeldata.read: the pixeldata is read from the OME-TIFF and stored in
     memory
 -   pixeldata.write: the pixeldata is written to disk as another OME-TIFF
 
-For each test, the execution time is measured in the benchmark script
-using the standard system utility function and stored in a tabular form.
+Each benchmark test records the real time in milliseconds before and after each
+test, and computes the elapsed time from the difference.
 
 ## Building and executing the benchmark scripts
+
+See the [OME Files C++](http://www.openmicroscopy.org/site/support/ome-files-cpp/ome-cmake-superbuild/manual/html/building.html) and [Bio-Formats](https://www.openmicroscopy.org/site/support/bio-formats/developers/building-bioformats.html) building instructions.
 
 ### Windows
 
@@ -109,11 +111,10 @@ The following metrics are defined for the assessment of the benchmark:
     benchmark test
 -   relative performance is defined as the ratio of the performance vs the
     performance of Bio-Formats on Linux for each test
--   metadata item rate is defined as the number of XML items (elements and
-    attributes) transfered per unit of time expressed in kiloitems/s
 -   metadata rate is defined as the rate of XML transfer per unit of time
-    expressed in KiB/s
--   pixel data rate is defined as the rate of binary pixel data transfer per
+    expressed in MiB/s or kiloitems/s (where items corresponds to XML elements
+    and attributes)
+-   pixeldata rate is defined as the rate of binary pixeldata transfer per
     unit of time expressed in MiB/s
 
 ## References
