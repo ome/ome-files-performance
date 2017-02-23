@@ -212,7 +212,7 @@ plot.figure2 <- function() {
     filename <- "analysis/files-fig2.pdf"
     cat("Creating ", filename, "\n")
     p <- figure.bardefaults(df, "Figure 2: Relative performance", FALSE) +
-        ylab("Performance ratio") +
+        ylab("Relative performance") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
                            labels = trans_format('log10', math_format(10^.x)),
@@ -228,7 +228,7 @@ plot.suppfigure1 <- function() {
 
     filename <- "analysis/files-suppfig1.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df, "Supplementary Figure 1: Absolute performance", TRUE) +
+    p <- figure.bardefaults(df, "Supplementary Figure 1: Execution time", TRUE) +
     ylab("Execution time (ms)") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
@@ -244,7 +244,7 @@ plot.suppfigure2 <- function() {
     filename <- "analysis/files-suppfig2.pdf"
     cat("Creating ", filename, "\n")
     p <- figure.bardefaults(df, "Supplementary Figure 2: Relative performance (repeated)", FALSE) +
-        ylab("Performance ratio") +
+        ylab("Relative performance") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
                            labels = trans_format('log10', math_format(10^.x)),
@@ -260,7 +260,7 @@ plot.suppfigure3 <- function() {
 
     filename <- "analysis/files-suppfig3.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df, "Supplementary Figure 3: Absolute performance (repeated)", TRUE) +
+    p <- figure.bardefaults(df, "Supplementary Figure 3: Execution time (repeated)", TRUE) +
     ylab("Execution time (ms)") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
@@ -274,7 +274,7 @@ plot.suppfigure4 <- function() {
 
     filename <- "analysis/files-suppfig4.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.boxdefaults(df, "Supplementary Figure 4: Absolute performance (detail)")
+    p <- figure.boxdefaults(df, "Supplementary Figure 4: Execution time (detail)")
 
     ggsave(filename=filename,
            plot=p, width=6, height=6)
@@ -285,7 +285,7 @@ plot.suppfigure5 <- function() {
 
     filename <- "analysis/files-suppfig5.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.boxdefaults(df, "Supplementary Figure 5: Absolute performance (detail, repeated)")
+    p <- figure.boxdefaults(df, "Supplementary Figure 5: Execution time (detail, repeated)")
 
     ggsave(filename=filename,
            plot=p, width=6, height=6)
