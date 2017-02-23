@@ -57,8 +57,9 @@ read.dataset <- function(datanames, testname, separate,
             if (includejace == TRUE && platform == "linux") {
                 if(separate == TRUE) {
                     for(filename in paste(paste(dataname, testname, platform, "jace", seq(1,20,1), sep="-"), "tsv", sep=".")) {
+                        filename <- paste("results", filename, sep="/")
                         if(file.exists(filename)) {
-                            df.jace.tmp <- read.table(paste("results", filename, sep="/"),
+                            df.jace.tmp <- read.table(filename,
                                                       header=TRUE, sep="\t", stringsAsFactors=FALSE)
                             df.jace <- bind_rows(df.jace, df.jace.tmp)
                         }
