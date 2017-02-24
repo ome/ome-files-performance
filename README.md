@@ -21,38 +21,50 @@ aspects of the OME Data model:
 
 -   a typical 5D fluorescence image - see  http://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/tubhiswt-4D/
 -   a plate generated from the public [Broad Bioimage Benchmark Collection](https://data.broadinstitute.org/bbbc/) and exported as an OME-TIFF - see http://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/BBBC/ [BBBC](http://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/BBBC/)
--   a metadata-rich (13K Regions of Interest) time-lapse sequence from the [MitoCheck](http://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/mitocheck/) project - see http://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/mitocheck/
+-   a metadata-rich (13K Regions of Interest) time-lapse sequence from the [MitoCheck](http://www.mitocheck.org/) project - see http://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/MitoCheck/
 
-For more references and description, see https://www.openmicroscopy.org/site/support/ome-model/ome-tiff/data.html.
+For more references and datasets description, see https://www.openmicroscopy.org/site/support/ome-model/ome-tiff/data.html.
 
 ## Benchmark tests
 
 For each of the datasets above, four benchmark tests were executed:
 
--   metadata.read: the metadata is extracted from the OME-TIFF ImageDescription tag and converted into OME Data Model objects
--   metadata.write: the metadata is written to disk as an OME-XML file
--   pixeldata.read: the pixeldata is read from the OME-TIFF and stored in
-    memory
--   pixeldata.write: the pixeldata is written to disk as another OME-TIFF
+ Category  | Test  | Description
+-----------|-------|-------------------------------------
+ metadata  | read  | Reads the metadata from an OME-TIFF
+ metadata  | write | Writes the metadata into an OME-XML
+ pixeldata | read  | Reads the pixeldata from an OME-TIFF
+ pixeldata | write | Writes the pixeldata into an OME-TIFF
+
+-   metadata.read: the metadata is extracted from the OME-TIFF
+    ImageDescription tag and converted into OME Data Model objects using the
+    ``createOMEXMLMetadata`` API ([Java](http://downloads.openmicroscopy.org/bio-formats/5.3.4/api/loci/formats/services/OMEXMLService.html#createOMEXMLMetadata-java.lang.String-) / [C++](http://downloads.openmicroscopy.org/ome-files-cpp/0.3.1/21/docs/ome-files-bundle-docs-0.3.1-b21/ome-files/api/html/namespaceome_1_1files.html#a469d4ec5c1bddd7b3afc0daa11ba1989))
+-   metadata.write: the metadata is serialized using the ``getOMEXML`` API ([Java](http://downloads.openmicroscopy.org/bio-formats/5.3.4/api/loci/formats/services/OMEXMLService.html#getOMEXML-loci.formats.meta.MetadataRetrieve-) / [C++](http://downloads.openmicroscopy.org/ome-files-cpp/0.3.1/21/docs/ome-files-bundle-docs-0.3.1-b21/ome-files/api/html/namespaceome_1_1files.html#ad2898e87098e67fdda2154d7883692e0) and written to disk as an OME-XML file
+-   pixeldata.read: the pixeldata is read from the OME-TIFF using the
+    ``openBytes`` API ([Java](http://downloads.openmicroscopy.org/bio-formats/5.3.4/api/loci/formats/IFormatReader.html#openBytes-int-byte:A-) / [C++](http://downloads.openmicroscopy.org/ome-files-cpp/0.3.1/21/docs/ome-files-bundle-docs-0.3.1-b21/ome-files/api/html/classome_1_1files_1_1detail_1_1FormatReader.html#a2106d1dd7b4f4fe6597fde5cdbdb0f37)) and stored in memory
+-   pixeldata.write: the pixeldata is written to disk as another OME-TIFF using the ``saveBytes`` API ([Java](http://downloads.openmicroscopy.org/bio-formats/5.3.4/api/loci/formats/IFormatWriter.html#saveBytes-int-byte:A-) / [C++](http://downloads.openmicroscopy.org/ome-files-cpp/0.3.1/21/docs/ome-files-bundle-docs-0.3.1-b21/ome-files/api/html/classome_1_1files_1_1detail_1_1FormatWriter.html#a51115641c238f5830f796c1839d75872))
 
 Each benchmark test records the real time in milliseconds before and after each
 test, and computes the elapsed time from the difference.
 
 ## Building and executing the benchmark scripts
 
-See the [OME Files C++](http://www.openmicroscopy.org/site/support/ome-files-cpp/ome-cmake-superbuild/manual/html/building.html) and [Bio-Formats](https://www.openmicroscopy.org/site/support/bio-formats/developers/building-bioformats.html) building instructions.
+See the
+[OME Files C++](http://www.openmicroscopy.org/site/support/ome-files-cpp/ome-cmake-superbuild/manual/html/building.html) and
+[Bio-Formats](https://www.openmicroscopy.org/site/support/bio-formats/developers/building-bioformats.html) building instructions.
 
 ### Windows
 
 The benchmark scripts have been executed on a Windows 2008 Server. The other
 build requirements are [Cmake](https://cmake.org/), 
 [Maven](http://maven.apache.org/),
-[Visual Studio](https://www.visualstudio.com/) and a local version of the 
-standalone OME Files bundle for the chosen Visual Studio version.
+[Visual Studio](https://www.visualstudio.com/) and a local version of the
+standalone OME Files bundle matching the Visual Studio version.
 
 In the context of our benchmark, we used
 [Jenkins](https://jenkins.io/index.html) to trigger the Windows benchmark
-builds. The building and execution script is available under [jenkins_build.bat]([scripts/jenkins_build.bat).
+builds. The building and execution script is available under
+[jenkins_build.bat]([scripts/jenkins_build.bat).
 
 To build the OME Files performance scripts manually, within a `build` directory
 run the following `cmake` command:
