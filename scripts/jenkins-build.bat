@@ -130,21 +130,21 @@ for %%T in (bbbc mitocheck tubhiswt) do (
     cd %WORKSPACE%\source
 
     REM Run Java metadata performance tests
-    call mvn -P metadata -Dtest.iterations=%iterations% -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.xml -Dtest.results=%resultsdir%\!test!-metadata-win-java.tsv exec:java
+    call scripts\metadata-performance-java %iterations% !input! %outdir%\!test!-java.ome.xml %resultsdir%\!test!-metadata-win-java.tsv exec:java
     for /L %%I IN (1,1,!iterations!) do (
-        call mvn -P metadata -Dtest.iterations=1 -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.xml -Dtest.results=%resultsdir%\!test!-metadata-win-java-%%I.tsv exec:java
+        call scripts\metadata-performance-java 1 !input! %outdir%\!test!-java.ome.xml %resultsdir%\!test!-metadata-win-java-%%I.tsv exec:java
     )
 
     REM Run Java pixels performance tests
-    call mvn -P pixels -Dtest.iterations=%iterations% -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.tiff -Dtest.results=%resultsdir%\!test!-pixeldata-win-java.tsv exec:java
+    call scripts\pixels-performance-java %iterations% !input! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-pixeldata-win-java.tsv exec:java
     for /L %%I IN (1,1,!iterations!) do (
-        call mvn -P pixels -Dtest.iterations=1 -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.tiff -Dtest.results=%resultsdir%\!test!-pixeldata-win-java-%%I.tsv exec:java
+        call scripts\pixels-performance-java 1 !input! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-pixeldata-win-java-%%I.tsv exec:java
     )
 
     REM Run Java ometiff performance tests
-    call mvn -P ometiff -Dtest.iterations=%iterations% -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.tiff -Dtest.results=%resultsdir%\!test!-ometiffdata-win-java.tsv exec:java
+    call scripts\ometiff-performance-java %iterations% !input! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-ometiffdata-win-java.tsv exec:java
     for /L %%I IN (1,1,!iterations!) do (
-        call mvn -P ometiff -Dtest.iterations=1 -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.tiff -Dtest.results=%resultsdir%\!test!-ometiffdata-win-java-%%I.tsv exec:java
+        call scripts\ometiff-performance-java 1 !input! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-ometiffdata-win-java-%%I.tsv exec:java
     )
 
     REM Execute C++ performance tests

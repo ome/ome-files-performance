@@ -29,11 +29,6 @@
 
     <!-- NB: Override argLine property for extra maven-surefire-plugin args. -->
     <argLine/>
-
-    <test.iterations>1</test.iterations>
-    <test.input>test.file</test.input>
-    <test.output>test.write</test.output>
-    <test.results>test.results</test.results>
   </properties>
   <build>
     <defaultGoal>install</defaultGoal>
@@ -85,6 +80,15 @@
       <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
         <version>2.10</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>
@@ -174,105 +178,6 @@
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>metadata</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.2.1</version>
-            <executions>
-              <execution>
-                <id>metadata</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <mainClass>ome.files.performance.MetadataPerformance</mainClass>
-              <arguments>
-                <argument>${test.iterations}</argument>
-                <argument>${test.input}</argument>
-                <argument>${test.output}</argument>
-                <argument>${test.results}</argument>
-              </arguments>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>pixels</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.2.1</version>
-            <executions>
-              <execution>
-                <id>metadata</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <mainClass>ome.files.performance.PixelsPerformance</mainClass>
-              <arguments>
-                <argument>${test.iterations}</argument>
-                <argument>${test.input}</argument>
-                <argument>${test.output}</argument>
-                <argument>${test.results}</argument>
-              </arguments>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>ometiff</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.2.1</version>
-            <executions>
-              <execution>
-                <id>metadata</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <mainClass>ome.files.performance.OMETIFFPerformance</mainClass>
-              <arguments>
-                <argument>${test.iterations}</argument>
-                <argument>${test.input}</argument>
-                <argument>${test.output}</argument>
-                <argument>${test.results}</argument>
-              </arguments>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
   <repositories>
     <repository>
