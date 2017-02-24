@@ -64,3 +64,36 @@ result(std::ostream& os,
      << boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().system // process system time
      << '\n';
 }
+
+void
+result(std::ostream& os,
+       const std::string& testname,
+       const boost::filesystem::path& testfile,
+       const std::vector<timepoint>& starts,
+       const std::vector<timepoint>& ends)
+{
+  using rettype = decltype(boost::chrono::duration_cast<cpu_clock_milliseconds>(ends[0].process - starts[0].process).count().real);
+  rettype real = 0, user = 0, system = 0;
+
+  for (std::vector<timepoint>::size_type i = 0; i < starts.size(); ++i)
+    {
+      const timepoint& start = starts.at(i);
+      const timepoint& end = ends.at(i);
+      real += boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().real;
+      user += boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().user;
+      system += boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().system;
+    }
+
+  os << "C++"
+     << '\t'
+     << testname
+     << '\t'
+     << testfile.filename().string()
+     << '\t'
+     << real // process real time
+     << '\t'
+     << user // process user time
+     << '\t'
+     << system // process system time
+     << '\n';
+}

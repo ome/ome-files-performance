@@ -56,7 +56,7 @@
 
 int main(int argc, char *argv[])
 {
-  if (argc != 5)
+  if (argc < 5)
     {
       std::cerr << "Usage: " << argv[0] << " iterations inputfile outputfile resultfile\n";
       std::exit(1);
@@ -67,9 +67,13 @@ int main(int argc, char *argv[])
       ome::common::setLogLevel(ome::logging::trivial::warning);
 
       int iterations = std::atoi(argv[1]);
-      boost::filesystem::path infile(argv[2]);
-      boost::filesystem::path outfile(argv[3]);
-      boost::filesystem::path resultfile(argv[4]);
+      std::vector<boost::filesystem::path> infiles;
+      for(int i = 2; i < argc-2; ++i)
+        {
+          infiles.push_back(argv[i]);
+        }
+      boost::filesystem::path outfile(argv[argc-2]);
+      boost::filesystem::path resultfile(argv[argc-1]);
 
       std::ofstream results(resultfile.string().c_str());
 
@@ -77,119 +81,126 @@ int main(int argc, char *argv[])
 
       for(int i = 0; i < iterations; ++i)
         {
-          std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> omexmlmeta = std::make_shared<ome::xml::meta::OMEXMLMetadata>();
-          std::shared_ptr< ::ome::xml::meta::MetadataStore> store = std::dynamic_pointer_cast< ::ome::xml::meta::MetadataStore>(omexmlmeta);
-          std::shared_ptr< ::ome::xml::meta::MetadataRetrieve> retrieve;
-          std::vector<std::vector<std::unique_ptr<ome::files::VariantPixelBuffer> > > pixels;
-          std::vector<bool> interleaved;
+          std::vector<timepoint> read_start(infiles.size());
+          std::vector<timepoint> read_init(infiles.size());
+          std::vector<timepoint> read_end(infiles.size());
+          std::vector<timepoint> write_start(infiles.size());
+          std::vector<timepoint> write_init(infiles.size());
+          std::vector<timepoint> write_close_start(infiles.size());
+          std::vector<timepoint> write_end(infiles.size());
 
-          timepoint read_start;
-          timepoint read_init;
-
-          {
-            std::cout << "pass " << i << ": read init..." << std::flush;
-            ome::files::in::MinimalTIFFReader reader;
-            reader.setMetadataStore(store);
-            reader.setId(infile);
-            std::cout << "done\n" << std::flush;
-
-            read_init = timepoint();
-
-            pixels.resize(reader.getSeriesCount());
-            interleaved.resize(reader.getSeriesCount());
-
-            for (ome::files::dimension_size_type series = 0;
-                 series < reader.getSeriesCount();
-                 ++series)
-              {
-                std::cout << "pass " << i << ": read series " << series << ": " << std::flush;
-                reader.setSeries(series);
-
-                std::vector<std::unique_ptr<ome::files::VariantPixelBuffer> >& planes = pixels.at(series);
-                planes.resize(reader.getImageCount());
-                interleaved.at(series) = reader.isInterleaved();
-
-                for (ome::files::dimension_size_type plane = 0;
-                     plane < reader.getImageCount();
-                     ++plane)
-                  {
-                    reader.setPlane(plane);
-                    std::unique_ptr<ome::files::VariantPixelBuffer>& buf = planes.at(plane);
-                    buf = std::make_unique<ome::files::VariantPixelBuffer>
-                      (boost::extents[1][1][1][1][1][1][1][1][1],
-                       reader.getPixelType(),
-                       ome::files::PixelBufferBase::make_storage_order(reader.getDimensionOrder(), reader.isInterleaved()));
-                    reader.openBytes(plane, *buf);
-                    std::cout << '.' << std::flush;
-                  }
-                std::cout << " done\n" << std::flush;
-              }
-          }
-
-          timepoint read_end;
-
-          result(results, "pixeldata.read", infile, read_start, read_end);
-          result(results, "pixeldata.read.init", infile, read_start, read_init);
-          result(results, "pixeldata.read.pixels", infile, read_init, read_end);
-
-          retrieve = std::dynamic_pointer_cast<ome::xml::meta::MetadataRetrieve>(store);
-          if (!retrieve)
+          for(std::vector<boost::filesystem::path>::size_type j = 0; j < infiles.size(); ++j)
             {
-              throw ome::files::FormatException("MetadataStore does not implement MetadataRetrieve");
-            }
+              const auto& infile = infiles.at(j);
 
-          // To keep the logic the same as for JACE, even though it's unnecessary here
-          if(boost::filesystem::exists(outfile))
-            boost::filesystem::remove(outfile);
+              std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> omexmlmeta = std::make_shared<ome::xml::meta::OMEXMLMetadata>();
+              std::shared_ptr< ::ome::xml::meta::MetadataStore> store = std::dynamic_pointer_cast< ::ome::xml::meta::MetadataStore>(omexmlmeta);
+              std::shared_ptr< ::ome::xml::meta::MetadataRetrieve> retrieve;
+              std::vector<std::vector<std::unique_ptr<ome::files::VariantPixelBuffer> > > pixels;
+              std::vector<bool> interleaved;
 
-          timepoint write_start;
-          timepoint write_init;
-          timepoint close_start;
+              read_start[j] = timepoint();
 
-          {
-            std::cout << "pass " << i << ": write init..." << std::flush;
-            std::unique_ptr<ome::files::FormatWriter> writer = std::make_unique<ome::files::out::MinimalTIFFWriter>();
-            writer->setMetadataRetrieve(retrieve);
-            writer->setInterleaved(interleaved.at(0));
-            dynamic_cast<ome::files::out::MinimalTIFFWriter &>(*writer.get()).setBigTIFF(true);
-            writer->setId(outfile);
-            std::cout << "done\n" << std::flush;
+              std::cout << "pass " << i << ": read init..." << std::flush;
+              ome::files::in::MinimalTIFFReader reader;
+              reader.setMetadataStore(store);
+              reader.setId(infile);
+              std::cout << "done\n" << std::flush;
 
-            write_init = timepoint();
+              read_init[j] = timepoint();
 
-            for (ome::files::dimension_size_type series = 0;
-                 series < pixels.size();
-                 ++series)
               {
-                std::cout << "pass " << i << ": write series " << series << ": " << std::flush;
-                writer->setInterleaved(interleaved.at(series));
-                writer->setSeries(series);
+                pixels.resize(reader.getSeriesCount());
+                interleaved.resize(reader.getSeriesCount());
 
-                std::vector<std::unique_ptr<ome::files::VariantPixelBuffer> >& planes = pixels.at(series);
-
-                for (ome::files::dimension_size_type plane = 0;
-                     plane < planes.size();
-                     ++plane)
+                for (ome::files::dimension_size_type series = 0;
+                     series < reader.getSeriesCount();
+                     ++series)
                   {
-                    writer->setPlane(plane);
+                    std::cout << "pass " << i << ": read series " << series << ": " << std::flush;
+                    reader.setSeries(series);
 
-                    std::unique_ptr<ome::files::VariantPixelBuffer>& buf = planes.at(plane);
-                    writer->saveBytes(plane, *buf);
-                    std::cout << '.' << std::flush;
+                    std::vector<std::unique_ptr<ome::files::VariantPixelBuffer> >& planes = pixels.at(series);
+                    planes.resize(reader.getImageCount());
+                    interleaved.at(series) = reader.isInterleaved();
+
+                    for (ome::files::dimension_size_type plane = 0;
+                         plane < reader.getImageCount();
+                         ++plane)
+                      {
+                        reader.setPlane(plane);
+                        std::unique_ptr<ome::files::VariantPixelBuffer>& buf = planes.at(plane);
+                        buf = std::make_unique<ome::files::VariantPixelBuffer>
+                          (boost::extents[1][1][1][1][1][1][1][1][1],
+                           reader.getPixelType(),
+                           ome::files::PixelBufferBase::make_storage_order(reader.getDimensionOrder(), reader.isInterleaved()));
+                        reader.openBytes(plane, *buf);
+                        std::cout << '.' << std::flush;
+                      }
+                    std::cout << " done\n" << std::flush;
                   }
-                std::cout << " done\n" << std::flush;
               }
-            close_start = timepoint();
-            writer->close();
-          }
 
-          timepoint write_end;
+              read_end[j] = timepoint();
 
-          result(results, "pixeldata.write", infile, write_start, write_end);
-          result(results, "pixeldata.write.init", infile, write_start, write_init);
-          result(results, "pixeldata.write.pixels", infile, write_init, close_start);
-          result(results, "pixeldata.write.close", infile, close_start, write_end);
+              retrieve = std::dynamic_pointer_cast<ome::xml::meta::MetadataRetrieve>(store);
+              if (!retrieve)
+                {
+                  throw ome::files::FormatException("MetadataStore does not implement MetadataRetrieve");
+                }
 
+              // To keep the logic the same as for JACE, even though it's unnecessary here
+              if(boost::filesystem::exists(outfile))
+                boost::filesystem::remove(outfile);
+
+              write_start[j] = timepoint();
+
+              {
+                std::cout << "pass " << i << ": write init..." << std::flush;
+                std::unique_ptr<ome::files::FormatWriter> writer = std::make_unique<ome::files::out::MinimalTIFFWriter>();
+                writer->setMetadataRetrieve(retrieve);
+                writer->setInterleaved(interleaved.at(0));
+                dynamic_cast<ome::files::out::MinimalTIFFWriter &>(*writer.get()).setBigTIFF(true);
+                writer->setId(outfile);
+                std::cout << "done\n" << std::flush;
+
+                write_init[j] = timepoint();
+
+                for (ome::files::dimension_size_type series = 0;
+                     series < pixels.size();
+                     ++series)
+                  {
+                    std::cout << "pass " << i << ": write series " << series << ": " << std::flush;
+                    writer->setInterleaved(interleaved.at(series));
+                    writer->setSeries(series);
+
+                    std::vector<std::unique_ptr<ome::files::VariantPixelBuffer> >& planes = pixels.at(series);
+
+                    for (ome::files::dimension_size_type plane = 0;
+                         plane < planes.size();
+                         ++plane)
+                      {
+                        writer->setPlane(plane);
+
+                        std::unique_ptr<ome::files::VariantPixelBuffer>& buf = planes.at(plane);
+                        writer->saveBytes(plane, *buf);
+                        std::cout << '.' << std::flush;
+                      }
+                    std::cout << " done\n" << std::flush;
+                  }
+                write_close_start[j] = timepoint();
+                writer->close();
+              }
+
+              write_end[j] = timepoint();
+            }
+          result(results, "pixeldata.read", infiles[0], read_start, read_end);
+          result(results, "pixeldata.read.init", infiles[0], read_start, read_init);
+          result(results, "pixeldata.read.pixels", infiles[0], read_init, read_end);
+          result(results, "pixeldata.write", infiles[0], write_start, write_end);
+          result(results, "pixeldata.write.init", infiles[0], write_start, write_init);
+          result(results, "pixeldata.write.pixels", infiles[0], write_init, write_close_start);
+          result(results, "pixeldata.write.close", infiles[0], write_close_start, write_end);
         }
       return 0;
     }

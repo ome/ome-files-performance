@@ -78,7 +78,7 @@ using loci::formats::tiff::IFD;
 
 int main(int argc, char *argv[])
 {
-  if (argc != 5)
+  if (argc < 5)
     {
       std::cerr << "Usage: " << argv[0] << " iterations inputfile outputfile resultfile\n";
       std::exit(1);
@@ -87,9 +87,13 @@ int main(int argc, char *argv[])
   try
     {
       int iterations = std::atoi(argv[1]);
-      boost::filesystem::path infile(argv[2]);
-      boost::filesystem::path outfile(argv[3]);
-      boost::filesystem::path resultfile(argv[4]);
+      std::vector<boost::filesystem::path> infiles;
+      for(int i = 2; i < argc-2; ++i)
+        {
+          infiles.push_back(argv[i]);
+        }
+      boost::filesystem::path outfile(argv[argc-2]);
+      boost::filesystem::path resultfile(argv[argc-1]);
 
       JavaTools::createJVM(8192);
       std::unique_ptr<OMEXMLService> service = std::make_unique<OMEXMLServiceImpl>();
@@ -100,110 +104,119 @@ int main(int argc, char *argv[])
 
       for(int i = 0; i < iterations; ++i)
         {
-          IMetadata meta = service->createOMEXMLMetadata();
-          // ByteArray isn't copyable or assignable, so we use a
-          // unique_ptr to allow storage in a container.
-          std::vector<std::vector<std::unique_ptr<ByteArray>>> pixels;
+          std::vector<timepoint> read_start(infiles.size());
+          std::vector<timepoint> read_init(infiles.size());
+          std::vector<timepoint> read_end(infiles.size());
+          std::vector<timepoint> write_start(infiles.size());
+          std::vector<timepoint> write_init(infiles.size());
+          std::vector<timepoint> write_close_start(infiles.size());
+          std::vector<timepoint> write_end(infiles.size());
 
-          timepoint read_start;
-          timepoint read_init;
+          for(std::vector<boost::filesystem::path>::size_type j = 0; j < infiles.size(); ++j)
+            {
+              const auto& infile = infiles.at(j);
 
-          {
-            std::cout << "pass " << i << ": read init..." << std::flush;
-            MinimalTiffReader tiffreader;
-            FormatReader reader = java_cast<FormatReader>(tiffreader);
-            reader.setMetadataStore(meta);
-            reader.setId(infile.string());
-            std::cout << "done\n" << std::flush;
+              IMetadata meta = service->createOMEXMLMetadata();
+              // ByteArray isn't copyable or assignable, so we use a
+              // unique_ptr to allow storage in a container.
+              std::vector<std::vector<std::unique_ptr<ByteArray>>> pixels;
 
-            read_init = timepoint();
+              read_start[j] = timepoint();
 
-            pixels.resize(reader.getSeriesCount());
-
-            for (jint series = 0;
-                 series < reader.getSeriesCount();
-                 ++series)
               {
-                std::cout << "pass " << i << ": read series " << series << ": " << std::flush;
-                reader.setSeries(series);
+                std::cout << "pass " << i << ": read init..." << std::flush;
+                MinimalTiffReader tiffreader;
+                FormatReader reader = java_cast<FormatReader>(tiffreader);
+                reader.setMetadataStore(meta);
+                reader.setId(infile.string());
+                std::cout << "done\n" << std::flush;
 
-                std::vector<std::unique_ptr<ByteArray>>& planes = pixels.at(series);
-                planes.resize(reader.getImageCount());
+                read_init[j] = timepoint();
 
-                for (jint plane = 0;
-                     plane < reader.getImageCount();
-                     ++plane)
+                pixels.resize(reader.getSeriesCount());
+
+                for (jint series = 0;
+                     series < reader.getSeriesCount();
+                     ++series)
                   {
-                    planes.at(plane) = std::make_unique<ByteArray>(reader.openBytes(plane));
-                    std::cout << '.' << std::flush;
+                    std::cout << "pass " << i << ": read series " << series << ": " << std::flush;
+                    reader.setSeries(series);
+
+                    std::vector<std::unique_ptr<ByteArray>>& planes = pixels.at(series);
+                    planes.resize(reader.getImageCount());
+
+                    for (jint plane = 0;
+                         plane < reader.getImageCount();
+                         ++plane)
+                      {
+                        planes.at(plane) = std::make_unique<ByteArray>(reader.openBytes(plane));
+                        std::cout << '.' << std::flush;
+                      }
+                    std::cout << " done\n" << std::flush;
                   }
-                std::cout << " done\n" << std::flush;
-              }
-          }
-
-          timepoint read_end;
-
-          result(results, "pixeldata.read", infile, read_start, read_end);
-          result(results, "pixeldata.read.init", infile, read_start, read_init);
-          result(results, "pixeldata.read.pixels", infile, read_init, read_end);
-
-          // The Java writer doesn't automatically truncate the output file.
-          if(boost::filesystem::exists(outfile))
-            boost::filesystem::remove(outfile);
-
-          timepoint write_start;
-          timepoint write_init;
-          timepoint close_start;
-
-          {
-            std::cout << "pass " << i << ": write init..." << std::flush;
-            TiffWriter tiffwriter;
-            FormatWriter writer = java_cast<FormatWriter>(tiffwriter);
-            writer.setMetadataRetrieve(meta);
-            writer.setInterleaved(true);
-            tiffwriter.setBigTiff(true);
-            writer.setId(outfile.string());
-            std::cout << "done\n" << std::flush;
-
-            write_init = timepoint();
-
-            for (jint series = 0;
-                 series < static_cast<jint>(pixels.size());
-                 ++series)
-              {
-                std::cout << "pass " << i << ": write series " << series << ": " << std::flush;
-                writer.setSeries(series);
-
-                std::vector<unique_ptr<ByteArray>>& planes = pixels.at(series);
-
-                for (jint plane = 0;
-                     plane < static_cast<jint>(planes.size());
-                     ++plane)
-                  {
-                    int sizeX = meta.getPixelsSizeX(series).getNumberValue().intValue();
-                    IFD ifd;
-                    int rows = 65536 / sizeX;
-                    if (rows < 1) {
-                      rows = 1;
-                    }
-                    ifd.putIFDValue(IFD::ROWS_PER_STRIP(), static_cast<::jace::proxy::types::JInt>(rows));
-                    ByteArray& buf = *(planes.at(plane));
-                    tiffwriter.saveBytes(plane, buf, ifd);
-                    std::cout << '.' << std::flush;
-                  }
-                std::cout << " done\n" << std::flush;
               }
 
-            close_start = timepoint();
-            writer.close();
-          }
+              read_end[j] = timepoint();
 
-          timepoint write_end;
+              // The Java writer doesn't automatically truncate the output file.
+              if(boost::filesystem::exists(outfile))
+                boost::filesystem::remove(outfile);
 
-          result(results, "pixeldata.write", infile, write_start, write_end);
-          result(results, "pixeldata.write.init", infile, write_start, write_init);
-          result(results, "pixeldata.write.pixels", infile, write_init, close_start);
-          result(results, "pixeldata.write.close", infile, close_start, write_end);
+              write_start[j] = timepoint();
+
+              {
+                std::cout << "pass " << i << ": write init..." << std::flush;
+                TiffWriter tiffwriter;
+                FormatWriter writer = java_cast<FormatWriter>(tiffwriter);
+                writer.setMetadataRetrieve(meta);
+                writer.setInterleaved(true);
+                tiffwriter.setBigTiff(true);
+                writer.setId(outfile.string());
+                std::cout << "done\n" << std::flush;
+
+                write_init[j] = timepoint();
+
+                for (jint series = 0;
+                     series < static_cast<jint>(pixels.size());
+                     ++series)
+                  {
+                    std::cout << "pass " << i << ": write series " << series << ": " << std::flush;
+                    writer.setSeries(series);
+
+                    std::vector<unique_ptr<ByteArray>>& planes = pixels.at(series);
+
+                    for (jint plane = 0;
+                         plane < static_cast<jint>(planes.size());
+                         ++plane)
+                      {
+                        int sizeX = meta.getPixelsSizeX(series).getNumberValue().intValue();
+                        IFD ifd;
+                        int rows = 65536 / sizeX;
+                        if (rows < 1) {
+                          rows = 1;
+                        }
+                        ifd.putIFDValue(IFD::ROWS_PER_STRIP(), static_cast<::jace::proxy::types::JInt>(rows));
+                        ByteArray& buf = *(planes.at(plane));
+                        tiffwriter.saveBytes(plane, buf, ifd);
+                        std::cout << '.' << std::flush;
+                      }
+                    std::cout << " done\n" << std::flush;
+                  }
+
+                write_close_start[j] = timepoint();
+                writer.close();
+              }
+
+              write_end[j] = timepoint();
+            }
+
+          result(results, "pixeldata.read", infiles[0], read_start, read_end);
+          result(results, "pixeldata.read.init", infiles[0], read_start, read_init);
+          result(results, "pixeldata.read.pixels", infiles[0], read_init, read_end);
+          result(results, "pixeldata.write", infiles[0], write_start, write_end);
+          result(results, "pixeldata.write.init", infiles[0], write_start, write_init);
+          result(results, "pixeldata.write.pixels", infiles[0], write_init, write_close_start);
+          result(results, "pixeldata.write.close", infiles[0], write_close_start, write_end);
         }
       return 0;
     }

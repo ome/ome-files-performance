@@ -38,6 +38,9 @@
 
 #pragma once
 
+#include <utility>
+#include <vector>
+
 #include <boost/chrono/process_cpu_clocks.hpp>
 #include <boost/chrono/system_clocks.hpp>
 #include <boost/chrono/thread_clock.hpp>
@@ -57,14 +60,10 @@ typedef boost::chrono::duration<boost::chrono::process_times<boost::chrono::mill
  */
 struct timepoint
 {
-timepoint():
-  system(boost::chrono::high_resolution_clock::now()),
-    thread(boost::chrono::thread_clock::now()),
+  timepoint():
     process(boost::chrono::process_cpu_clock::now())
   {}
 
-  boost::chrono::high_resolution_clock::time_point system;
-  boost::chrono::thread_clock::time_point thread;
   boost::chrono::process_cpu_clock::time_point process;
 };
 
@@ -94,6 +93,25 @@ result(std::ostream& os,
        const boost::filesystem::path& testfile,
        const timepoint& start,
        const timepoint& end);
+
+/**
+ * Output TSV test result (accumulate readings).
+ *
+ * The time duration for each recorded timepoint will be output with
+ * millisecond precision.
+ *
+ * @param os the stream to use.
+ * @param testname the name of the test.
+ * @param testfile the input filename of the test data.
+ * @param starts the start timepoints.
+ * @param ends the endm timepoints.
+ */
+void
+result(std::ostream& os,
+       const std::string& testname,
+       const boost::filesystem::path& testfile,
+       const std::vector<timepoint>& starts,
+       const std::vector<timepoint>& ends);
 
 /*
  * Local Variables:
