@@ -134,21 +134,21 @@ for %%T in (bbbc mitocheck tubhiswt) do (
     cd %WORKSPACE%\source
 
     REM Run Java metadata performance tests
-    call scripts\metadata-performance-java %iterations% !input! %outdir%\!test!-java.ome.xml %resultsdir%\!test!-metadata-win-java.tsv exec:java
+    call scripts\metadata-performance-java %iterations% !input! %outdir%\!test!-java.ome.xml %resultsdir%\!test!-metadata-win-java.tsv
     for /L %%I IN (1,1,!iterations!) do (
-        call scripts\metadata-performance-java 1 !input! %outdir%\!test!-java.ome.xml %resultsdir%\!test!-metadata-win-java-%%I.tsv exec:java
+        call scripts\metadata-performance-java 1 !input! %outdir%\!test!-java.ome.xml %resultsdir%\!test!-metadata-win-java-%%I.tsv
     )
 
     REM Run Java pixels performance tests
-    call scripts\pixels-performance-java %iterations% !inputglob! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-pixeldata-win-java.tsv exec:java
+    call scripts\pixels-performance-java %iterations% !inputglob! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-pixeldata-win-java.tsv
     for /L %%I IN (1,1,!iterations!) do (
-        call scripts\pixels-performance-java 1 !inputglob! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-pixeldata-win-java-%%I.tsv exec:java
+        call scripts\pixels-performance-java 1 !inputglob! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-pixeldata-win-java-%%I.tsv
     )
 
     REM Run Java ometiff performance tests
-    call scripts\ometiff-performance-java %iterations% !input! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-ometiffdata-win-java.tsv exec:java
+    call scripts\ometiff-performance-java %iterations% !input! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-ometiffdata-win-java.tsv
     for /L %%I IN (1,1,!iterations!) do (
-        call scripts\ometiff-performance-java 1 !input! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-ometiffdata-win-java-%%I.tsv exec:java
+        call scripts\ometiff-performance-java 1 !input! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-ometiffdata-win-java-%%I.tsv
     )
 
     REM Execute C++ performance tests
