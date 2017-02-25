@@ -119,12 +119,16 @@ for %%T in (bbbc mitocheck tubhiswt) do (
     set input=unknown
     if [!test!] == [bbbc] (
         set input=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff
+        set inputglob=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff
     )
     if [!test!] == [mitocheck] (
         set input=%DATA_DIR%\mitocheck\00001_01.ome.tiff
+        set inputglob=%DATA_DIR%\mitocheck\00001_01.ome.tiff
     )
     if [!test!] == [tubhiswt] (
         set input=%DATA_DIR%\tubhiswt-4D\tubhiswt_C0_TP0.ome.tif
+        set inputglob=
+        for /f "tokens=*" %%F in ('dir /b /a:-d "%DATA_DIR%\tubhiswt-4D\tubhiswt_*.tif"') do call set inputglob=%%inputglob%% "%%F"
     )
 
     cd %WORKSPACE%\source
@@ -136,9 +140,9 @@ for %%T in (bbbc mitocheck tubhiswt) do (
     )
 
     REM Run Java pixels performance tests
-    call scripts\pixels-performance-java %iterations% !input! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-pixeldata-win-java.tsv exec:java
+    call scripts\pixels-performance-java %iterations% !inputglob! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-pixeldata-win-java.tsv exec:java
     for /L %%I IN (1,1,!iterations!) do (
-        call scripts\pixels-performance-java 1 !input! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-pixeldata-win-java-%%I.tsv exec:java
+        call scripts\pixels-performance-java 1 !inputglob! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-pixeldata-win-java-%%I.tsv exec:java
     )
 
     REM Run Java ometiff performance tests
@@ -157,9 +161,9 @@ for %%T in (bbbc mitocheck tubhiswt) do (
     )
 
     REM Run C++ pixels performance tests
-    install\bin\pixels-performance %iterations% !input! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-pixeldata-win-cpp.tsv
+    install\bin\pixels-performance %iterations% !inputglob! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-pixeldata-win-cpp.tsv
     for /L %%I IN (1,1,!iterations!) do (
-        install\bin\pixels-performance 1 !input! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-pixeldata-win-cpp-%%I.tsv
+        install\bin\pixels-performance 1 !inputglob! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-pixeldata-win-cpp-%%I.tsv
     )
 
     REM Run C++ ometiff performance tests

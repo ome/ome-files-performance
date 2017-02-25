@@ -19,12 +19,15 @@ for test in bbbc mitocheck tubhiswt; do
     case "$test" in
         bbbc)
             input=${datapath}/BBBC/NIRHTa-001.ome.tiff
+            inputglob=${datapath}/BBBC/NIRHTa-001.ome.tiff
         ;;
         mitocheck)
             input=${datapath}/mitocheck/00001_01.ome.tiff
+            inputglob=${datapath}/mitocheck/00001_01.ome.tiff
         ;;
         tubhiswt)
             input=${datapath}/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif
+            input=${datapath}/tubhiswt-4D/*.tif
         ;;
     esac
 
@@ -35,9 +38,9 @@ for test in bbbc mitocheck tubhiswt; do
             scripts/metadata-performance-java 1 "$input" ${outpath}/${test}-java.ome.xml ${resultpath}/${test}-metadata-linux-java-${i}.tsv exec:java
         done
 
-        scripts/pixels-performance-java ${iterations} "$input" ${outpath}/${test}-java.ome.tiff ${resultpath}/${test}-pixeldata-linux-java.tsv exec:java
+        scripts/pixels-performance-java ${iterations} $inputglob ${outpath}/${test}-java.ome.tiff ${resultpath}/${test}-pixeldata-linux-java.tsv exec:java
         for i in $(seq ${iterations}); do
-            scripts/pixels-performance-java 1 "$input" ${outpath}/${test}-java.ome.tiff ${resultpath}/${test}-pixeldata-linux-java-${i}.tsv exec:java
+            scripts/pixels-performance-java 1 $inputglob ${outpath}/${test}-java.ome.tiff ${resultpath}/${test}-pixeldata-linux-java-${i}.tsv exec:java
         done
 
         scripts/ometiff-performance-java ${iterations} "$input" ${outpath}/${test}-java.ome.tiff ${resultpath}/${test}-ometiffdata-linux-java.tsv exec:java
@@ -53,9 +56,9 @@ for test in bbbc mitocheck tubhiswt; do
             ${binpath}/metadata-performance 1 "$input" ${outpath}/${test}-cpp.ome.xml ${resultpath}/${test}-metadata-linux-cpp-${i}.tsv
         done
 
-        ${binpath}/pixels-performance ${iterations} "$input" ${outpath}/${test}-cpp.ome.tiff ${resultpath}/${test}-pixeldata-linux-cpp.tsv
+        ${binpath}/pixels-performance ${iterations} $inputglob ${outpath}/${test}-cpp.ome.tiff ${resultpath}/${test}-pixeldata-linux-cpp.tsv
         for i in $(seq ${iterations}); do
-            ${binpath}/pixels-performance 1 "$input" ${outpath}/${test}-cpp.ome.tiff ${resultpath}/${test}-pixeldata-linux-cpp-${i}.tsv
+            ${binpath}/pixels-performance 1 $inputglob ${outpath}/${test}-cpp.ome.tiff ${resultpath}/${test}-pixeldata-linux-cpp-${i}.tsv
         done
 
         ${binpath}/ometiff-performance ${iterations} "$input" ${outpath}/${test}-cpp.ome.tiff ${resultpath}/${test}-ometiffdata-linux-cpp.tsv
@@ -78,9 +81,9 @@ for test in bbbc mitocheck tubhiswt; do
         if [ "$test" == "bbbc" ]; then
             jace_iterations=6
         fi
-        ${binpath}/pixels-performance-jace ${jace_iterations} "$input" ${outpath}/${test}-jace.ome.tiff ${resultpath}/${test}-pixeldata-linux-jace.tsv
+        ${binpath}/pixels-performance-jace ${jace_iterations} $inputglob ${outpath}/${test}-jace.ome.tiff ${resultpath}/${test}-pixeldata-linux-jace.tsv
         for i in $(seq ${jace_iterations}); do
-            ${binpath}/pixels-performance-jace 1 "$input" ${outpath}/${test}-jace.ome.tiff ${resultpath}/${test}-pixeldata-linux-jace-${i}.tsv
+            ${binpath}/pixels-performance-jace 1 $inputglob ${outpath}/${test}-jace.ome.tiff ${resultpath}/${test}-pixeldata-linux-jace-${i}.tsv
         done
         ${binpath}/ometiff-performance-jace ${jace_iterations} "$input" ${outpath}/${test}-jace.ome.tiff ${resultpath}/${test}-ometiffdata-linux-jace.tsv
         for i in $(seq ${jace_iterations}); do
