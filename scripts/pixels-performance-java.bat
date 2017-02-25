@@ -8,4 +8,5 @@ set params=%params% %1
 goto argloop
 :afterargloop
 
+echo Running java -classpath "target/classes;target/dependency/*" ome.files.performance.PixelsPerformance %params%
 java -classpath "target/classes;target/dependency/*" ome.files.performance.PixelsPerformance %params%
