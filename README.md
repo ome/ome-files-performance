@@ -125,8 +125,7 @@ The following metrics are defined for the assessment of the benchmark:
 -   relative performance is defined as the ratio of the performance vs the
     performance of Bio-Formats on Linux for each test
 -   metadata rate is defined as the rate of XML transfer per unit of time
-    expressed in MiB/s or kiloitems/s (where items corresponds to XML elements
-    and attributes)
+    expressed in MiB/s
 -   pixeldata rate is defined as the rate of binary pixeldata transfer per
     unit of time expressed in MiB/s
 
