@@ -65,7 +65,7 @@ standalone OME Files bundle matching the Visual Studio version.
 In the context of our benchmark, we used
 [Jenkins](https://jenkins.io/index.html) to trigger the Windows benchmark
 builds. The building and execution script is available under
-[jenkins_build.bat]([scripts/jenkins_build.bat).
+[jenkins_build.bat](scripts/jenkins_build.bat).
 
 To build the OME Files performance scripts manually, within a `build` directory
 run the following `cmake` command:
