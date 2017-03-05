@@ -16,12 +16,15 @@ datasets are:
     https://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/tubhiswt-4D/.
     The metadata size is 176KiB and the size of the pixeldata is 216MiB.
 -   “Plate”, a plate containing 384 wells and 6 fields, derived from the
-    [Broad Bioimage Benchmark Collection](https://data.broadinstitute.org/bbbc/)[^1]
+    [Broad Bioimage Benchmark Collection](https://data.broadinstitute.org/bbbc/) resource
+    described in [Ljosa V, Sokolnicki KL, Carpenter AE (2012). Annotated high-throughput microscopy image sets for validation. Nature Methods 9(7):637](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3627348/)
     and available at
     https://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/BBBC/. The
     metadata size is 2.3MiB and the size of the pixeldata is 3.4GiB.
 -   “ROI”, a time-lapse sequence with ~13K regions of interest, derived from
-    the [MitoCheck project](http://www.mitocheck.org/)[^2] and available at
+    the [MitoCheck project](http://www.mitocheck.org/) described in
+    [Neumann B et al. (2010). Phenotypic profiling of the human genome by time-lapse microscopy reveals cell division genes. Nature 464(7289):721](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3108885/)
+    and available at
     https://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/MitoCheck/.
     The metadata size is 3.2MiB and the size of the pixeldata is 130MiB.
 
@@ -34,9 +37,6 @@ examples where the file content is either dominated by the pixeldata or the
 metadata. 5D represents file layouts where the pixeldata is distributed over
 multiple files. For more information, see
 https://www.openmicroscopy.org/site/support/ome-model/ome-tiff/data.html.
-
-[^1] [Ljosa V, Sokolnicki KL, Carpenter AE (2012). Annotated high-throughput microscopy image sets for validation. Nature Methods 9(7):637](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3627348/)
-[^2] [Neumann B et al. (2010). Phenotypic profiling of the human genome by time-lapse microscopy reveals cell division genes. Nature 464(7289):721](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3108885/)
 
 ## Benchmark hardware and software
 
