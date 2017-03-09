@@ -28,9 +28,6 @@ datasets are:
     https://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/MitoCheck/.
     The metadata size is 3.2MiB and the size of the pixeldata is 130MiB.
 
-For more references and datasets description, see
-https://www.openmicroscopy.org/site/support/ome-model/ome-tiff/data.html.
-
 The datasets were chosen to test different aspects of library performance. The
 Plate and ROI datasets are both single OME-TIFF derived from real-world
 examples where the file content is either dominated by the pixeldata or the
@@ -50,8 +47,8 @@ two reference libraries:
 [OME Files C++ 0.3.1](http://downloads.openmicroscopy.org/ome-files-cpp/0.3.1/)
 and [Bio-Formats version 5.3.4](http://downloads.openmicroscopy.org/bio-formats/5.3.4/).
 The Bio-Formats library was executed directly using the Java Virtual Machine
-but also over C++ using the
-[Bio-Formats JNI/JACE C++ bindings](https://github.com/ome/bio-formats-jace).
+but also over C++ using the Bio-Formats
+[JNI/JACE C++ bindings](https://github.com/ome/bio-formats-jace).
 All benchmark  tests have been executed under both Windows and Linux
 environments with the exception of the JNI/JACE C++ bindings which were only
 successfully built under Ubuntu 16.04. We used Java Development Kit
@@ -87,7 +84,7 @@ The Windows build requirements are [Cmake](https://cmake.org/),
 [Visual Studio](https://www.visualstudio.com/) and a local version of the
 standalone OME Files bundle matching the Visual Studio version.
 
- For running our builds, we used the Continuous Integration software
+For running our builds, we used the Continuous Integration software
 [Jenkins](https://jenkins.io/index.html) to trigger the Windows benchmark
 builds. A single script executing the building and execution steps is
 available under [jenkins_build.bat](scripts/jenkins_build.bat).
