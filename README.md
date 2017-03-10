@@ -1,6 +1,6 @@
 # OME Files Benchmark
 
-The current repository contains the set of benchmarks scripts used to test the
+The current repository contains the set of benchmark scripts used to test the
 performance of the C++-based OME Files library.
 
 ## Benchmark datasets
@@ -38,7 +38,7 @@ https://www.openmicroscopy.org/site/support/ome-model/ome-tiff/data.html.
 ## Benchmark hardware and software
 
 The benchmark scripts have been executed using two identical sleds in a single
-server  provisioned with the  same hardware (Dell PowerEdge™ C6220, 2x
+server  provisioned with the same hardware (Dell PowerEdge™ C6220, 2x
 E5-2640/96 GB). Windows 2008 Server was installed on one sled, Ubuntu 16.04
 running in a Docker virtualized environment was installed on the other.
 
@@ -49,7 +49,7 @@ and [Bio-Formats version 5.3.4](http://downloads.openmicroscopy.org/bio-formats/
 The Bio-Formats library was executed directly using the Java Virtual Machine
 but also over C++ using the Bio-Formats
 [JNI/JACE C++ bindings](https://github.com/ome/bio-formats-jace).
-All benchmark  tests have been executed under both Windows and Linux
+All benchmark tests have been executed under both Windows and Linux
 environments with the exception of the JNI/JACE C++ bindings which were only
 successfully built under Ubuntu 16.04. We used Java Development Kit
 (`1.7.0_80` on Windows and `1.7.0_95` on Linux) to build and run the benchmark
@@ -154,8 +154,8 @@ for the assessment of each benchmark test:
 
 
 The benchmark metrics have been derived from twenty independent iterations of
-each benchmark tests. The only exception is the Plate dataset pixeldata
-performance test which has only been reproduced 6 times as a result of its
+each benchmark test. The only exception is the Plate dataset pixeldata
+performance test which has only been reproduced six times as a result of its
 long execution time (~1.5hr per test).
 
 Additionally, we have reproduced the benchmark by repeating the same number of
@@ -163,7 +163,7 @@ iterations of each test in a loop within the same environment. For most tests,
 the results were found to be identical and independent of whether the tests
 were run separately or repeated. Interestingly, in the case of the metadata
 tests using Bio-Formats and the Java Virtual Machine (JVM), there is a gain
-due to the optimiser in the JVM. We include these results for completeness and
+due to the optimizer in the JVM. We include these results for completeness and
 to indicate the performance achieved if the same operation is invoked within a
 process multiple times.
 
