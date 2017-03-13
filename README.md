@@ -1,41 +1,64 @@
 # OME Files Benchmark
 
-## Introduction
-
-The current repository includes a set of benchmarks used to test the following
-software:
-
--   [OME Files 0.3.1](https://downloads.openmicroscopy.org/ome-files-cpp/0.3.1/)
--   [Bio-Formats 5.3.4](https://downloads.openmicroscopy.org/bio-formats/5.3.4/)
-    both using the Java Virtual Machine and the
-    [Jace C++ bindings](https://github.com/ome/bio-formats-jace)
-
-The benchmark suite has been executed under Windows Server 2008 and Ubuntu
-16.04 with the exception of the JACE C++ bindings which we have only built
-under Ubuntu 16.04 using JDK 7.
+The current repository contains the set of benchmark scripts used to test the
+performance of the C++-based OME Files library.
 
 ## Benchmark datasets
 
-Three public reference OME-TIFF datasets were used, representing different
-aspects of the OME Data model:
+Three public reference OME-TIFF datasets were used for performance tests. For
+each dataset, we computed the metadata size-- the size in bytes of the raw
+OME-XML string stored in the ImageDescription TIFF tag-- and the pixeldata
+size-- the size in bytes of the binary pixel data stored as TIFF. The test
+datasets are:
 
--   a typical 5D fluorescence image - see  https://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/tubhiswt-4D/
--   a plate generated from the public [Broad Bioimage Benchmark Collection](https://data.broadinstitute.org/bbbc/) and exported as an OME-TIFF - see https://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/BBBC/
--   a metadata-rich (13K Regions of Interest) time-lapse sequence from the [MitoCheck](http://www.mitocheck.org/) project - see https://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/MitoCheck/
+-   “5D”, a multi-dimensional fluorescence image with 10 Z-sections, 2
+    channels, 43 timepoints available at
+    https://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/tubhiswt-4D/.
+    The metadata size is 176KiB and the size of the pixeldata is 216MiB.
+-   “Plate”, a plate containing 384 wells and 6 fields, derived from the
+    [Broad Bioimage Benchmark Collection](https://data.broadinstitute.org/bbbc/) resource
+    described in [Ljosa V, Sokolnicki KL, Carpenter AE (2012). Annotated high-throughput microscopy image sets for validation. Nature Methods 9(7):637](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3627348/)
+    and available at
+    https://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/BBBC/. The
+    metadata size is 2.3MiB and the size of the pixeldata is 3.4GiB.
+-   “ROI”, a time-lapse sequence with ~13K regions of interest, derived from
+    the [MitoCheck project](http://www.mitocheck.org/) described in
+    [Neumann B et al. (2010). Phenotypic profiling of the human genome by time-lapse microscopy reveals cell division genes. Nature 464(7289):721](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3108885/)
+    and available at
+    https://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/MitoCheck/.
+    The metadata size is 3.2MiB and the size of the pixeldata is 130MiB.
 
-For more references and datasets description, see
+The datasets were chosen to test different aspects of library performance. The
+Plate and ROI datasets are both single OME-TIFF derived from real-world
+examples where the file content is either dominated by the pixeldata or the
+metadata. 5D represents file layouts where the pixeldata is distributed over
+multiple files. For more information, see
 https://www.openmicroscopy.org/site/support/ome-model/ome-tiff/data.html.
+
+## Benchmark hardware and software
+
+The benchmark scripts have been executed using two identical sleds in a single
+server  provisioned with the same hardware (Dell PowerEdge™ C6220, 2x
+E5-2640/96 GB). Windows 2008 Server was installed on one sled, Ubuntu 16.04
+running in a Docker virtualized environment was installed on the other.
+
+Our benchmark tests measured the performance of the current versions of our
+two reference libraries:
+[OME Files C++ 0.3.1](http://downloads.openmicroscopy.org/ome-files-cpp/0.3.1/)
+and [Bio-Formats version 5.3.4](http://downloads.openmicroscopy.org/bio-formats/5.3.4/).
+The Bio-Formats library was executed directly using the Java Virtual Machine
+but also over C++ using the Bio-Formats
+[JNI/JACE C++ bindings](https://github.com/ome/bio-formats-jace).
+All benchmark tests have been executed under both Windows and Linux
+environments with the exception of the JNI/JACE C++ bindings which were only
+successfully built under Ubuntu 16.04. We used Java Development Kit
+(`1.7.0_80` on Windows and `1.7.0_95` on Linux) to build and run the benchmark
+scripts as JDK7 is  currently required to build the Bio-Formats JACE C++
+bindings.
 
 ## Benchmark tests
 
 For each of the datasets above, four benchmark tests were executed:
-
- Category  | Test  | Description
------------|-------|-------------------------------------
- metadata  | read  | Reads the metadata from an OME-TIFF
- metadata  | write | Writes the metadata into an OME-XML
- pixeldata | read  | Reads the pixeldata from an OME-TIFF
- pixeldata | write | Writes the pixeldata into an OME-TIFF
 
 -   metadata.read: the metadata is extracted from the OME-TIFF
     ImageDescription tag and converted into OME Data Model objects using the
@@ -56,19 +79,18 @@ See the
 
 ### Windows
 
-The benchmark scripts have been executed on a Windows 2008 Server. The other
-build requirements are [Cmake](https://cmake.org/), 
+The Windows build requirements are [Cmake](https://cmake.org/),
 [Maven](http://maven.apache.org/),
 [Visual Studio](https://www.visualstudio.com/) and a local version of the
 standalone OME Files bundle matching the Visual Studio version.
 
-In the context of our benchmark, we used
+For running our builds, we used the Continuous Integration software
 [Jenkins](https://jenkins.io/index.html) to trigger the Windows benchmark
-builds. The building and execution script is available under
-[jenkins_build.bat](scripts/jenkins_build.bat).
+builds. A single script executing the building and execution steps is
+available under [jenkins_build.bat](scripts/jenkins_build.bat).
 
-To build the OME Files performance scripts manually, within a `build` directory
-run the following `cmake` command:
+To build the OME Files performance scripts manually, within a `build`
+directory, execute the following `cmake` command:
 
     $ cmake -G "Ninja" -DCMAKE_VERBOSE_MAKEFILE:BOOL=%verbose%
       -DCMAKE_INSTALL_PREFIX:PATH=%installdir% -DCMAKE_BUILD_TYPE=%build_type%
@@ -95,8 +117,8 @@ benchmark Docker image, run:
     $ docker build -t ome-files-performance .
 
 In order to execute the benchmark scripts, download the benchmark datasets
-under a local folder e.g. `/tmp/benchmark_data` then mount this local folder as
-a  `/data` volume and run the Docker image:
+under a local folder, e.g. `/tmp/benchmark_data`, then mount this local folder
+as a `/data` volume and run the Docker image:
 
     $ docker run --rm -it -v /data:/data ome-files-performance
 
@@ -106,7 +128,6 @@ under `/data/results`.
 
 ## Benchmark results
 
-### Tabular results
 
 The [results](results) folder contains the final set of results generated using
 the benchmark tests described above with the following columns:
@@ -116,18 +137,35 @@ the benchmark tests described above with the following columns:
 - `test.file`: name of the benchmark dataset
 - `proc.real`/`real`: execution time measured by the benchmark script
 
-### Metrics
-
-The following metrics are defined for the assessment of the benchmark:
+From these tab-separated value files, the following metrics have been defined
+for the assessment of each benchmark test:
 
 -   performance is defined as the inverse of the execution time for each
     benchmark test
--   relative performance is defined as the ratio of the performance vs the
-    performance of Bio-Formats on Linux for each test
--   metadata rate is defined as the rate of XML transfer per unit of time
-    expressed in MiB/s
--   pixeldata rate is defined as the rate of binary pixeldata transfer per
-    unit of time expressed in MiB/s
+-   relative performance of a test is defined as the ratio of the performance
+    over the performance of the same test for the same dataset executed using
+    Bio-Formats under Linux or Windows, as appropriate,
+-   metadata rate i.e. the rate of XML transfer per unit of time expressed in
+    MiB/s is defined as the ratio of the metadata size of the test dataset
+    over the execution time of the metadata test,
+-   pixeldata rate i.e. the rate of binary pixeldata transfer per unit of time
+    expressed in MiB/s is defined as the ratio of the the pixeldata size of
+    the test dataset over the execution time of the pixeldata test.
+
+
+The benchmark metrics have been derived from twenty independent iterations of
+each benchmark test. The only exception is the Plate dataset pixeldata
+performance test which has only been reproduced six times as a result of its
+long execution time (~1.5hr per test).
+
+Additionally, we have reproduced the benchmark by repeating the same number of
+iterations of each test in a loop within the same environment. For most tests,
+the results were found to be identical and independent of whether the tests
+were run separately or repeated. Interestingly, in the case of the metadata
+tests using Bio-Formats and the Java Virtual Machine (JVM), there is a gain
+due to the optimizer in the JVM. We include these results for completeness and
+to indicate the performance achieved if the same operation is invoked within a
+process multiple times.
 
 ## References
 
