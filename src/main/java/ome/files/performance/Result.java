@@ -36,6 +36,7 @@ import java.io.Writer;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.nio.file.Path;
+import java.util.List;
 
 class Result {
   private Writer writer;
@@ -57,6 +58,26 @@ class Result {
                    (end.cpu-start.cpu)/1000000 + "\t" +
                    (end.user-start.user)/1000000 + "\t" +
                    (end.system-start.system)/1000000);
+
+  }
+
+  void add(String testname,
+           Path testfile,
+           List<Timepoint> start,
+           List<Timepoint> end) {
+    long real = 0, cpu = 0, user = 0, system = 0;
+    for(int i = 0; i < start.size(); i++) {
+      real += (end.get(i).real-start.get(i).real);
+      cpu += (end.get(i).cpu-start.get(i).cpu);
+      user += (end.get(i).user-start.get(i).user);
+      system += (end.get(i).system-start.get(i).system);
+    }
+    output.println("Java\t" + testname + "\t" +
+                   testfile.getFileName().toString() + "\t" +
+                   real/1000000 + "\t" +
+                   cpu/1000000 + "\t" +
+                   user/1000000 + "\t" +
+                   system/1000000);
 
   }
 

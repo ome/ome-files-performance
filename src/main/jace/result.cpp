@@ -41,7 +41,7 @@
 void
 result_header(std::ostream& os)
 {
-  os << "test.lang\ttest.name\ttest.file\tsystem.time\tthread.time\tproc.real\tproc.user\tproc.system\n";
+  os << "test.lang\ttest.name\ttest.file\tproc.real\tproc.user\tproc.system\n";
 }
 
 void
@@ -57,14 +57,43 @@ result(std::ostream& os,
      << '\t'
      << testfile.filename().string()
      << '\t'
-     << boost::chrono::duration_cast<boost::chrono::milliseconds>(end.system - start.system).count() // system time
-     << '\t'
-     << boost::chrono::duration_cast<boost::chrono::milliseconds>(end.thread - start.thread).count() // thread time
-     << '\t'
      << boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().real // process real time
      << '\t'
      << boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().user // process user time
      << '\t'
      << boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().system // process system time
+     << '\n';
+}
+
+void
+result(std::ostream& os,
+       const std::string& testname,
+       const boost::filesystem::path& testfile,
+       const std::vector<timepoint>& starts,
+       const std::vector<timepoint>& ends)
+{
+  using rettype = decltype(boost::chrono::duration_cast<cpu_clock_milliseconds>(ends[0].process - starts[0].process).count().real);
+  rettype real = 0, user = 0, system = 0;
+
+  for (std::vector<timepoint>::size_type i = 0; i < starts.size(); ++i)
+    {
+      const timepoint& start = starts.at(i);
+      const timepoint& end = ends.at(i);
+      real += boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().real;
+      user += boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().user;
+      system += boost::chrono::duration_cast<cpu_clock_milliseconds>(end.process - start.process).count().system;
+    }
+
+  os << "C++"
+     << '\t'
+     << testname
+     << '\t'
+     << testfile.filename().string()
+     << '\t'
+     << real // process real time
+     << '\t'
+     << user // process user time
+     << '\t'
+     << system // process system time
      << '\n';
 }

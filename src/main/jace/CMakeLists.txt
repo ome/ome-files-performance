@@ -175,7 +175,25 @@ if(BioFormatsJACE_FOUND AND JNI_FOUND)
     ${JNI_LIBRARIES}
     ${CMAKE_DL_LIBS})
 
-  install(TARGETS metadata-performance-jace pixels-performance-jace
+  add_executable(ometiff-performance-jace
+    ometiff-performance.cpp
+    result.cpp
+    result.h
+    ${jace_sources}
+    ${jace_tools})
+  target_link_libraries(ometiff-performance-jace
+    BioFormatsJACE::BioFormatsJACE
+    Threads::Threads
+    Boost::filesystem
+    Boost::thread
+    Boost::disable_autolinking
+    Boost::dynamic_linking
+    ${JNI_LIBRARIES}
+    ${CMAKE_DL_LIBS})
+
+  install(TARGETS metadata-performance-jace
+                  pixels-performance-jace
+                  ometiff-performance-jace
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     COMPONENT "runtime")
 

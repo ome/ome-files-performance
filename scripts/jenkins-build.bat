@@ -95,26 +95,36 @@ for %%T in (bbbc mitocheck tubhiswt) do (
     set input=unknown
     if [!test!] == [bbbc] (
         set input=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff
+        set inputglob=%DATA_DIR%\BBBC\NIRHTa-001.ome.tiff
     )
     if [!test!] == [mitocheck] (
         set input=%DATA_DIR%\mitocheck\00001_01.ome.tiff
+        set inputglob=%DATA_DIR%\mitocheck\00001_01.ome.tiff
     )
     if [!test!] == [tubhiswt] (
         set input=%DATA_DIR%\tubhiswt-4D\tubhiswt_C0_TP0.ome.tif
+        set inputglob=
+        for /f "tokens=*" %%F in ('dir /b /a:-d "%DATA_DIR%\tubhiswt-4D\tubhiswt_*.tif"') do call set inputglob=%%inputglob%% "%%F"
     )
 
     cd %WORKSPACE%\source
 
     REM Run Java metadata performance tests
-    call mvn -P metadata -Dtest.iterations=%iterations% -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.xml -Dtest.results=%resultsdir%\!test!-metadata-win-java.tsv exec:java
+    call scripts\metadata-performance-java %iterations% !input! %outdir%\!test!-java.ome.xml %resultsdir%\!test!-metadata-win-java.tsv
     for /L %%I IN (1,1,!iterations!) do (
-        call mvn -P metadata -Dtest.iterations=1 -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.xml -Dtest.results=%resultsdir%\!test!-metadata-win-java-%%I.tsv exec:java
+        call scripts\metadata-performance-java 1 !input! %outdir%\!test!-java.ome.xml %resultsdir%\!test!-metadata-win-java-%%I.tsv
     )
 
     REM Run Java pixels performance tests
-    call mvn -P pixels -Dtest.iterations=%iterations% -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.tiff -Dtest.results=%resultsdir%\!test!-pixeldata-win-java.tsv exec:java
+    call scripts\pixels-performance-java %iterations% !inputglob! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-pixeldata-win-java.tsv
     for /L %%I IN (1,1,!iterations!) do (
-        call mvn -P pixels -Dtest.iterations=1 -Dtest.input=!input! -Dtest.output=%outdir%\!test!-java.ome.tiff -Dtest.results=%resultsdir%\!test!-pixeldata-win-java-%%I.tsv exec:java
+        call scripts\pixels-performance-java 1 !inputglob! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-pixeldata-win-java-%%I.tsv
+    )
+
+    REM Run Java ometiff performance tests
+    call scripts\ometiff-performance-java %iterations% !input! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-ometiffdata-win-java.tsv
+    for /L %%I IN (1,1,!iterations!) do (
+        call scripts\ometiff-performance-java 1 !input! %outdir%\!test!-java.ome.tiff %resultsdir%\!test!-ometiffdata-win-java-%%I.tsv
     )
 
     REM Execute C++ performance tests
@@ -127,8 +137,14 @@ for %%T in (bbbc mitocheck tubhiswt) do (
     )
 
     REM Run C++ pixels performance tests
-    install\bin\pixels-performance %iterations% !input! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-pixeldata-win-cpp.tsv
+    install\bin\pixels-performance %iterations% !inputglob! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-pixeldata-win-cpp.tsv
     for /L %%I IN (1,1,!iterations!) do (
-        install\bin\pixels-performance 1 !input! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-pixeldata-win-cpp-%%I.tsv
+        install\bin\pixels-performance 1 !inputglob! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-pixeldata-win-cpp-%%I.tsv
+    )
+
+    REM Run C++ ometiff performance tests
+    install\bin\ometiff-performance %iterations% !input! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-ometiffdata-win-cpp.tsv
+    for /L %%I IN (1,1,!iterations!) do (
+        install\bin\ometiff-performance 1 !input! %outdir%\!test!-cpp.ome.tiff %resultsdir%\!test!-ometiffdata-win-cpp-%%I.tsv
     )
 )
