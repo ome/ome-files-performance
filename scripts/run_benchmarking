@@ -6,7 +6,7 @@ datapath="/data"
 binpath="/install/bin"
 resultpath="${datapath}/results"
 outpath="${datapath}/out"
-iterations=20
+iterations=1
 
 # Clean results folder
 mkdir -p "${resultpath}"
