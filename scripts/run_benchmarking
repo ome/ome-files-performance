@@ -6,7 +6,7 @@ datapath="/data"
 binpath="/install/bin"
 resultpath="${datapath}/results"
 outpath="${datapath}/out"
-iterations=20
+iterations=1
 
 # Clean results folder
 mkdir -p "${resultpath}"
@@ -51,26 +51,6 @@ for test in bbbc mitocheck tubhiswt; do
         ${binpath}/pixels-performance ${iterations} "$input" ${outpath}/${test}-cpp.ome.tiff ${resultpath}/${test}-pixeldata-linux-cpp.tsv
         for i in $(seq ${iterations}); do
             ${binpath}/pixels-performance 1 "$input" ${outpath}/${test}-cpp.ome.tiff ${resultpath}/${test}-pixeldata-linux-cpp-${i}.tsv
-        done
-    )
-
-    # JACE tests
-    (
-        cd $BF_JACE_HOME
-        # Can throw boost: mutex exception
-        ${binpath}/metadata-performance-jace ${iterations} "$input" ${outpath}/${test}-jace.ome.xml ${resultpath}/${test}-metadata-linux-jace.tsv || true
-        for i in $(seq ${iterations}); do
-            ${binpath}/metadata-performance-jace 1 "$input" ${outpath}/${test}-jace.ome.xml ${resultpath}/${test}-metadata-linux-jace-${i}.tsv || true
-        done
-
-        jace_iterations=${iterations}
-        # NB: takes ~1h30 to complete
-        if [ "$test" == "bbbc" ]; then
-            jace_iterations=6
-        fi
-        ${binpath}/pixels-performance-jace ${jace_iterations} "$input" ${outpath}/${test}-jace.ome.tiff ${resultpath}/${test}-pixeldata-linux-jace.tsv
-        for i in $(seq ${jace_iterations}); do
-            ${binpath}/pixels-performance-jace 1 "$input" ${outpath}/${test}-jace.ome.tiff ${resultpath}/${test}-pixeldata-linux-jace-${i}.tsv
         done
     )
 done

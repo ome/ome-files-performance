@@ -86,7 +86,7 @@ cd "%WORKSPACE%"
 cd source
 call mvn clean install || exit /b
 
-set iterations=20
+set iterations=1
 set outdir=%WORKSPACE%\out
 set resultsdir=%WORKSPACE%\results
 
