@@ -6,15 +6,22 @@ library(scales)
 dataset.name <- function(filename) {
     t <- "Unknown"
     if(filename=="NIRHTa-001.ome.tiff") {
-        t <- "BBBC"
+        t <- "Plate"
     }
     if(filename=="00001_01.ome.tiff") {
-        t <- "MitoCheck"
+        t <- "ROI"
     }
     if(filename=="tubhiswt_C0_TP0.ome.tif") {
-        t <- "tubhiswt"
+        t <- "5D"
     }
     t
+}
+
+language.name <- function(language) {
+    if(language=="JACE") {
+        language <- "JNI"
+    }
+    language
 }
 
 read.dataset <- function(datanames, testname, separate,
@@ -78,12 +85,13 @@ read.dataset <- function(datanames, testname, separate,
 
     df$test.name <- gsub(paste(testname, ".", sep=""), "", df$test.name)
     df$dataset <- sapply(df$test.file, dataset.name)
+    df$test.lang <- sapply(df$test.lang, language.name)
 
-    df$Language <- factor(df$test.lang)
+    df$Language <- factor(df$test.lang, levels = c("C++", "JNI", "Java"))
     df$Platform <- factor(df$plat)
     df$Test <- factor(df$test.name)
     df$Filename <- factor(df$test.file)
-    df$Dataset <- factor(df$dataset, levels = c("tubhiswt", "BBBC", "MitoCheck"))
+    df$Dataset <- factor(df$dataset, levels = c("5D", "Plate", "ROI"))
 
     df$Implementation <- interaction(df$Language, df$Platform, sep="/", lex.order=TRUE)
 
@@ -151,11 +159,11 @@ figure.rawdata <- function(separate) {
 
     df <- bind_rows(dfmeta, dfpix, dfagg)
 
-    df$Language <- factor(df$test.lang)
+    df$Language <- factor(df$test.lang, levels = c("C++", "JNI", "Java"))
     df$Platform <- factor(df$plat)
     df$Test <- factor(df$test.name)
     df$Filename <- factor(df$test.file)
-    df$Dataset <- factor(df$dataset, levels = c("tubhiswt", "BBBC", "MitoCheck"))
+    df$Dataset <- factor(df$dataset, levels = c("5D", "Plate", "ROI"))
     df$Category <- factor(df$cat, levels = c("metadata", "pixeldata", "aggregate"))
 
     df$Implementation <- interaction(df$Language, df$Platform, sep="/", lex.order=TRUE)
