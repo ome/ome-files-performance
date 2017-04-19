@@ -173,21 +173,39 @@ figure.rawdata <- function(separate) {
 
 figure.data <- function(normalise, separate) {
     df <- figure.rawdata(separate)
-#    df <- group_by(df, Implementation, Test, Filename, Dataset, Category) %>%
+
+#    sdf <- group_by(sdf, Implementation, Test, Filename, Dataset, Category) %>%
 #        mutate_each(funs(./mean(.[Implementation == "Java/Linux"])), +proc.real)
-                                        #    tapply(df$proc.real, interaction(df$Implementation, df$Test, df$Filename, df$Dataset, df$Category), mean)
+                                        #    tapply(sdf$proc.real, interaction(sdf$Implementation, sdf$Test, sdf$Filename, sdf$Dataset, sdf$Category), mean)
 
     if (normalise == TRUE) {
-        ana <- group_by(filter(df, Implementation == "Java/Linux"), Implementation, Test, Dataset, Category) %>%
-        summarise(proc.real.mean = mean(proc.real), proc.real.sd=sd(proc.real))
+        # Normalise per-platform
+        ndf <- data.frame()
+        for(platform in levels(df$Platform)) {
+            sdf <-  subset(df, Platform == platform)
+            ana <- group_by(filter(sdf, Language == "Java"), Implementation, Test, Dataset, Category) %>%
+                summarise(proc.real.mean = mean(proc.real), proc.real.sd=sd(proc.real))
 
-        df.norm <- left_join(df, ana, by = c("Test", "Dataset", "Category")) %>%
-        mutate(proc.real =  proc.real.mean / proc.real)
-        df.norm$Implementation <- df.norm$Implementation.x
+            sdf.norm <- left_join(sdf, ana, by = c("Test", "Dataset", "Category")) %>%
+                mutate(proc.real =  proc.real.mean / proc.real)
+            sdf.norm$Implementation <- sdf.norm$Implementation.x
 
-#    select(df.norm, Filesname=) [,c("Test", "Dataset", "Category", "Implementation", "proc.real", "proc.real.mean")]
+#    select(sdf.norm, Filesname=) [,c("Test", "Dataset", "Category", "Implementation", "proc.real", "proc.real.mean")]
+            ndf <- rbind(ndf, sdf.norm)
+        }
 
-        df <- df.norm
+        ndf <-  subset(ndf, Language != "Java")
+
+        ndf$Language <- factor(ndf$test.lang, levels = levels(df$Language))
+        ndf$Platform <- factor(ndf$plat)
+        ndf$Test <- factor(ndf$test.name)
+        ndf$Filename <- factor(ndf$test.file)
+        ndf$Dataset <- factor(ndf$dataset, levels = levels(df$Dataset))
+        ndf$Category <- factor(ndf$cat, levels = levels(df$Category))
+
+        ndf$Implementation <- interaction(ndf$Language, ndf$Platform, sep="/", lex.order=TRUE)
+
+        df <- ndf
     }
 
     df
