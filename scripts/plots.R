@@ -1,26 +1,7 @@
+
 library(dplyr)
 library(ggplot2)
 library(scales)
-
-##########
-# From https://groups.google.com/d/msg/ggplot2/a_xhMoQyxZ4/OQHLPGsRtAQJ (with some modification)
-fancy_scientific <- function(l) {
-     # turn in to character string in scientific notation
-     print(l)
-     l <- format(l, scientific = TRUE)
-     print(l)
-     # Use verbatim zero value
-     l <- gsub("0e\\+00", "0", l)
-     # quote the part before the exponent to keep all the digits
-     l <- gsub("^(.*)e", "'\\1'e", l)
-     print(l)
-     # turn the 'e+' into plotmath format
-     l <- gsub("e\\+?", "%*%10^", l)
-     print(l)
-     # return this as an expression
-     parse(text=l)
-}
-##########
 
 dataset.name <- function(filename) {
     t <- "Unknown"
