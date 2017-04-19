@@ -88,7 +88,7 @@ read.dataset <- function(datanames, testname, separate,
 
     df$Language <- factor(df$test.lang, levels = c("C++", "JNI", "Java"))
     df$Platform <- factor(df$plat)
-    df$Test <- factor(df$test.name)
+    df$Test <- factor(df$test.name, levels = c("pixeldata", "metadata"))
     df$Filename <- factor(df$test.file)
     df$Dataset <- factor(df$dataset, levels = c("5D", "Plate", "ROI"))
 
@@ -125,14 +125,18 @@ figure.boxdefaults <- function(df, title, logscale) {
         facet_grid(Category ~ Dataset, scales="free_y")
 }
 
-figure.bardefaults <- function(df, title, free) {
+figure.bardefaults <- function(df, title, free, invert) {
+    summary <- data.frame()
     summary <- group_by(df, Implementation, Test, Dataset, Category) %>%
         summarise(proc.real = mean(proc.real))
 
     scales <- "fixed"
     if(free)
         scales <- "free_y"
-    p <- ggplot(aes(y = proc.real, x = Test, fill=Implementation), data = summary) +
+    a <- aes(y = proc.real, x = Test, fill=Implementation)
+    if(invert)
+        a <- aes(y = proc.real, x = Implementation, fill=Test)
+    p <- ggplot(a, data = summary) +
         labs(title=title) +
         theme(panel.grid.minor.y = element_blank()) +
         scale_fill_brewer(palette = "Dark2") +
@@ -163,7 +167,7 @@ figure.rawdata <- function(separate) {
     df$Test <- factor(df$test.name)
     df$Filename <- factor(df$test.file)
     df$Dataset <- factor(df$dataset, levels = c("5D", "Plate", "ROI"))
-    df$Category <- factor(df$cat, levels = c("metadata", "pixeldata", "aggregate"))
+    df$Category <- factor(df$cat, levels = c("pixeldata", "metadata", "aggregate"))
 
     df$Implementation <- interaction(df$Language, df$Platform, sep="/", lex.order=TRUE)
 
@@ -217,8 +221,21 @@ plot.figure2 <- function() {
 
     filename <- "analysis/files-fig2.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df, "Figure 2: Relative performance", FALSE) +
+    p <- figure.bardefaults(df, "Figure 2: Relative performance", FALSE, FALSE) +
         theme(axis.title.x=element_blank()) +
+        ylab("Relative performance") +
+        scale_y_continuous(trans = 'log10',
+                           breaks = trans_breaks('log10', function(x) 10^x),
+                           labels = trans_format('log10', math_format(10^.x)),
+                           limits=c(0.01,100))
+
+    ggsave(filename=filename,
+           plot=p, width=6, height=4)
+
+    filename <- "analysis/files-fig2-inverted.pdf"
+    cat("Creating ", filename, "\n")
+    p <- figure.bardefaults(df, "Figure 2: Relative performance", FALSE, TRUE) +
+        theme(axis.title.x=element_blank(), axis.text.x  = element_text(angle=30, hjust=1)) +
         ylab("Relative performance") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
@@ -235,7 +252,7 @@ plot.suppfigure1 <- function() {
 
     filename <- "analysis/files-suppfig1.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df, "Supplementary Figure 1: Execution time", TRUE) +
+    p <- figure.bardefaults(df, "Supplementary Figure 1: Execution time", TRUE, FALSE) +
     ylab("Execution time (ms)") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
@@ -250,7 +267,7 @@ plot.suppfigure2 <- function() {
 
     filename <- "analysis/files-suppfig2.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df, "Supplementary Figure 2: Relative performance (repeated)", FALSE) +
+    p <- figure.bardefaults(df, "Supplementary Figure 2: Relative performance (repeated)", FALSE, FALSE) +
         ylab("Relative performance") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
@@ -267,7 +284,7 @@ plot.suppfigure3 <- function() {
 
     filename <- "analysis/files-suppfig3.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df, "Supplementary Figure 3: Execution time (repeated)", TRUE) +
+    p <- figure.bardefaults(df, "Supplementary Figure 3: Execution time (repeated)", TRUE, FALSE) +
     ylab("Execution time (ms)") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
