@@ -1,4 +1,3 @@
-
 library(dplyr)
 library(ggplot2)
 library(scales)
@@ -219,6 +218,7 @@ plot.figure2 <- function() {
     filename <- "analysis/files-fig2.pdf"
     cat("Creating ", filename, "\n")
     p <- figure.bardefaults(df, "Figure 2: Relative performance", FALSE) +
+        theme(axis.title.x=element_blank()) +
         ylab("Relative performance") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
