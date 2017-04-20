@@ -4,13 +4,13 @@ library(scales)
 
 dataset.name <- function(filename) {
     t <- "Unknown"
-    if(filename=="NIRHTa-001.ome.tiff") {
+    if(filename=="NIRHTa-001.ome.tiff" || filename=="BBBC") {
         t <- "Plate"
     }
-    if(filename=="00001_01.ome.tiff") {
+    if(filename=="00001_01.ome.tiff" || filename=="MitoCheck") {
         t <- "ROI"
     }
-    if(filename=="tubhiswt_C0_TP0.ome.tif") {
+    if(filename=="tubhiswt_C0_TP0.ome.tif" || filename=="tubhiswt") {
         t <- "5D"
     }
     t
