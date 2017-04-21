@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/78862024.svg)](https://zenodo.org/badge/latestdoi/78862024)
+
 # OME Files Benchmark
 
 The current repository contains the set of benchmark scripts used to test the
