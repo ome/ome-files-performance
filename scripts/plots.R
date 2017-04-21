@@ -2,38 +2,25 @@ library(dplyr)
 library(ggplot2)
 library(scales)
 
-##########
-# From https://groups.google.com/d/msg/ggplot2/a_xhMoQyxZ4/OQHLPGsRtAQJ (with some modification)
-fancy_scientific <- function(l) {
-     # turn in to character string in scientific notation
-     print(l)
-     l <- format(l, scientific = TRUE)
-     print(l)
-     # Use verbatim zero value
-     l <- gsub("0e\\+00", "0", l)
-     # quote the part before the exponent to keep all the digits
-     l <- gsub("^(.*)e", "'\\1'e", l)
-     print(l)
-     # turn the 'e+' into plotmath format
-     l <- gsub("e\\+?", "%*%10^", l)
-     print(l)
-     # return this as an expression
-     parse(text=l)
-}
-##########
-
 dataset.name <- function(filename) {
     t <- "Unknown"
-    if(filename=="NIRHTa-001.ome.tiff") {
-        t <- "BBBC"
+    if(filename=="NIRHTa-001.ome.tiff" || filename=="BBBC") {
+        t <- "Plate"
     }
-    if(filename=="00001_01.ome.tiff") {
-        t <- "MitoCheck"
+    if(filename=="00001_01.ome.tiff" || filename=="MitoCheck") {
+        t <- "ROI"
     }
-    if(filename=="tubhiswt_C0_TP0.ome.tif") {
-        t <- "tubhiswt"
+    if(filename=="tubhiswt_C0_TP0.ome.tif" || filename=="tubhiswt") {
+        t <- "5D"
     }
     t
+}
+
+language.name <- function(language) {
+    if(language=="JACE") {
+        language <- "JNI"
+    }
+    language
 }
 
 read.dataset <- function(datanames, testname, separate,
@@ -97,12 +84,13 @@ read.dataset <- function(datanames, testname, separate,
 
     df$test.name <- gsub(paste(testname, ".", sep=""), "", df$test.name)
     df$dataset <- sapply(df$test.file, dataset.name)
+    df$test.lang <- sapply(df$test.lang, language.name)
 
-    df$Language <- factor(df$test.lang)
+    df$Language <- factor(df$test.lang, levels = c("C++", "JNI", "Java"))
     df$Platform <- factor(df$plat)
-    df$Test <- factor(df$test.name)
+    df$Test <- factor(df$test.name, levels = c("pixeldata", "metadata"))
     df$Filename <- factor(df$test.file)
-    df$Dataset <- factor(df$dataset, levels = c("tubhiswt", "BBBC", "MitoCheck"))
+    df$Dataset <- factor(df$dataset, levels = c("5D", "Plate", "ROI"))
 
     df$Implementation <- interaction(df$Language, df$Platform, sep="/", lex.order=TRUE)
 
@@ -137,14 +125,18 @@ figure.boxdefaults <- function(df, title, logscale) {
         facet_grid(Category ~ Dataset, scales="free_y")
 }
 
-figure.bardefaults <- function(df, title, free) {
+figure.bardefaults <- function(df, title, free, invert) {
+    summary <- data.frame()
     summary <- group_by(df, Implementation, Test, Dataset, Category) %>%
         summarise(proc.real = mean(proc.real))
 
     scales <- "fixed"
     if(free)
         scales <- "free_y"
-    p <- ggplot(aes(y = proc.real, x = Test, fill=Implementation), data = summary) +
+    a <- aes(y = proc.real, x = Test, fill=Implementation)
+    if(invert)
+        a <- aes(y = proc.real, x = Implementation, fill=Test)
+    p <- ggplot(a, data = summary) +
         labs(title=title) +
         theme(panel.grid.minor.y = element_blank()) +
         scale_fill_brewer(palette = "Dark2") +
@@ -170,12 +162,12 @@ figure.rawdata <- function(separate) {
 
     df <- bind_rows(dfmeta, dfpix, dfagg)
 
-    df$Language <- factor(df$test.lang)
+    df$Language <- factor(df$test.lang, levels = c("C++", "JNI", "Java"))
     df$Platform <- factor(df$plat)
     df$Test <- factor(df$test.name)
     df$Filename <- factor(df$test.file)
-    df$Dataset <- factor(df$dataset, levels = c("tubhiswt", "BBBC", "MitoCheck"))
-    df$Category <- factor(df$cat, levels = c("metadata", "pixeldata", "aggregate"))
+    df$Dataset <- factor(df$dataset, levels = c("5D", "Plate", "ROI"))
+    df$Category <- factor(df$cat, levels = c("pixeldata", "metadata", "aggregate"))
 
     df$Implementation <- interaction(df$Language, df$Platform, sep="/", lex.order=TRUE)
 
@@ -184,21 +176,39 @@ figure.rawdata <- function(separate) {
 
 figure.data <- function(normalise, separate) {
     df <- figure.rawdata(separate)
-#    df <- group_by(df, Implementation, Test, Filename, Dataset, Category) %>%
+
+#    sdf <- group_by(sdf, Implementation, Test, Filename, Dataset, Category) %>%
 #        mutate_each(funs(./mean(.[Implementation == "Java/Linux"])), +proc.real)
-                                        #    tapply(df$proc.real, interaction(df$Implementation, df$Test, df$Filename, df$Dataset, df$Category), mean)
+                                        #    tapply(sdf$proc.real, interaction(sdf$Implementation, sdf$Test, sdf$Filename, sdf$Dataset, sdf$Category), mean)
 
     if (normalise == TRUE) {
-        ana <- group_by(filter(df, Implementation == "Java/Linux"), Implementation, Test, Dataset, Category) %>%
-        summarise(proc.real.mean = mean(proc.real), proc.real.sd=sd(proc.real))
+        # Normalise per-platform
+        ndf <- data.frame()
+        for(platform in levels(df$Platform)) {
+            sdf <-  subset(df, Platform == platform)
+            ana <- group_by(filter(sdf, Language == "Java"), Implementation, Test, Dataset, Category) %>%
+                summarise(proc.real.mean = mean(proc.real), proc.real.sd=sd(proc.real))
 
-        df.norm <- left_join(df, ana, by = c("Test", "Dataset", "Category")) %>%
-        mutate(proc.real =  proc.real.mean / proc.real)
-        df.norm$Implementation <- df.norm$Implementation.x
+            sdf.norm <- left_join(sdf, ana, by = c("Test", "Dataset", "Category")) %>%
+                mutate(proc.real =  proc.real.mean / proc.real)
+            sdf.norm$Implementation <- sdf.norm$Implementation.x
 
-#    select(df.norm, Filesname=) [,c("Test", "Dataset", "Category", "Implementation", "proc.real", "proc.real.mean")]
+#    select(sdf.norm, Filesname=) [,c("Test", "Dataset", "Category", "Implementation", "proc.real", "proc.real.mean")]
+            ndf <- rbind(ndf, sdf.norm)
+        }
 
-        df <- df.norm
+        ndf <-  subset(ndf, Language != "Java")
+
+        ndf$Language <- factor(ndf$test.lang, levels = levels(df$Language))
+        ndf$Platform <- factor(ndf$plat)
+        ndf$Test <- factor(ndf$test.name)
+        ndf$Filename <- factor(ndf$test.file)
+        ndf$Dataset <- factor(ndf$dataset, levels = levels(df$Dataset))
+        ndf$Category <- factor(ndf$cat, levels = levels(df$Category))
+
+        ndf$Implementation <- interaction(ndf$Language, ndf$Platform, sep="/", lex.order=TRUE)
+
+        df <- ndf
     }
 
     df
@@ -211,7 +221,8 @@ plot.figure2 <- function() {
 
     filename <- "analysis/files-fig2.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df, "Figure 2: Relative performance", FALSE) +
+    p <- figure.bardefaults(df, "Figure 2: Relative performance", FALSE, TRUE) +
+        theme(axis.title.x=element_blank(), axis.text.x  = element_text(angle=30, hjust=1)) +
         ylab("Relative performance") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
@@ -223,12 +234,31 @@ plot.figure2 <- function() {
 }
 
 plot.suppfigure1 <- function() {
+    df <- figure.data(TRUE, TRUE)
+
+    df <- subset(df, Category != 'aggregate')
+    filename <- "analysis/files-suppfig1.pdf"
+    cat("Creating ", filename, "\n")
+    p <- figure.bardefaults(df, "Supplementary Figure 1: Relative performance", FALSE, FALSE) +
+        theme(axis.title.x=element_blank()) +
+        ylab("Relative performance") +
+        scale_y_continuous(trans = 'log10',
+                           breaks = trans_breaks('log10', function(x) 10^x),
+                           labels = trans_format('log10', math_format(10^.x)),
+                           limits=c(0.01,100))
+
+    ggsave(filename=filename,
+           plot=p, width=6, height=4)
+
+}
+
+plot.suppfigure2 <- function() {
     df <- figure.data(FALSE, TRUE)
     df <- subset(df, Category != 'aggregate')
 
-    filename <- "analysis/files-suppfig1.pdf"
+    filename <- "analysis/files-suppfig2.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df, "Supplementary Figure 1: Execution time", TRUE) +
+    p <- figure.bardefaults(df, "Supplementary Figure 2: Execution time", TRUE, FALSE) +
     ylab("Execution time (ms)") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
@@ -237,13 +267,13 @@ plot.suppfigure1 <- function() {
            plot=p, width=6, height=4)
 }
 
-plot.suppfigure2 <- function() {
+plot.suppfigure3 <- function() {
     df <- figure.data(TRUE, FALSE)
     df <- subset(df, Category != 'aggregate')
 
-    filename <- "analysis/files-suppfig2.pdf"
+    filename <- "analysis/files-suppfig3.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df, "Supplementary Figure 2: Relative performance (repeated)", FALSE) +
+    p <- figure.bardefaults(df, "Supplementary Figure 3: Relative performance (repeated)", FALSE, FALSE) +
         ylab("Relative performance") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
@@ -254,13 +284,13 @@ plot.suppfigure2 <- function() {
            plot=p, width=6, height=4)
 }
 
-plot.suppfigure3 <- function() {
+plot.suppfigure4 <- function() {
     df <- figure.data(FALSE, FALSE)
     df <- subset(df, Category != 'aggregate')
 
-    filename <- "analysis/files-suppfig3.pdf"
+    filename <- "analysis/files-suppfig4.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.bardefaults(df, "Supplementary Figure 3: Execution time (repeated)", TRUE) +
+    p <- figure.bardefaults(df, "Supplementary Figure 4: Execution time (repeated)", TRUE, FALSE) +
     ylab("Execution time (ms)") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
@@ -269,23 +299,23 @@ plot.suppfigure3 <- function() {
            plot=p, width=6, height=4)
 }
 
-plot.suppfigure4 <- function() {
+plot.suppfigure5 <- function() {
     df <- figure.data(FALSE, TRUE)
 
-    filename <- "analysis/files-suppfig4.pdf"
+    filename <- "analysis/files-suppfig5.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.boxdefaults(df, "Supplementary Figure 4: Execution time (detail)")
+    p <- figure.boxdefaults(df, "Supplementary Figure 5: Execution time (detail)")
 
     ggsave(filename=filename,
            plot=p, width=6, height=6)
 }
 
-plot.suppfigure5 <- function() {
+plot.suppfigure6 <- function() {
     df <- figure.data(FALSE, FALSE)
 
-    filename <- "analysis/files-suppfig5.pdf"
+    filename <- "analysis/files-suppfig6.pdf"
     cat("Creating ", filename, "\n")
-    p <- figure.boxdefaults(df, "Supplementary Figure 5: Execution time (detail, repeated)")
+    p <- figure.boxdefaults(df, "Supplementary Figure 6: Execution time (detail, repeated)")
 
     ggsave(filename=filename,
            plot=p, width=6, height=6)
@@ -295,10 +325,11 @@ save.suppdata <- function(separate) {
     source.stats <- read.table("results/datasets.tsv",
                                header=TRUE, sep="\t")
     source.stats$XMLComplexity <- source.stats$Elements + source.stats$Attributes
+    source.stats$Dataset <- sapply(source.stats$Dataset, dataset.name)
 
     df <- figure.rawdata(separate)
 
-    sdf <- group_by(df, Implementation,  Dataset, Category, Test) %>%
+    sdf <- group_by(df, Implementation, Dataset, Category, Test) %>%
             summarise(proc.real.mean = mean(proc.real), proc.real.sd=sd(proc.real))
 
     msdf <- subset(sdf, Category == 'metadata')
@@ -344,6 +375,7 @@ plot.suppfigure2()
 plot.suppfigure3()
 plot.suppfigure4()
 plot.suppfigure5()
+plot.suppfigure6()
 
 save.suppdata(TRUE)
 save.suppdata(FALSE)
