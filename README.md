@@ -130,7 +130,6 @@ under `/data/results`.
 
 ## Benchmark results
 
-
 The [results](results) folder contains the final set of results generated using
 the benchmark tests described above with the following columns:
 
@@ -154,20 +153,98 @@ for the assessment of each benchmark test:
     expressed in MiB/s is defined as the ratio of the the pixeldata size of
     the test dataset over the execution time of the pixeldata test.
 
-
 The benchmark metrics have been derived from twenty independent iterations of
 each benchmark test. The only exception is the Plate dataset pixeldata
 performance test which has only been reproduced six times as a result of its
 long execution time (~1.5hr per test).
 
-Additionally, we have reproduced the benchmark by repeating the same number of
-iterations of each test in a loop within the same environment. For most tests,
-the results were found to be identical and independent of whether the tests
-were run separately or repeated. Interestingly, in the case of the metadata
-tests using Bio-Formats and the Java Virtual Machine (JVM), there is a gain
-due to the optimizer in the JVM. We include these results for completeness and
-to indicate the performance achieved if the same operation is invoked within a
-process multiple times.
+The [analysis](analysis) folder contains the plots and summarized data
+after processing the data with GNU R and the script
+[plots.R](scripts/plots.R).
+
+[Figure 2](analysis/files-fig2.pdf) is a copy of the figure submitted
+for publication.  The read and write performance of pixeldata and
+metadata are compared for three software implementations and three
+datasets.  The relative performance of Linux implementations are
+normalized based upon the Java/Linux results, while the Windows
+implementations are normalized based upon the Java/Windows results.
+The read and write performance of C++ is faster than Java in all
+cases.  However, while the JNI read performance is equivalent to Java,
+the JNI write performance is much slower, indicating performance
+problems which scaled with dataset size, approaching two orders of
+magnitude slower with the largest dataset.  C++ metadata read
+performance was faster than Java for datasets with minimal metadata,
+but slower with datasets containing large amounts of metadata.  C++
+metadata write performance was consistently faster than Java.  JNI
+metadata performance was equivalent or very similar to the Java
+performance.  [Supplementary Figure 1](analysis/files-suppfig1.pdf)
+presents the same data with the Implementation and Test categories
+swapped, to allow for easier comparison of implementation differences.
+[Supplementary Figure 2](analysis/files-suppfig2.pdf) shows the
+absolute timings for the above two figures, including the Java/Linux
+and Java/Windows results previously omitted due to normalisation.
+
+Summary data is presented in these tables:
+
+- [pixeldata](analysis/summary-pixeldata-separate.tsv)
+- [metadata](analysis/summary-metadata-separate.tsv)
+
+Additionally, we have reproduced the benchmark by repeating the same
+number of iterations of each test in a loop within the same
+environment. We include these results for completeness and to indicate
+the performance achieved if the same operation is invoked within a
+process multiple times.  [Supplementary Figure
+3](analysis/files-suppfig3.pdf) and [Supplementary Figure
+4](analysis/files-suppfig4.pdf) show the test results with repeated
+iterations within the same environment.  These may be compared with
+Supplementary Figures 1 and 2.  The pixeldata results are almost
+identical with no significant changes.  The metadata results however
+show an improvement in Java performance, with C++ metadata reading
+being slower than Java in all cases, while C++ retained a slight edge
+over Java when writing.  JNI performance was faster than Java for the
+simplest dataset, and marginally faster for datasets with more complex
+metadata.
+
+For most tests, the results were found to be identical and independent
+of whether the tests were run separately or repeated. Interestingly,
+in the case of the metadata tests using Bio-Formats and the Java
+Virtual Machine (JVM), there is a gain due to the optimizer in the
+JVM.  This gain is small for pixeldata, but large for metadata.
+
+[Supplementary Figure 5](analysis/files-suppfig5.pdf) and
+[Supplementary Figure 6](analysis/files-suppfig6.pdf) present the same
+data in more detail as boxplots, showing the distribution of timings
+within each treatment.  Figure 6 shows the effects of the Java HotSpot
+optimizer when the same routines are invoked repeatedly.  The outliers
+for metadata in particular highlight the significant reduction in
+runtime over each iteration before approaching a plateau.
+
+Summary data is presented in these tables:
+
+- [pixeldata](analysis/summary-pixeldata-repeated.tsv)
+- [metadata](analysis/summary-metadata-repeated.tsv)
+
+## Benchmark conclusions
+
+- C++ pixeldata reading and writing is significantly faster than Java
+  in all cases, indicating that for workloads requiring the fastest
+  possible data transfer rates that C++ should be preferred.
+
+- C++ metadata reading showed poor scalability compared with Java.
+  Further profiling showed this was largely time spent in the
+  Xerces-C++ XML library, which appearts to have some inefficiencies
+  in its implementation compared with the Xerces-Java library.
+
+- C++ metadata writing was faster than Java, though Java approached
+  the C++ performance when the HotSpot optimizer was allowed to
+  effectively optimize the Java bytecode.
+
+- JNI performance is broadly equivalent to Java, which is to be
+  expected since in both cases the same code is running inside the
+  JVM.  However, the performance of pixeldata writing is much slower
+  than expected, indicating a severe performance bottleneck in the
+  JNI/JACE wrapper code.  JNI/JACE provides no clear performance
+  advantage over using Java directly.
 
 ## References
 
