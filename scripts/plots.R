@@ -116,6 +116,7 @@ realtime.compare <- function(datanames, testname, separate, includejace) {
 figure.boxdefaults <- function(df, title, logscale) {
     p <- ggplot(aes(y = proc.real, x = Test, colour=Implementation), data = df) +
       ylab("Execution time (ms)") + labs(title=title) +
+        theme(axis.title.x=element_blank()) +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
                            labels = trans_format('log10', math_format(10^.x))) +
@@ -259,7 +260,8 @@ plot.suppfigure2 <- function() {
     filename <- "analysis/files-suppfig2.pdf"
     cat("Creating ", filename, "\n")
     p <- figure.bardefaults(df, "Supplementary Figure 2: Execution time", TRUE, FALSE) +
-    ylab("Execution time (ms)") +
+        theme(axis.title.x=element_blank()) +
+        ylab("Execution time (ms)") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
                            labels = trans_format('log10', math_format(10^.x)))
@@ -274,6 +276,7 @@ plot.suppfigure3 <- function() {
     filename <- "analysis/files-suppfig3.pdf"
     cat("Creating ", filename, "\n")
     p <- figure.bardefaults(df, "Supplementary Figure 3: Relative performance (repeated)", FALSE, FALSE) +
+        theme(axis.title.x=element_blank()) +
         ylab("Relative performance") +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
@@ -292,6 +295,7 @@ plot.suppfigure4 <- function() {
     cat("Creating ", filename, "\n")
     p <- figure.bardefaults(df, "Supplementary Figure 4: Execution time (repeated)", TRUE, FALSE) +
     ylab("Execution time (ms)") +
+        theme(axis.title.x=element_blank()) +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks('log10', function(x) 10^x),
                            labels = trans_format('log10', math_format(10^.x)))
