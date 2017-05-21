@@ -54,6 +54,19 @@ target_link_libraries(pixels-performance
   Boost::disable_autolinking
   Boost::dynamic_linking)
 
-install(TARGETS metadata-performance pixels-performance
+add_executable(tile-performance tile-performance.cpp result.cpp result.h)
+target_link_libraries(tile-performance
+  OME::Files
+  Boost::boost
+  Boost::chrono
+  Boost::filesystem
+  Boost::random
+  Boost::disable_autolinking
+  Boost::dynamic_linking)
+
+install(TARGETS
+          metadata-performance
+          pixels-performance
+          tile-performance
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         COMPONENT "runtime")
