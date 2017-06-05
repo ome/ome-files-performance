@@ -240,6 +240,54 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>tiling</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.2.1</version>
+            <executions>
+              <execution>
+                <id>metadata</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+              </execution>
+            </executions>
+            <properties>
+              <tileXEnd>16</tileXEnd>
+              <tileYEnd>16</tileYEnd>
+              <test.tileOperator>"/"</test.tileOperator>
+              <test.tileIncrement>2</test.tileIncrement>
+              <test.series>0</test.series>
+              <test.autoTile>true</test.autoTile>
+            </properties>
+            <configuration>
+              <mainClass>ome.files.performance.TilingPerformance</mainClass>
+              <arguments>
+                <argument>${test.iterations}</argument>
+                <argument>${test.tileXStart}</argument>
+                <argument>${test.tileYStart}</argument>
+                <argument>${test.tileXEnd}</argument>
+                <argument>${test.tileYEnd}</argument>
+                <argument>${test.tileOperator}</argument>
+                <argument>${test.tileIncrement}</argument>
+                <argument>${test.series}</argument>
+                <argument>${test.autoTile}</argument>
+                <argument>${test.input}</argument>
+                <argument>${test.output}</argument>
+                <argument>${test.results}</argument>
+              </arguments>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
   <repositories>

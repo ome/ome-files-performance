@@ -36,15 +36,22 @@ import java.io.Writer;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 class Result {
   private Writer writer;
   private PrintWriter output;
+  ResultMap<String,Object> customParams = new ResultMap<String,Object>();
 
   Result(Path filename) throws java.io.IOException {
     writer = new FileWriter(filename.toString());
     output = new PrintWriter(writer);
-    output.println("test.lang\ttest.name\ttest.file\treal\tproc.cpu\tproc.user\tproc.system");
+    output.println("test.lang\ttest.name\ttest.file\t"+customParams.keyToString()+"treal\tproc.cpu\tproc.user\tproc.system");
+  }
+  
+  void addCustomParam(String heading, Object value) {
+    customParams.put(heading, value);
   }
 
   void add(String testname,
@@ -53,14 +60,46 @@ class Result {
            Timepoint end) {
     output.println("Java\t" + testname + "\t" +
                    testfile.getFileName().toString() + "\t" +
+                   customParams.valueToString() +
                    (end.real-start.real)/1000000 + "\t" +
                    (end.cpu-start.cpu)/1000000 + "\t" +
                    (end.user-start.user)/1000000 + "\t" +
                    (end.system-start.system)/1000000);
 
   }
+  
+  void add(String testname, Path testfile, double size) {
+output.println("Java\t" + testname + "\t" +
+              testfile.getFileName().toString() + "\t" +
+              customParams.valueToString() +
+              0 + "\t" +
+              0 + "\t" +
+              0 + "\t" +
+              0 + "\t" + size);
+}
 
   void close() {
     output.close();
+  }
+  
+  private class ResultMap<K,V> extends HashMap<K,V> {
+
+    public String keyToString() {
+        String keyString = "";
+        for (Map.Entry<K, V> entry : this.entrySet()) {
+            keyString += entry.getKey();
+            keyString += "\t";
+        }
+        return keyString;
+    }
+    
+    public String valueToString() {
+      String valueString = "";
+      for (Map.Entry<K, V> entry : this.entrySet()) {
+          valueString += entry.getKey();
+          valueString += "\t";
+      }
+      return valueString;
+    }
   }
 }
