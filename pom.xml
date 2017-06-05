@@ -34,6 +34,12 @@
     <test.input>test.file</test.input>
     <test.output>test.write</test.output>
     <test.results>test.results</test.results>
+    <test.tileXEnd>16</test.tileXEnd>
+    <test.tileYEnd>16</test.tileYEnd>
+    <test.tileOperator>"/"</test.tileOperator>
+    <test.tileIncrement>2</test.tileIncrement>
+    <test.series>0</test.series>
+    <test.autoTile>true</test.autoTile>
   </properties>
   <build>
     <defaultGoal>install</defaultGoal>
