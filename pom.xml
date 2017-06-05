@@ -259,14 +259,6 @@
                 </goals>
               </execution>
             </executions>
-            <properties>
-              <tileXEnd>16</tileXEnd>
-              <tileYEnd>16</tileYEnd>
-              <test.tileOperator>"/"</test.tileOperator>
-              <test.tileIncrement>2</test.tileIncrement>
-              <test.series>0</test.series>
-              <test.autoTile>true</test.autoTile>
-            </properties>
             <configuration>
               <mainClass>ome.files.performance.TilingPerformance</mainClass>
               <arguments>
