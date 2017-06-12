@@ -40,8 +40,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.ArrayList;
 
-import loci.formats.ome.OMEXMLMetadata;
-import loci.formats.ome.OMEXMLMetadataImpl;
 import loci.formats.out.OMETiffWriter;
 import loci.formats.out.TiffWriter;
 import loci.formats.tiff.IFD;
