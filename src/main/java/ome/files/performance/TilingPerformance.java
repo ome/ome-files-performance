@@ -89,7 +89,7 @@ public final class TilingPerformance {
             System.out.print("pass " + i + ": init...");
             System.out.flush();
             OMEXMLMetadata meta = new OMEXMLMetadataImpl();
-            List<List<byte[]>> pixels = new ArrayList<List<byte[]>>();
+            List<List<byte[]>> planes = new ArrayList<List<byte[]>>();
             ImageReader reader = new ImageReader();
             reader.setMetadataStore(meta);
             reader.setId(infile.toString());
@@ -143,13 +143,13 @@ public final class TilingPerformance {
               System.out.flush();
               reader.setSeries(series);
   
-              List<byte[]> planes = new ArrayList<byte[]>();
-              pixels.add(planes);
+              List<byte[]> tiles = new ArrayList<byte[]>();
+              planes.add(tiles);
   
               for (int plane = 0; plane < reader.getImageCount(); ++plane) {
                 if (autoTiling) {
                   byte[] data = reader.openBytes(plane);
-                  planes.add(data);
+                  tiles.add(data);
                 }
                 else {
                   for (int y=0; y<nYTiles; y++) {
@@ -160,7 +160,7 @@ public final class TilingPerformance {
                       int effTileSizeY = (tileY + tileSizeY) < height ? tileSizeY : height - tileY;
   
                       byte[] data = reader.openBytes(plane, tileX, tileY, effTileSizeX, effTileSizeY);
-                      planes.add(data);
+                      tiles.add(data);
                     }
                   }
                 }
@@ -190,22 +190,22 @@ public final class TilingPerformance {
     
               write_init = new Timepoint();
     
-              for (int seriesNum = 0; seriesNum < pixels.size(); ++seriesNum) {
+              for (int seriesNum = 0; seriesNum < planes.size(); ++seriesNum) {
                 System.out.print("pass " + i + ": write series " + seriesNum + ": ");
                 System.out.flush();
                 writer.setInterleaved(true);
                 writer.setSeries(seriesNum);
     
-                List<byte[]> planes = pixels.get(seriesNum);
+                List<byte[]> tiles = planes.get(seriesNum);
                 int dataIndex = 0;
-                int imageCount = planes.size();
+                int imageCount = tiles.size();
                 if (!autoTiling) {
                   imageCount = imageCount / tilesPerImage;
                 }
     
                 for (int plane = 0; plane < imageCount; ++plane) {
                   if (autoTiling) {
-                    byte[] data = planes.get(dataIndex);
+                    byte[] data = tiles.get(dataIndex);
                     ((TiffWriter) writer).saveBytes(plane, data);
                     dataIndex++;
                   }
@@ -219,7 +219,7 @@ public final class TilingPerformance {
                         int tileY = y * tileSizeY;
                         int effTileSizeX = (tileX + tileSizeX) < width ? tileSizeX : width - tileX;
                         int effTileSizeY = (tileY + tileSizeY) < height ? tileSizeY : height - tileY;
-                        byte[] data = planes.get(dataIndex);
+                        byte[] data = tiles.get(dataIndex);
     
                         ((TiffWriter) writer).saveBytes(plane, data, ifd, tileX, tileY, effTileSizeX, effTileSizeY);
                         dataIndex++;
@@ -270,13 +270,13 @@ public final class TilingPerformance {
                 System.out.flush();
                 reader.setSeries(seriesNum);
     
-                List<byte[]> planes = new ArrayList<byte[]>();
-                pixels.add(planes);
+                List<byte[]> tiles = new ArrayList<byte[]>();
+                planes.add(tiles);
     
                 for (int plane = 0; plane < reader.getImageCount(); ++plane) {
                   if (autoTiling) {
                     byte[] data = reader.openBytes(plane);
-                    planes.add(data);
+                    tiles.add(data);
                   }
                   else {
                     for (int y=0; y<nYTiles; y++) {
@@ -287,7 +287,7 @@ public final class TilingPerformance {
                         int effTileSizeY = (tileY + tileSizeY) < height ? tileSizeY : height - tileY;
     
                         byte[] data = reader.openBytes(plane, tileX, tileY, effTileSizeX, effTileSizeY);
-                        planes.add(data);
+                        tiles.add(data);
                       }
                     }
                   }
