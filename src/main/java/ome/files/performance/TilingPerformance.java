@@ -48,6 +48,8 @@ import loci.formats.tiff.IFD;
 import ome.xml.model.primitives.PositiveInteger;
 import loci.formats.FormatWriter;
 import loci.formats.ImageReader;
+import loci.formats.MetadataTools;
+import loci.formats.meta.IMetadata;
 
 public final class TilingPerformance {
 
@@ -88,7 +90,7 @@ public final class TilingPerformance {
             Path outfile = Paths.get(outfileBase+"-"+tileSizeX+"-"+tileSizeY+".ome.tiff");
             System.out.print("pass " + i + ": init...");
             System.out.flush();
-            OMEXMLMetadata meta = new OMEXMLMetadataImpl();
+            IMetadata meta = MetadataTools.createOMEXMLMetadata();
             List<List<byte[]>> planes = new ArrayList<List<byte[]>>();
             ImageReader reader = new ImageReader();
             reader.setMetadataStore(meta);
@@ -98,7 +100,7 @@ public final class TilingPerformance {
             int height = reader.getSizeY();
             
             FormatWriter writer = new OMETiffWriter();
-            OMEXMLMetadata writerMeta = new OMEXMLMetadataImpl();
+            IMetadata writerMeta = MetadataTools.createOMEXMLMetadata();
             writerMeta.setImageID("Image:0", 0);
             writerMeta.setPixelsID("Pixels:0", 0);
             writerMeta.setPixelsSizeX(new PositiveInteger(width), 0);
