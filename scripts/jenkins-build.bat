@@ -91,17 +91,20 @@ set outdir=%WORKSPACE%\out
 set resultsdir=%WORKSPACE%\results
 
 set do_default=true
-if exist "metadata" (
-    call metadata.bat
-    set do_default=false
-)
-if exist "pixeldata" (
-    call pixeldata.bat
-    set do_default=false
-)
-if exist "tiling" (
-    call tiling.bat
-    set do_default=false
+REM Read the options
+for %%I in (%*) do (
+    if %%I == metadata (
+        call metadata.bat
+        set do_default=false
+    )
+    if %%I = pixeldata (
+        call pixeldata.bat
+        set do_default=false
+    )
+    if %%I == tiling (
+        call tiling.bat
+        set do_default=false
+    )
 )
 if [%do_default%] == [true] (
     call metadata.bat
