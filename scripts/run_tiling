@@ -2,59 +2,6 @@
 set -e
 set -x
 
-datapath="/data"
-binpath="/install/bin"
-resultpath="${datapath}/results"
-outpath="${datapath}/out"
-iterations=1
-
-# Clean results folder
-mkdir -p "${resultpath}"
-mkdir -p "${outpath}"
-rm "${resultpath}"/* || echo "No results"
-rm "${outpath}"/* || echo "No output"
-
-for test in bbbc mitocheck tubhiswt; do
-    input=unknown
-    case "$test" in
-        bbbc)
-            input=${datapath}/BBBC/NIRHTa-001.ome.tiff
-        ;;
-        mitocheck)
-            input=${datapath}/mitocheck/00001_01.ome.tiff
-        ;;
-        tubhiswt)
-            input=${datapath}/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif
-        ;;
-    esac
-
-    # Java tests
-    (
-        mvn -P metadata -Dtest.iterations=${iterations} -Dtest.input="$input" -Dtest.output=${outpath}/${test}-java.ome.xml -Dtest.results=${resultpath}/${test}-metadata-linux-java.tsv exec:java
-        for i in $(seq ${iterations}); do
-            mvn -P metadata -Dtest.iterations=1 -Dtest.input="$input" -Dtest.output=${outpath}/${test}-java.ome.xml -Dtest.results=${resultpath}/${test}-metadata-linux-java-${i}.tsv exec:java
-        done
-
-        mvn -P pixels -Dtest.iterations=${iterations} -Dtest.input="$input" -Dtest.output=${outpath}/${test}-java.ome.tiff -Dtest.results=${resultpath}/${test}-pixeldata-linux-java.tsv exec:java
-        for i in $(seq ${iterations}); do
-            mvn -P pixels -Dtest.iterations=1 -Dtest.input="$input" -Dtest.output=${outpath}/${test}-java.ome.tiff -Dtest.results=${resultpath}/${test}-pixeldata-linux-java-${i}.tsv exec:java
-        done
-    )
-
-    # C++ tests
-    (
-        ${binpath}/metadata-performance ${iterations} "$input" ${outpath}/${test}-cpp.ome.xml ${resultpath}/${test}-metadata-linux-cpp.tsv
-        for i in $(seq ${iterations}); do
-            ${binpath}/metadata-performance 1 "$input" ${outpath}/${test}-cpp.ome.xml ${resultpath}/${test}-metadata-linux-cpp-${i}.tsv
-        done
-
-        ${binpath}/pixels-performance ${iterations} "$input" ${outpath}/${test}-cpp.ome.tiff ${resultpath}/${test}-pixeldata-linux-cpp.tsv
-        for i in $(seq ${iterations}); do
-            ${binpath}/pixels-performance 1 "$input" ${outpath}/${test}-cpp.ome.tiff ${resultpath}/${test}-pixeldata-linux-cpp-${i}.tsv
-        done
-    )
-done
-
 # Tiling Performance Tests
 for test in neff-histopathology tubhiswt; do
     input=unknown
