@@ -1,4 +1,4 @@
-FROM openmicroscopy/ome-files-cpp-u1604:0.3.1
+FROM openmicroscopy/ome-files-cpp-u1604:latest
 MAINTAINER ome-devel@lists.openmicroscopy.org.uk
 
 # Install JDK7 and Maven
