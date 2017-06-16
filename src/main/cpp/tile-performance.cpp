@@ -157,31 +157,21 @@ namespace
     unsigned int tileysize;
     unsigned int tilexcount;
     unsigned int tileycount;
+    std::string description;
+    boost::filesystem::path output_file;
   };
 
   void
   run_tests(const std::vector<test_data>& tests,
-            const std::string& outfileprefix,
-            const boost::filesystem::path& resultfile,
-            const boost::filesystem::path& sizefile)
+            std::ofstream& results,
+            std::ofstream& sizes)
   {
     RandomFillVisitor random_fill;
-
-    std::ofstream results(resultfile.string().c_str());
-    std::ofstream sizes(sizefile.string().c_str());
-
-    result_header(results);
-    extra_result_header(sizes, {{"filesize"}});
 
     for (const auto& t : tests)
       {
 
-        std::ostringstream desc;
-        desc << t.sizex << '-' << t.sizey << '-'
-             << (t.tiletype == TILE ? "tile" : "strip") << '-'
-             << t.tilexsize << '-' << t.tileysize << '-'
-             << t.pixeltype;
-        std::cout << "TEST: [" << t.iteration << "] " << desc.str() << std::endl;
+        std::cout << "TEST: [" << t.iteration << "] " << t.description << std::endl;
 
         VariantPixelBuffer buf(boost::extents[t.tilexsize][t.tileysize][1][1][1][1][1][1][1],
                                t.pixeltype);
@@ -189,9 +179,8 @@ namespace
         // (or compressing) empty data blocks as an optimisation.
         boost::apply_visitor(random_fill, buf.vbuffer());
 
-        boost::filesystem::path outfile(outfileprefix + '-' + desc.str() + ".tiff");
-        boost::filesystem::remove(outfile);
-        auto tiff = TIFF::open(outfile, "w8");
+        boost::filesystem::remove(t.output_file);
+        auto tiff = TIFF::open(t.output_file, "w8");
         auto ifd = tiff->getCurrentDirectory();
         ifd->setImageWidth(t.sizex);
         ifd->setImageHeight(t.sizex);
@@ -221,9 +210,13 @@ namespace
         tiff->close();
 
         timepoint write_end;
-        result(results, "pixeldata.write", desc.str(), write_start, write_end);
-        extra_result(sizes, "pixeldata.write", desc.str(), boost::filesystem::file_size(outfile));
+        result(results, "pixeldata.write", t.description, write_start, write_end);
+        extra_result(sizes, "pixeldata.write", t.description, boost::filesystem::file_size(t.output_file));
       }
+
+    // Intermediate cleanup
+    for (const auto& t : tests)
+      boost::filesystem::remove(t.output_file);
   }
 
 }
@@ -253,12 +246,11 @@ int main(int argc, char *argv[])
       boost::filesystem::path sizefile(argv[11]);
 
       std::vector<test_data> tests;
-      std::vector<test_data> unique_tests;
       for(unsigned int tilesize = tilestart;
           tilesize <= tileend;
           tilesize += tilestep)
         {
-          test_data t {0, {pixeltype}, tiletype, sizex, sizey, 0, 0, 0, 0};
+          test_data t {0, {pixeltype}, tiletype, sizex, sizey, 0, 0, 0, 0, {}, {}};
 
           if (t.tiletype == STRIP)
             {
@@ -277,21 +269,36 @@ int main(int argc, char *argv[])
           if (t.sizey % tilesize)
             ++ t.tileycount;
 
-          unique_tests.push_back(t);
+          std::ostringstream desc;
+          desc << t.sizex << '-' << t.sizey << '-'
+               << (t.tiletype == TILE ? "tile" : "strip") << '-'
+               << t.tilexsize << '-' << t.tileysize << '-'
+               << t.pixeltype;
+          t.description = desc.str();
+
+          t.output_file = outfileprefix + '-' + desc.str() + ".tiff";
+
+          tests.push_back(t);
         }
 
-      for(int i = 0; i < iterations; ++i)
+    std::ofstream results(resultfile.string().c_str());
+    std::ofstream sizes(sizefile.string().c_str());
+
+    result_header(results);
+    extra_result_header(sizes, {{"filesize"}});
+
+    for(int i = 0; i < iterations; ++i)
         {
           // Randomise test order.
           std::random_device rd;
           std::mt19937 g(rd());
-          std::shuffle(unique_tests.begin(), unique_tests.end(), g);
-          for (auto& t : unique_tests)
+          std::shuffle(tests.begin(), tests.end(), g);
+          for (auto& t : tests)
             t.iteration = i;
-          tests.insert(tests.end(), unique_tests.begin(), unique_tests.end());
+
+          run_tests(tests, results, sizes);
         }
 
-      run_tests(tests, outfileprefix, resultfile, sizefile);
       return 0;
     }
   catch(const std::exception &e)
