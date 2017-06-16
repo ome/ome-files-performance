@@ -17,7 +17,7 @@ tilesizeincrement=16
 stripsizestart=1
 stripsizeend=256
 stripsizeincrement=1
-pixeltypes="uint8 int16 uint32 float double double-complex"
+pixeltypes="uint8 int16 uint32 float"
 
 # Clean results folder
 mkdir -p "${resultpath}"
