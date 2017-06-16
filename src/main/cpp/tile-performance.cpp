@@ -38,17 +38,21 @@
 
 #include "result.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <memory>
+#include <random>
 #include <sstream>
 #include <vector>
 
 #include <boost/filesystem.hpp>
 
 #include <boost/random/normal_distribution.hpp>
+#include <boost/random/uniform_01.hpp>
 #include <boost/random.hpp>
 
 #include <ome/compat/array.h>
@@ -61,6 +65,7 @@
 
 using namespace ome::files::tiff;
 using ome::files::PixelBuffer;
+using ome::files::PixelProperties;
 using ome::files::VariantPixelBuffer;
 using ome::xml::model::enums::PixelType;
 
@@ -70,7 +75,7 @@ namespace
   struct RandomFillVisitor : public boost::static_visitor<>
   {
     RandomFillVisitor():
-      rng(934)
+      rng(9343)
     {
     }
 
@@ -80,8 +85,8 @@ namespace
       >::type
     operator() (std::shared_ptr<PixelBuffer<T>>& buffer)
     {
-      boost::random::uniform_int_distribution<> distrib
-        (std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+      boost::random::uniform_int_distribution<T> distrib
+        (std::numeric_limits<T>::min(), std::numeric_limits<T>::max() - 1);
       typename PixelBuffer<T>::value_type *data = buffer->data();
       for(typename PixelBuffer<T>::size_type i = 0;
           i < buffer->num_elements();
@@ -97,7 +102,7 @@ namespace
       >::type
     operator() (std::shared_ptr<PixelBuffer<T>>& buffer)
     {
-      boost::random::uniform_real_distribution<> distrib(0, 1);
+      boost::random::uniform_real_distribution<T> distrib(0, 1);
 
       typename PixelBuffer<T>::value_type *data = buffer->data();
       for(typename PixelBuffer<T>::size_type i = 0;
@@ -112,7 +117,7 @@ namespace
     void
     operator() (std::shared_ptr<PixelBuffer<std::complex<T>>>& buffer)
     {
-      boost::random::uniform_real_distribution<> distrib(0, 1);
+      boost::random::uniform_real_distribution<T> distrib(0, 1);
 
       typename PixelBuffer<std::complex<T>>::value_type *data = buffer->data();
       for(typename PixelBuffer<std::complex<T>>::size_type i = 0;
@@ -123,17 +128,111 @@ namespace
         }
     }
 
+    void
+    operator() (std::shared_ptr<PixelBuffer<PixelProperties<PixelType::BIT>::std_type>>& buffer)
+    {
+      boost::random::uniform_01<boost::mt19937> distrib(rng);
+
+      typename PixelBuffer<PixelProperties<::ome::xml::model::enums::PixelType::BIT>::std_type>::value_type *data = buffer->data();
+      for(typename PixelBuffer<PixelProperties<::ome::xml::model::enums::PixelType::BIT>::std_type>::size_type i = 0;
+          i < buffer->num_elements();
+          ++i)
+        {
+          data[i] = distrib();
+        }
+    }
+
   private:
     boost::mt19937 rng;
   };
+
+  struct test_data
+  {
+    int iteration;
+    PixelType pixeltype;
+    TileType tiletype;
+    unsigned int sizex;
+    unsigned int sizey;
+    unsigned int tilexsize;
+    unsigned int tileysize;
+    unsigned int tilexcount;
+    unsigned int tileycount;
+  };
+
+  void
+  run_tests(const std::vector<test_data>& tests,
+            const std::string& outfileprefix,
+            const boost::filesystem::path& resultfile,
+            const boost::filesystem::path& sizefile)
+  {
+    RandomFillVisitor random_fill;
+
+    std::ofstream results(resultfile.string().c_str());
+    std::ofstream sizes(sizefile.string().c_str());
+
+    result_header(results);
+    extra_result_header(sizes, {{"filesize"}});
+
+    for (const auto& t : tests)
+      {
+
+        std::ostringstream desc;
+        desc << t.sizex << '-' << t.sizey << '-'
+             << (t.tiletype == TILE ? "tile" : "strip") << '-'
+             << t.tilexsize << '-' << t.tileysize << '-'
+             << t.pixeltype;
+        std::cout << "TEST: [" << t.iteration << "] " << desc.str() << std::endl;
+
+        VariantPixelBuffer buf(boost::extents[t.tilexsize][t.tileysize][1][1][1][1][1][1][1],
+                               t.pixeltype);
+        // Fill with random data, to avoid the filesystem not writing
+        // (or compressing) empty data blocks as an optimisation.
+        boost::apply_visitor(random_fill, buf.vbuffer());
+
+        boost::filesystem::path outfile(outfileprefix + '-' + desc.str() + ".tiff");
+        boost::filesystem::remove(outfile);
+        auto tiff = TIFF::open(outfile, "w8");
+        auto ifd = tiff->getCurrentDirectory();
+        ifd->setImageWidth(t.sizex);
+        ifd->setImageHeight(t.sizex);
+        ifd->setTileType(t.tiletype);
+        ifd->setTileWidth(t.tilexsize);
+        ifd->setTileHeight(t.tileysize);
+
+        ifd->setPixelType(t.pixeltype);
+        ifd->setBitsPerSample(ome::files::bitsPerPixel(t.pixeltype));
+        ifd->setSamplesPerPixel(1);
+        ifd->setPlanarConfiguration(CONTIG);
+        ifd->setPhotometricInterpretation(MIN_IS_BLACK);
+
+        timepoint write_start;
+
+        for (unsigned int tilex = 0; tilex < t.tilexcount; ++tilex)
+          {
+            unsigned int x = tilex * t.tilexsize;
+            unsigned int sx = t.tilexsize;
+            for (unsigned int tiley = 0; tiley < t.tileycount; ++tiley)
+              {
+                unsigned int y = tiley * t.tileysize;
+                unsigned int sy = t.tileysize;
+                ifd->writeImage(buf, x, y, sx, sy);
+              }
+          }
+        tiff->close();
+
+        timepoint write_end;
+        result(results, "pixeldata.write", desc.str(), write_start, write_end);
+        extra_result(sizes, "pixeldata.write", desc.str(), boost::filesystem::file_size(outfile));
+      }
+  }
 
 }
 
 int main(int argc, char *argv[])
 {
-  if (argc != 11)
+  if (argc != 12)
     {
-      std::cerr << "Usage: " << argv[0] << " iterations sizex sizey tiletype tilesizestart tilesizeend tilesizestep pixeltype outputfileprefix resultfile\n";
+      std::cerr << "Usage: " << argv[0] << " iterations sizex sizey tiletype tilesizestart tilesizeend tilesizestep pixeltype outputfileprefix resultfile sizefile\n";
       std::exit(1);
     }
 
@@ -151,86 +250,48 @@ int main(int argc, char *argv[])
       std::string pixeltype(argv[8]);
       std::string outfileprefix(argv[9]);
       boost::filesystem::path resultfile(argv[10]);
+      boost::filesystem::path sizefile(argv[11]);
 
-      RandomFillVisitor random_fill;
+      std::vector<test_data> tests;
+      std::vector<test_data> unique_tests;
+      for(unsigned int tilesize = tilestart;
+          tilesize <= tileend;
+          tilesize += tilestep)
+        {
+          test_data t {0, {pixeltype}, tiletype, sizex, sizey, 0, 0, 0, 0};
 
-      std::ofstream results(resultfile.string().c_str());
+          if (t.tiletype == STRIP)
+            {
+              t.tilexsize = sizex;
+              t.tilexcount = 1;
+            }
+          else
+            {
+              t.tilexsize = tilesize;
+              t.tilexcount = t.sizex / tilesize;
+              if (t.sizex % tilesize)
+                ++ t.tilexcount;
+            }
+          t.tileysize = tilesize;
+          t.tileycount = t.sizey / tilesize;
+          if (t.sizey % tilesize)
+            ++ t.tileycount;
 
-      result_header(results);
+          unique_tests.push_back(t);
+        }
 
       for(int i = 0; i < iterations; ++i)
         {
-          for(unsigned int tilesize = tilestart;
-              tilesize <= tileend;
-              tilesize += tilestep)
-            {
-              unsigned int tilexsize, tileysize, tilexcount, tileycount;
-              if (tiletype == STRIP)
-                {
-                  tilexsize = sizex;
-                  tilexcount = 1;
-                }
-              else
-                {
-                  tilexsize = tilesize;
-                  tilexcount = sizex / tilesize;
-                  if (sizex % tilesize)
-                    ++ tilexcount;
-                }
-              tileysize = tilesize;
-              tileycount = sizey / tilesize;
-              if (sizey % tilesize)
-                ++ tileycount;
-
-              std::ostringstream desc;
-              desc << sizex << '-' << sizey << '-'
-                   << (tiletype == TILE ? "tile" : "strip") << '-'
-                   << tilexsize << '-' << tileysize << '-'
-                   << pixeltype;
-
-              VariantPixelBuffer buf(boost::extents[tilesize][tilesize][1][1][1][1][1][1][1],
-                                     PixelType(pixeltype));
-              // Fill with random data, to avoid the filesystem not
-              // writing data blocks as an optimisation.
-              boost::apply_visitor(random_fill, buf.vbuffer());
-
-
-              boost::filesystem::path outfile(outfileprefix + '-' + desc.str() + ".tiff");
-              boost::filesystem::remove(outfile);
-              auto tiff = TIFF::open(outfile, "w8");
-              auto ifd = tiff->getCurrentDirectory();
-              ifd->setImageWidth(sizex);
-              ifd->setImageHeight(sizex);
-              ifd->setTileType(tiletype);
-              ifd->setTileWidth(tilexsize);
-              ifd->setTileHeight(tileysize);
-
-              ifd->setPixelType(pixeltype);
-              ifd->setBitsPerSample(ome::files::bitsPerPixel(pixeltype));
-              ifd->setSamplesPerPixel(1);
-              ifd->setPlanarConfiguration(CONTIG);
-              ifd->setPhotometricInterpretation(MIN_IS_BLACK);
-
-              timepoint write_start;
-
-              for (unsigned int tilex = 0; tilex < tilexcount; ++tilex)
-                {
-                  unsigned int x = tilex * tilexsize;
-                  unsigned int sx = tilexsize;
-                  for (unsigned int tiley = 0; tiley < tileycount; ++tiley)
-                    {
-                      unsigned int y = tiley * tileysize;
-                      unsigned int sy = tileysize;
-                      ifd->writeImage(buf, x, y, sx, sy);
-                    }
-                }
-              tiff->close();
-
-              timepoint write_end;
-              result(results, "pixeldata.write", desc.str(), write_start, write_end);
-
-            }
+          // Randomise test order.
+          std::random_device rd;
+          std::mt19937 g(rd());
+          std::shuffle(unique_tests.begin(), unique_tests.end(), g);
+          for (auto& t : unique_tests)
+            t.iteration = i;
+          tests.insert(tests.end(), unique_tests.begin(), unique_tests.end());
         }
+
+      run_tests(tests, outfileprefix, resultfile, sizefile);
       return 0;
     }
   catch(const std::exception &e)

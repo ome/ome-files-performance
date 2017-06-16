@@ -6,7 +6,7 @@ datapath="/data"
 binpath="/install/bin"
 resultpath="${datapath}/results"
 outpath="${datapath}/out"
-iterations=20
+iterations=10
 imagesizex=16384
 imagesizey=16384
 bigimagesizex=65536
@@ -17,7 +17,7 @@ tilesizeincrement=16
 stripsizestart=1
 stripsizeend=256
 stripsizeincrement=1
-pixeltypes="uint8 uint16 uint32 float double"
+pixeltypes="uint8 int16 uint32 float double double-complex"
 
 # Clean results folder
 mkdir -p "${resultpath}"
@@ -28,25 +28,31 @@ rm "${outpath}"/* || echo "No output"
 # C++ tests
 (
     for pixeltype in ${pixeltypes}; do
-        ${binpath}/tile-performance ${iterations} \
+        "${binpath}/tile-performance" ${iterations} \
                   ${imagesizex} ${imagesizey} \
                   tile ${tilesizestart} ${tilesizeend} ${tilesizeincrement} \
                   ${pixeltype} \
-                  ${outpath}/tile-test-small\
-                  ${resultpath}/tile-test-tile-${pixeltype}.tsv
+                  ${outpath}/tile-test-small \
+                  "${resultpath}/tile-test-tile-small-${pixeltype}.tsv" \
+                  "${resultpath}/tile-test-tile-small-${pixeltype}-sizes.tsv"
+        rm -f "${outpath}"/*
 
-        ${binpath}/tile-performance ${iterations} \
+        "${binpath}/tile-performance" ${iterations} \
                   ${bigimagesizex} ${bigimagesizey} \
                   tile ${tilesizestart} ${tilesizeend} ${tilesizeincrement} \
                   ${pixeltype} \
                   ${outpath}/tile-test-big\
-                  ${resultpath}/tile-test-tile-${pixeltype}.tsv
+                  "${resultpath}/tile-test-tile-big-${pixeltype}.tsv" \
+                  "${resultpath}/tile-test-tile-big-${pixeltype}-sizes.tsv"
+        rm -f "${outpath}"/*
 
-        ${binpath}/tile-performance ${iterations} \
+        "${binpath}/tile-performance" ${iterations} \
                   ${imagesizex} ${imagesizey} \
                   strip ${stripsizestart} ${stripsizeend} ${stripsizeincrement} \
                   ${pixeltype} \
-                  ${outpath}/strip-test.tiff \
-                  ${resultpath}/tile-test-strip-${pixeltype}.tsv
+                  "${outpath}/strip-test.tiff" \
+                  "${resultpath}/tile-test-strip-${pixeltype}.tsv" \
+                  "${resultpath}/tile-test-strip-${pixeltype}-sizes.tsv"
+        rm -f "${outpath}"/*
     done
 )
