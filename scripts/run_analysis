@@ -7,4 +7,4 @@ if [ -d analysis ]; then
 fi
 mkdir analysis
 
-R --vanilla BATCH < scripts/plots.R
+R --vanilla BATCH < scripts/cpp-tile-plots.R

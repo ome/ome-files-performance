@@ -2,8 +2,8 @@
 set -e
 set -x
 
-datapath="/data"
-binpath="/install/bin"
+datapath="/fdata/rleigh/scratch/data"
+binpath="/tmp/bm/src/main/cpp"
 resultpath="${datapath}/results"
 outpath="${datapath}/out"
 iterations=10
