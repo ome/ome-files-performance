@@ -15,24 +15,25 @@ rm "${resultpath}"/* || echo "No results"
 rm "${outpath}"/* || echo "No output"
 
 run_all_benchmarks=true
+dir="$(dirname "$0")"
 # read the options
 for var in "$@"
 do
     if [ "$var" == "metadata" ];  then
         run_all_benchmarks=false
-        ./run_metadata
+        $dir/run_metadata
     fi
     if [ "$var" == "pixeldata" ];  then
         run_all_benchmarks=false
-        ./run_pixeldata
+        $dir/run_pixeldata
     fi
     if [ "$var" == "tiling" ];  then
         run_all_benchmarks=false
-        ./run_tiling
+        $dir/run_tiling
     fi
 done
 if [ "$run_all_benchmarks" == "true" ];  then
-    ./run_metadata
-    ./run_pixeldata
-    ./run_tiling
+    $dir/run_metadata
+    $dir/run_pixeldata
+    $dir/run_tiling
 fi
