@@ -7,7 +7,7 @@ for test in neff-histopathology tubhiswt; do
     input=unknown
     case "$test" in
         neff-histopathology )
-            input=${datapath}/ndpi/neff-histopathology/Bazla-14-100-brain - 2015-06-19 23.34.11.ndpi
+            input="${datapath}/ndpi/neff-histopathology/Bazla-14-100-brain - 2015-06-19 23.34.11.ndpi"
             # Very Large
             #mvn -P tiling -Dtest.iterations=${iterations} -Dtest.input="$input" -Dtest.tileXStart=122880 -Dtest.tileYStart=103424 -Dtest.output=${outpath}/${test}-java.ome.xml -Dtest.results=${resultpath}/${test}-metadata-linux-java.tsv exec:java
             #for i in $(seq ${iterations}); do
