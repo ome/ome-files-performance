@@ -24,9 +24,9 @@ for %%T in (neff-histopathology tubhiswt) do (
         REM )
 
         REM Run Java tiling performance tests - large image
-        call mvn -P tiling -Dtest.iterations=%iterations% -Dtest.input=!input! -Dtest.tileXStart=30720 -Dtest.tileYStart=25856 -Dtest.series=1 -Dtest.autoTile=false -Dtest.output=%outdir%\!test!-java.ome.xml -Dtest.results=%resultsdir%\!test!-tiling—large-win-java.tsv exec:java
+        call mvn -P tiling -Dtest.iterations=%iterations% -Dtest.input=!input! -Dtest.tileXStart=15360 -Dtest.tileYStart=12928 -Dtest.series=1 -Dtest.autoTile=false -Dtest.output=%outdir%\!test!-java.ome.xml -Dtest.results=%resultsdir%\!test!-tiling—large-win-java.tsv exec:java
         for /L %%I IN (1,1,!iterations!) do (
-            call mvn -P tiling -Dtest.iterations=1 -Dtest.input=!input! -Dtest.tileXStart=30720 -Dtest.tileYStart=25856 -Dtest.series=1 -Dtest.autoTile=false -Dtest.output=%outdir%\!test!-java.ome.xml -Dtest.results=%resultsdir%\!test!-tiling-large-win-java-%%I.tsv exec:java
+            call mvn -P tiling -Dtest.iterations=1 -Dtest.input=!input! -Dtest.tileXStart=15360 -Dtest.tileYStart=12928 -Dtest.series=1 -Dtest.autoTile=false -Dtest.output=%outdir%\!test!-java.ome.xml -Dtest.results=%resultsdir%\!test!-tiling-large-win-java-%%I.tsv exec:java
         )
 
         REM Run Java tiling performance tests - medium image
