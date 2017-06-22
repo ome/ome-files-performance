@@ -117,8 +117,7 @@ extra_result(std::ostream& os,
 {
   os << "C++"
      << '\t' << testname
-     << '\t' << testfile.filename().string()
-     << '\t';
+     << '\t' << testfile.filename().string();
   print_extra_result(os, results...);
   os << '\n';
 }
