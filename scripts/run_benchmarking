@@ -19,20 +19,20 @@ dir="$(dirname "$0")"
 # read the options
 for var in "$@"
 do
-    if [ "$var" == "metadata" ];  then
+    if [ "$var" = "metadata" ];  then
         run_all_benchmarks=false
         $dir/run_metadata
     fi
-    if [ "$var" == "pixeldata" ];  then
+    if [ "$var" = "pixeldata" ];  then
         run_all_benchmarks=false
         $dir/run_pixeldata
     fi
-    if [ "$var" == "tiling" ];  then
+    if [ "$var" = "tiling" ];  then
         run_all_benchmarks=false
         $dir/run_tiling
     fi
 done
-if [ "$run_all_benchmarks" == "true" ];  then
+if [ "$run_all_benchmarks" = "true" ];  then
     $dir/run_metadata
     $dir/run_pixeldata
     $dir/run_tiling
