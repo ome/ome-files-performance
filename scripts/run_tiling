@@ -1,0 +1,41 @@
+#! /bin/sh
+set -e
+set -x
+
+# Tiling Performance Tests
+for test in neff-histopathology tubhiswt; do
+    input=unknown
+    case "$test" in
+        neff-histopathology )
+            input="${datapath}/ndpi/neff-histopathology/Bazla-14-100-brain - 2015-06-19 23.34.11.ndpi"
+            # Very Large
+            #mvn -P tiling -Dtest.iterations=${iterations} -Dtest.input="$input" -Dtest.tileXStart=122880 -Dtest.tileYStart=103424 -Dtest.output=${outpath}/${test}-java.ome.xml -Dtest.results=${resultpath}/${test}-tiling-linux-java.tsv exec:java
+            #for i in $(seq ${iterations}); do
+                #mvn -P tiling -Dtest.iterations=1 -Dtest.input="$input" -Dtest.tileXStart=122880 -Dtest.tileYStart=103424 -Dtest.output=${outpath}/${test}-java.ome.xml -Dtest.results=${resultpath}/${test}-tiling-linux-java-${i}.tsv exec:java
+            #done
+            # Large - Even divisions
+            mvn -P tiling -Dtest.iterations=${iterations} -Dtest.input="$input" -Dtest.tileXStart=15360 -Dtest.tileYStart=12928 -Dtest.series=1 -Dtest.autoTile=false -Dtest.output=${outpath}/${test}-java.ome.xml -Dtest.results=${resultpath}/${test}-tiling-large-linux-java.tsv exec:java
+            for i in $(seq ${iterations}); do
+                mvn -P tiling -Dtest.iterations=1 -Dtest.input="$input" -Dtest.tileXStart=15360 -Dtest.tileYStart=12928 -Dtest.series=1 -Dtest.autoTile=false -Dtest.output=${outpath}/${test}-java.ome.xml -Dtest.results=${resultpath}/${test}-tiling—large-linux-java-${i}.tsv exec:java
+            done
+            # Medium - Steady Increment
+            mvn -P tiling -Dtest.iterations=${iterations} -Dtest.input="$input" -Dtest.tileXStart=7680 -Dtest.tileYStart=6464 -Dtest.tileOperator="-" -Dtest.tileIncrement=64 -Dtest.series=2 -Dtest.autoTile=false -Dtest.output=${outpath}/${test}-java.ome.xml -Dtest.results=${resultpath}/${test}-tiling—medium-linux-java.tsv exec:java
+            for i in $(seq ${iterations}); do
+                mvn -P tiling -Dtest.iterations=1 -Dtest.input="$input" -Dtest.tileXStart=7680 -Dtest.tileYStart=6464 -Dtest.tileOperator="-" -Dtest.tileIncrement=64 -Dtest.series=2 -Dtest.autoTile=false -Dtest.output=${outpath}/${test}-java.ome.xml -Dtest.results=${resultpath}/${test}-tiling-medium-linux-java-${i}.tsv exec:java
+            done
+        ;;
+        tubhiswt)
+            input=${datapath}/tubhiswt-4D/tubhiswt_C0_TP0.ome.tif
+            # Auto Tiling
+            mvn -P tiling -Dtest.iterations=${iterations} -Dtest.input="$input" -Dtest.tileXStart=512 -Dtest.tileYStart=512  -Dtest.output=${outpath}/${test}-java.ome.xml -Dtest.results=${resultpath}/${test}-tiling-autotile-linux-java.tsv exec:java
+            for i in $(seq ${iterations}); do
+                mvn -P tiling -Dtest.iterations=1 -Dtest.input="$input" -Dtest.tileXStart=512 -Dtest.tileYStart=512 -Dtest.output=${outpath}/${test}-java.ome.xml -Dtest.results=${resultpath}/${test}-tiling-autotile-linux-java-${i}.tsv exec:java
+            done
+            # Manual Tiling
+             mvn -P tiling -Dtest.iterations=${iterations} -Dtest.input="$input" -Dtest.tileXStart=512 -Dtest.tileYStart=512 -Dtest.autoTile=false -Dtest.output=${outpath}/${test}-java.ome.xml -Dtest.results=${resultpath}/${test}-tiling—noauto-linux-java.tsv exec:java
+            for i in $(seq ${iterations}); do
+                mvn -P tiling -Dtest.iterations=1 -Dtest.input="$input" -Dtest.tileXStart=512 -Dtest.tileYStart=512 -Dtest.autoTile=false -Dtest.output=${outpath}/${test}-java.ome.xml -Dtest.results=${resultpath}/${test}-tiling—noauto-linux-java-${i}.tsv exec:java
+            done
+        ;;
+    esac
+done
