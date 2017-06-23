@@ -39,7 +39,7 @@ set(Boost_USE_STATIC_LIBS OFF)
 
 find_package(Boost 1.54 REQUIRED
              COMPONENTS chrono date_time filesystem system iostreams
-                        log log_setup program_options regex thread)
+                        log log_setup program_options random regex thread)
 
 include(CheckIncludeFileCXX)
 include(CheckCXXSourceCompiles)

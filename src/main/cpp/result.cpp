@@ -41,7 +41,17 @@
 void
 result_header(std::ostream& os)
 {
-  os << "test.lang\ttest.name\ttest.file\tproc.real\tproc.user\tproc.system\n";
+  os << "test.lang\ttest.name\ttest.file\tproc.real\tproc.user\tproc.system"
+     << std::endl;
+}
+
+void
+extra_result_header(std::ostream& os, const std::vector<std::string>& extra_results)
+{
+  os << "test.lang\ttest.name\ttest.file";
+  for (const auto& name : extra_results)
+    os << '\t' << name;
+  os << std::endl;
 }
 
 void

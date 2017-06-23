@@ -91,6 +91,37 @@ result(std::ostream& os,
        const timepoint& start,
        const timepoint& end);
 
+void
+extra_result_header(std::ostream& os, const std::vector<std::string>& extra_results);
+
+inline void
+print_extra_result(std::ostream& /* os */)
+{
+}
+
+template<typename T, typename ...Ts>
+inline void
+print_extra_result(std::ostream& os, T result, Ts... results)
+{
+  os << '\t' << result;
+  print_extra_result(os, results...);
+}
+
+
+template<typename ...Ts>
+inline void
+extra_result(std::ostream& os,
+             const std::string& testname,
+             const boost::filesystem::path& testfile,
+             Ts... results)
+{
+  os << "C++"
+     << '\t' << testname
+     << '\t' << testfile.filename().string();
+  print_extra_result(os, results...);
+  os << '\n';
+}
+
 /*
  * Local Variables:
  * mode:C++
