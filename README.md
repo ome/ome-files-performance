@@ -15,7 +15,7 @@ a set of predefined datasets.
 Refer to the following pages for more details about the scope, datasets, tests,
 and results of:
 
-- the [metadata and pixeldata](metadata-pixeldata.md) benchmark,
+- the [metadata and pixeldata](doc/metadata-pixeldata.md) benchmark,
 - the tiling benchmark.
 
 ## Building and executing the benchmark scripts

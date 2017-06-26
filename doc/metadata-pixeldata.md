@@ -1,5 +1,12 @@
 # Metadata and pixeldata benchmark
 
+These benchmarks measure the execution times associated with the reading and
+writing of the metadata and pixeldata of various datasets.
+See this
+[reference](https://github.com/openmicroscopy/ome-files-performance/tree/v0.1.1)
+for a complete execution of this benchmark including results, analysis and
+discussion.
+
 ## Benchmark datasets
 
 Three public reference OME-TIFF datasets were used for performance
@@ -72,7 +79,7 @@ after each test, and computes the elapsed time from the difference.
 
 ## Benchmark execution
 
-See the top-level [README.md](README.md) for instructions on how to compile
+See the top-level [README.md](../README.md) for instructions on how to compile
 the performance stack. Before executing the benchmark,:
 
 - the "5D" dataset must be available under a folder called `tubhiswt-4D/tubhiswt_C0_TP0.ome.tif` 
@@ -83,7 +90,6 @@ Then use the `metadata/pixeldata` script. If using Docker execute:
 
     root@084bb88d5a62:/git/ome-files-performance$ ./scripts/run_benchmarking metadata
     root@084bb88d5a62:/git/ome-files-performance$ ./scripts/run_benchmarking pixeldata
-
 
 ## Benchmark results
 
@@ -113,13 +119,3 @@ for the assessment of each benchmark test:
   pixeldata size of the test dataset over the execution time of the
   pixeldata test.
 
-The benchmark metrics have been derived from twenty independent
-iterations of each benchmark test. The only exception is the Plate
-dataset pixeldata performance test which has only been reproduced six
-times as a result of its long execution time (~1.5hr per test).
-
-## References
-
-See this 
-[reference](https://github.com/openmicroscopy/ome-files-performance/blob/v0.1.1/README.md)
-for the results, analysis and a complete discussion of this benchmark.
