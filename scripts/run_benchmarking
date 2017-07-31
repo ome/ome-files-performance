@@ -31,6 +31,10 @@ do
         run_all_benchmarks=false
         $dir/run_tiling
     fi
+    if [ "$var" = "basic-tiling" ];  then
+        run_all_benchmarks=false
+        $dir/run_basic_tiling
+    fi
 done
 if [ "$run_all_benchmarks" = "true" ];  then
     $dir/run_metadata
