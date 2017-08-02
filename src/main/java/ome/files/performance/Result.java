@@ -43,21 +43,29 @@ class Result {
   private Writer writer;
   private PrintWriter output;
   ResultMap<String,Object> customParams = new ResultMap<String,Object>();
+  private boolean headerWritten = false;
 
   Result(Path filename) throws java.io.IOException {
     writer = new FileWriter(filename.toString());
     output = new PrintWriter(writer);
-    output.println("test.lang\ttest.name\ttest.file\t"+customParams.keyToString()+"treal\tproc.cpu\tproc.user\tproc.system");
   }
   
   void addCustomParam(String heading, Object value) {
     customParams.put(heading, value);
   }
 
+  void printHeader() {
+      output.println("test.lang\ttest.name\ttest.file\t"+customParams.keyToString()+"treal\tproc.cpu\tproc.user\tproc.system");
+  }
+
   void add(String testname,
            Path testfile,
            Timepoint start,
            Timepoint end) {
+      if (headerWritten == false) {
+          printHeader();
+          headerWritten = true;
+      }
     output.println("Java\t" + testname + "\t" +
                    testfile.getFileName().toString() + "\t" +
                    customParams.valueToString() +
@@ -69,7 +77,11 @@ class Result {
   }
   
   void add(String testname, Path testfile, double size) {
-output.println("Java\t" + testname + "\t" +
+      if (headerWritten == false) {
+          printHeader();
+          headerWritten = true;
+      }
+      output.println("Java\t" + testname + "\t" +
               testfile.getFileName().toString() + "\t" +
               customParams.valueToString() +
               0 + "\t" +

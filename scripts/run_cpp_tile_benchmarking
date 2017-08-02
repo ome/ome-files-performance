@@ -2,7 +2,7 @@
 set -e
 set -x
 
-datapath="/fdata/rleigh/scratch/data"
+datapath="/data"
 binpath="/tmp/bm/src/main/cpp"
 resultpath="${datapath}/results"
 outpath="${datapath}/out"
@@ -24,6 +24,24 @@ mkdir -p "${resultpath}"
 mkdir -p "${outpath}"
 rm "${resultpath}"/* || echo "No results"
 rm "${outpath}"/* || echo "No output"
+
+# Java tests
+(
+    for pixeltype in ${pixeltypes}; do
+        mvn -P basictiling -Dtest.iterations=${iterations} \
+            -Dtest.sizex=${imagesizex} -Dtest.sizey=${imagesizey} \
+            -Dtest.tiletype=tile \
+            -Dtest.tilesizestart=${tilesizestart} \
+            -Dtest.tilesizeend=${tilesizeend} \
+            -Dtest.tilesizestep=${tilesizeincrement} \
+            -Dtest.pixeltype=${pixeltype} \
+            -Dtest.outputfileprefix=${outpath}/tile-test-small \
+            -Dtest.resultfile="${resultpath}/tile-test-tile-small-${pixeltype}.tsv" \
+            -Dtest.sizefile="${resultpath}/tile-test-tile-small-${pixeltype}-sizes.tsv" \
+            exec:java
+        rm -f "${outpath}"/*
+    done
+)
 
 # C++ tests
 (
