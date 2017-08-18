@@ -46,7 +46,7 @@ rm "${outpath}"/* || echo "No output"
 # C++ tests
 (
     for pixeltype in ${pixeltypes}; do
-        "${binpath}/tile-performance" ${iterations} \
+        "${binpath}/basic-tile-performance" ${iterations} \
                   ${imagesizex} ${imagesizey} \
                   tile ${tilesizestart} ${tilesizeend} ${tilesizeincrement} \
                   ${pixeltype} \
@@ -55,7 +55,7 @@ rm "${outpath}"/* || echo "No output"
                   "${resultpath}/tile-test-tile-small-${pixeltype}-sizes.tsv"
         rm -f "${outpath}"/*
 
-        "${binpath}/tile-performance" ${iterations} \
+        "${binpath}/basic-tile-performance" ${iterations} \
                   ${bigimagesizex} ${bigimagesizey} \
                   tile ${tilesizestart} ${tilesizeend} ${tilesizeincrement} \
                   ${pixeltype} \
@@ -64,7 +64,7 @@ rm "${outpath}"/* || echo "No output"
                   "${resultpath}/tile-test-tile-big-${pixeltype}-sizes.tsv"
         rm -f "${outpath}"/*
 
-        "${binpath}/tile-performance" ${iterations} \
+        "${binpath}/basic-tile-performance" ${iterations} \
                   ${imagesizex} ${imagesizey} \
                   strip ${stripsizestart} ${stripsizeend} ${stripsizeincrement} \
                   ${pixeltype} \
