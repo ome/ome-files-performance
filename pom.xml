@@ -16,12 +16,12 @@
     <dependency>
       <groupId>ome</groupId>
       <artifactId>formats-bsd</artifactId>
-      <version>5.3.4</version>
+      <version>5.6.0</version>
     </dependency>
     <dependency>
       <groupId>ome</groupId>
       <artifactId>formats-gpl</artifactId>
-      <version>5.3.4</version>
+      <version>5.6.0</version>
     </dependency>
   </dependencies>
   <properties>
@@ -232,7 +232,7 @@
             <version>1.2.1</version>
             <executions>
               <execution>
-                <id>metadata</id>
+                <id>pixels</id>
                 <goals>
                   <goal>java</goal>
                 </goals>
@@ -264,7 +264,7 @@
             <version>1.2.1</version>
             <executions>
               <execution>
-                <id>metadata</id>
+                <id>tiling</id>
                 <goals>
                   <goal>java</goal>
                 </goals>
@@ -285,6 +285,45 @@
                 <argument>${test.input}</argument>
                 <argument>${test.output}</argument>
                 <argument>${test.results}</argument>
+              </arguments>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>basictiling</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.2.1</version>
+            <executions>
+              <execution>
+                <id>basictiling</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <mainClass>ome.files.performance.BasicTilingPerformance</mainClass>
+              <arguments>
+                <argument>${test.iterations}</argument>
+                <argument>${test.sizex}</argument>
+                <argument>${test.sizey}</argument>
+                <argument>${test.tiletype}</argument>
+                <argument>${test.tilesizestart}</argument>
+                <argument>${test.tilesizeend}</argument>
+                <argument>${test.tilesizestep}</argument>
+                <argument>${test.pixeltype}</argument>
+                <argument>${test.outputfileprefix}</argument>
+                <argument>${test.resultfile}</argument>
+                <argument>${test.sizefile}</argument>
               </arguments>
             </configuration>
           </plugin>
