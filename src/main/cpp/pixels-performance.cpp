@@ -44,6 +44,8 @@
 #include <memory>
 #include <vector>
 
+#include <boost/filesystem.hpp>
+
 #include <ome/compat/array.h>
 #include <ome/common/log.h>
 
