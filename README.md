@@ -21,8 +21,8 @@ and results of:
 ## Building and executing the benchmark scripts
 
 See the
-[OME Files C++](https://www.openmicroscopy.org/site/support/ome-files-cpp/ome-cmake-superbuild/manual/html/building.html) and
-[Bio-Formats](https://www.openmicroscopy.org/site/support/bio-formats/developers/building-bioformats.html) building instructions.
+[OME Files C++](https://docs.openmicroscopy.org/latest/ome-files-cpp/ome-cmake-superbuild/manual/html/building.html) and
+[Bio-Formats](https://docs.openmicroscopy.org/latest/bio-formats/developers/building-bioformats.html) building instructions.
 
 ### Windows
 
@@ -112,5 +112,5 @@ Then from the shell, execute the desired benchmark::
 
 ## References
 
-- [OME Files documentation](https://www.openmicroscopy.org/site/support/ome-files-cpp/)
-- [Bio-Formats documentation](https://www.openmicroscopy.org/site/support/bio-formats)
+- [OME Files documentation](https://docs.openmicroscopy.org/latest/ome-files-cpp/)
+- [Bio-Formats documentation](https://docs.openmicroscopy.org/latest/bio-formats)
