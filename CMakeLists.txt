@@ -52,8 +52,10 @@ endif()
 list(APPEND CMAKE_MODULE_PATH
      "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-project(ome-files-performance
-        VERSION 0.0.1
+set(release-name "ome-files-performance")
+set(release-version "0.2.1") # unreleased
+project("${release-name}"
+        VERSION "${release-version}"
         LANGUAGES CXX)
 
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
