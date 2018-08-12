@@ -8,6 +8,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -118,7 +119,7 @@ int main(int argc, char *argv[])
                     reader.setPlane(plane);
                     std::unique_ptr<ome::files::VariantPixelBuffer>& buf = planes.at(plane);
                     buf = std::make_unique<ome::files::VariantPixelBuffer>
-                      (boost::extents[1][1][1][1][1][1][1][1][1],
+                      (boost::extents[1][1][1][1],
                        reader.getPixelType(),
                        ome::files::PixelBufferBase::make_storage_order(reader.getDimensionOrder(), reader.isInterleaved()));
                     reader.openBytes(plane, *buf);

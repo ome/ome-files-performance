@@ -174,7 +174,7 @@ namespace
 
         std::cout << "TEST: [" << t.iteration << "] " << t.description << std::endl;
 
-        VariantPixelBuffer buf(boost::extents[t.tilexsize][t.tileysize][1][1][1][1][1][1][1],
+        VariantPixelBuffer buf(boost::extents[t.tilexsize][t.tileysize][1][1],
                                t.pixeltype);
         // Fill with random data, to avoid the filesystem not writing
         // (or compressing) empty data blocks as an optimisation.
