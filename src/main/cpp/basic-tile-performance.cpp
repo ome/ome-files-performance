@@ -8,6 +8,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -72,7 +73,7 @@ using ome::xml::model::enums::PixelType;
 namespace
 {
 
-  struct RandomFillVisitor : public boost::static_visitor<>
+  struct RandomFillVisitor
   {
     RandomFillVisitor():
       rng(9343)
@@ -177,7 +178,7 @@ namespace
                                t.pixeltype);
         // Fill with random data, to avoid the filesystem not writing
         // (or compressing) empty data blocks as an optimisation.
-        boost::apply_visitor(random_fill, buf.vbuffer());
+        ome::compat::visit(random_fill, buf.vbuffer());
 
         boost::filesystem::remove(t.output_file);
         auto tiff = TIFF::open(t.output_file, "w8");
