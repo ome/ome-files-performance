@@ -1,6 +1,0 @@
-language: java
-services:
-  - docker
-
-script:
-  - docker build -t ome-files-performance .
